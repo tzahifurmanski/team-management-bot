@@ -1,25 +1,17 @@
 const { sendSlackMessage } = require("./slack");
+import { getRandomCompliment } from "./actions/compliment";
 
 export const post_init = async function () {
   await sendSlackMessage("unibot is initialising!");
 };
 
-// TODO: Add more
-const COMPLIMENTS_POOL = [
-  "Hey <RECEIVER>, just so you'll know - <@<SENDER>> thinks you're as bright as a button! :purple_heart:",
-];
 const compliment_action = async function (sender: string, receiver: string) {
-  // TODO: Implement random
-  const compliment = COMPLIMENTS_POOL[0];
-  await sendSlackMessage(
-    compliment.replace("<RECEIVER>", receiver).replace("<SENDER>", sender)
-  );
+  // TODO: Think of a better way to use the sender / receiver in the message
+  const compliment = getRandomCompliment();
+  await sendSlackMessage(`${receiver} ${compliment}`);
 };
 
 export const app_mention = async function (event: any) {
-  await sendSlackMessage("unibot got a mention command!");
-  // const message_text = event.text;
-
   // TODO: This assumes that the command is the second word - as the first word is the bot mention. For example "@unibot compliment @Yossi"
   const words = event.text.split(" ");
 
@@ -39,7 +31,7 @@ export const app_mention = async function (event: any) {
   switch (words[1]) {
     case "compliment":
       // TODO: Verify that the third argument is a valid username
-      compliment_action(event.user, words[2]);
+      await compliment_action(event.user, words[2]);
 
       break;
     default:

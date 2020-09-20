@@ -23,5 +23,5 @@ A slack bot for engineering teams (to get various stats and perform team related
 * Before responding, verify that the requestor is a unicorn member?
 * Make it configurable as possible (so that can later be used by others as well)
 * Add the app permission to custom the sending user details and support providing the bot name / icon via config
-* Comment on a a thread when someone tags @unicorn!
-    * Post a funny quote when someone uses a predefined keyword (SSO/team member) 
+* Comment on a thread when someone tags @unicorn! (except for specific channels)
+* Post a funny quote when someone uses a predefined keyword (SSO/team member) 
