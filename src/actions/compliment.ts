@@ -1,4 +1,6 @@
-// TODO: Add more
+const { sendSlackMessage, getUserIDInText } = require("../slack");
+
+// TODO: Add more / make it funnier :)
 // Got compliments from various sources:
 // * Some I thought about
 // * https://pairedlife.com/friendship/Funny-Compliments-for-Friends
@@ -63,7 +65,21 @@ const COMPLIMENTS_POOL = [
   "You are a great role model to others.",
 ];
 
-export const getRandomCompliment = function () {
+const getRandomCompliment = function () {
   const random = Math.floor(Math.random() * COMPLIMENTS_POOL.length);
   return COMPLIMENTS_POOL[random];
+};
+
+export const compliment_action = async function (event: any) {
+  // TODO: Think of a better way to use the sender / receiver in the message
+  const compliment = getRandomCompliment();
+
+  const receiver = getUserIDInText(event.text);
+
+  // If there is no receiver, ignore the compliment request
+  if (!receiver) {
+    return;
+  }
+
+  await sendSlackMessage(`${receiver} ${compliment}`);
 };

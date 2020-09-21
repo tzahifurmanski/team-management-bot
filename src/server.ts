@@ -14,7 +14,9 @@ const express = require("express");
 
 const app = express();
 
-app.use("/slack/", slackEvents.requestListener());
+// TODO: Change slack settings to match /slack/ instead of /?
+//app.use("/slack/", slackEvents.requestListener());
+app.use("/", slackEvents.requestListener());
 
 // Example: If you're using a body parser, always put it after the event adapter in the middleware stack
 // TODO: If the JSON body is invalid there's an ugly exception - SyntaxError: Unexpected token { in JSON at position 498
@@ -31,7 +33,7 @@ app.post("/commands", async (req: any, res: any) => {
     return;
   }
 
-  // TODO: Remove this when I can actually use the Slack events system (right now I have to manually write the logic)
+  // TODO: Remove this when I can actually use the Slack events system (right now I have to manually write the logic).
   switch (command.event.type) {
     case "app_mention":
       await app_mention(command.event);
@@ -44,8 +46,6 @@ app.post("/commands", async (req: any, res: any) => {
       break;
   }
 });
-
-console.log("Zigi");
 
 // const server = app.listen(SERVER_PORT, () =>
 //   console.log(`Listening for events on ${server.address().port}`)
