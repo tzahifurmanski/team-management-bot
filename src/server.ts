@@ -1,4 +1,4 @@
-import { post_init, app_mention } from "./bot_actions";
+import { post_init, post_shutdown, app_mention } from "./bot_actions";
 import { slackEvents } from "./slack";
 
 const config = require("../config.json");
@@ -18,10 +18,22 @@ const app = express();
 //app.use("/slack/", slackEvents.requestListener());
 app.use("/", slackEvents.requestListener());
 
+// TODO: CHECK THIS - An API to respond to a challenge. (to be able to deploy it on a server)
+app.post("/", async (req: any, res: any) => {
+  console.log("Got a challenge verification request!");
+
+  // Request from Slack
+  const { challenge } = req.body;
+
+  // Response from You
+  res.send({ challenge });
+});
+
 // Example: If you're using a body parser, always put it after the event adapter in the middleware stack
 // TODO: If the JSON body is invalid there's an ugly exception - SyntaxError: Unexpected token { in JSON at position 498
 app.use(bodyParser.json());
 
+// TODO: Remove this when I can actually use the Slack events system (right now I have to manually write the logic).
 app.post("/commands", async (req: any, res: any) => {
   console.log("Got a command");
 
@@ -33,7 +45,6 @@ app.post("/commands", async (req: any, res: any) => {
     return;
   }
 
-  // TODO: Remove this when I can actually use the Slack events system (right now I have to manually write the logic).
   switch (command.event.type) {
     case "app_mention":
       await app_mention(command.event);
@@ -57,10 +68,12 @@ server.listen(SERVER_PORT, () => {
   console.log(`Listening for events on ${server.address().port}`);
 });
 
+// TODO: This does not fire when I abort the server with CTRL+C
 process.on("SIGTERM", () => {
   // When SIGTERM is received, do a graceful shutdown
 
   server.close(() => {
     console.log("Process terminated");
+    post_shutdown();
   });
 });

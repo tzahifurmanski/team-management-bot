@@ -3,7 +3,11 @@ import { compliment_action } from "./actions/compliment";
 import { introduce_yourself_action } from "./actions/introduce_yourself";
 
 export const post_init = async function () {
-  await sendSlackMessage("unibot is initialising!");
+  await sendSlackMessage("Unibot is initialising!");
+};
+
+export const post_shutdown = async function () {
+  await sendSlackMessage("Unibot is going down!");
 };
 
 export const app_mention = async function (event: any) {
