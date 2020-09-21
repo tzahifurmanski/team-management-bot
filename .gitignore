@@ -1,4 +1,5 @@
 dist/
+ngrok/
 
 # Dependency directories
 node_modules/
