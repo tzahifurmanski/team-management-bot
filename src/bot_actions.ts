@@ -1,3 +1,5 @@
+import { what_can_you_do_action } from "./actions/what_can_you_do";
+
 const { sendSlackMessage } = require("./slack");
 import { compliment_action } from "./actions/compliment";
 import { introduce_yourself_action } from "./actions/introduce_yourself";
@@ -31,6 +33,11 @@ export const app_mention = async function (event: any) {
 
   if (event.text.includes("compliment")) {
     await compliment_action(event);
+    return;
+  }
+
+  if (event.text.includes("what can you do")) {
+    await what_can_you_do_action(event);
     return;
   }
 

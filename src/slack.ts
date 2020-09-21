@@ -37,16 +37,28 @@ export const slackEvents = slackEventsSetup;
 
 const web = new WebClient(token);
 
-export const sendSlackMessage = async function (text: string) {
+export const sendSlackMessage = async function (
+  text: string,
+  thread_ts: string = ""
+) {
   // Post a message to the channel, and await the result.
   // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
 
   // TODO: Identify if the message I'm responding to is in thread and if so, reply in thread
+  // thread_ts
 
-  const result = await web.chat.postMessage({
+  // var obj: {[k: string]: any} = {};
+
+  const message_options: { [k: string]: any } = {
     text: text,
     channel: BOT_TEST_CHANNEL,
-  });
+  };
+
+  // If we're in a thread, comment in the thread
+  if (thread_ts) {
+    message_options["thread_ts"] = thread_ts;
+  }
+  const result = await web.chat.postMessage(message_options);
 
   // The result contains an identifier for the message, `ts`.
   console.log(
