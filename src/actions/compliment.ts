@@ -118,5 +118,9 @@ export const compliment_action = async function (event: any) {
     return;
   }
 
-  await sendSlackMessage(`${receiver} ${compliment}`, event.thread_ts);
+  await sendSlackMessage(
+    `${receiver} ${compliment}`,
+    event.channel,
+    event.thread_ts
+  );
 };

@@ -1,32 +1,28 @@
 import { what_can_you_do_action } from "./actions/what_can_you_do";
 
-const { sendSlackMessage } = require("./slack");
+const { sendSlackMessage, BOT_LOGGING_CHANNEL_ID } = require("./slack");
 import { compliment_action } from "./actions/compliment";
 import { introduce_yourself_action } from "./actions/introduce_yourself";
 import { ask_channel_stats_action } from "./actions/asks_channel_stats";
 
+const config = require("../../config.json");
+
+const BOT_NAME = config.BOT_NAME;
+
 export const post_init = async function () {
-  await sendSlackMessage("Unibot is initialising!");
+  await sendSlackMessage(
+    `${BOT_NAME} is initialising!`,
+    BOT_LOGGING_CHANNEL_ID
+  );
 };
 
 export const post_shutdown = async function () {
-  await sendSlackMessage("Unibot is going down!");
+  await sendSlackMessage(`${BOT_NAME} is going down!`, BOT_LOGGING_CHANNEL_ID);
 };
 
-export const app_mention = async function (event: any) {
-  // TODO: This assumes that the command is the second word - as the first word is the bot mention. For example "@unibot compliment @Yossi"
-  //         probably should replace it with something like if (event.text.includes("tell me a joke")) {
-  const words = event.text.split(" ");
+export const handle_event = async function (event: any) {
+  console.log("Got new event", event);
 
-  // if (words.length < 3) {
-  //   console.log(
-  //     "A command must have at least 3 words but it had less",
-  //     words.length,
-  //     words
-  //   );
-  //   return;
-  // }
-  console.log(event.text);
   if (event.text.includes("introduce yourself")) {
     await introduce_yourself_action(event);
     return;
@@ -47,21 +43,5 @@ export const app_mention = async function (event: any) {
     return;
   }
 
-  console.log("Unsupported command", words[1]);
-  //
-  //
-  // // if (words[0] != "@unibot") {
-  // //   console.log("First word must be @unibot but it wasn't", words[0]);
-  // //   return;
-  // // }
-  //
-  // switch (words[1]) {
-  //   case "compliment":
-  //     // TODO: Verify that the third argument is a valid username
-  //     await compliment_action(event.user, words[2]);
-  //
-  //     break;
-  //   default:
-  //     break;
-  // }
+  console.log("Unsupported event", event);
 };

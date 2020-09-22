@@ -1,4 +1,12 @@
-import { app_mention } from "./bot_actions";
+import { handle_event } from "./bot_actions";
+import {
+  ChatGetPermalinkArguments,
+  ChatPostMessageArguments,
+  ConversationsHistoryArguments,
+  ConversationsListArguments,
+} from "@slack/web-api";
+
+import { KnownBlock, Block, SectionBlock } from "@slack/types";
 
 const config = require("../config.json");
 const { WebClient } = require("@slack/web-api");
@@ -6,7 +14,7 @@ const { WebClient } = require("@slack/web-api");
 const BOT_SLACK_ID = config.BOT_SLACK_ID || "asdas";
 const SLACK_USER_FORMAT = /<@.*>/;
 
-const BOT_TEST_CHANNEL = config.BOT_LOGGING_CHANNEL_ID;
+export const BOT_LOGGING_CHANNEL_ID = config.BOT_LOGGING_CHANNEL_ID;
 
 const token = config.BOT_USER_OAUTH_ACCESS_TOKEN;
 console.log("Token", config.BOT_USER_OAUTH_ACCESS_TOKEN);
@@ -15,16 +23,20 @@ const { createEventAdapter } = require("@slack/events-api");
 const slackSigningSecret = config.SLACK_SIGNING_SECRET;
 const slackEventsSetup = createEventAdapter(slackSigningSecret);
 
-slackEventsSetup.on("message", (event: any) => {
-  // TODO: Implement this
+slackEventsSetup.on("message", async (event: any) => {
+  // Ignoring the messages that the bot post in the conversation
+  if (event.user === BOT_SLACK_ID) {
+    console.log("Message from bot, ignoring...");
+    return;
+  }
+
   console.log("GOT A MESSAGE!");
-  console.log(event);
+  await handle_event(event);
 });
 
 slackEventsSetup.on("app_mention", async (event: any) => {
   console.log("GOT AN APP MENTION!");
-  console.log(event);
-  await app_mention(event);
+  await handle_event(event);
 });
 
 // All errors in listeners are caught here. If this weren't caught, the program would terminate.
@@ -37,24 +49,25 @@ export const slackEvents = slackEventsSetup;
 
 const web = new WebClient(token);
 
+// Post a message to the channel, and await the result.
+// Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
 export const sendSlackMessage = async function (
   text: string,
-  thread_ts: string = ""
+  channel: string,
+  thread_ts: string = "",
+  blocks: (KnownBlock | Block)[] = []
 ) {
-  // Post a message to the channel, and await the result.
-  // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
-
-  // TODO: Identify if the message I'm responding to is in thread and if so, reply in thread
-  // thread_ts
-
-  // var obj: {[k: string]: any} = {};
-
-  const options: { [k: string]: any } = {
+  const options: ChatPostMessageArguments = {
     text: text,
-    channel: BOT_TEST_CHANNEL,
+    channel: channel,
   };
 
-  // If we're in a thread, comment in the thread
+  // If there are blocks, add them
+  if (blocks) {
+    options["blocks"] = blocks;
+  }
+
+  // If we're in a thread, reply in the thread
   if (thread_ts) {
     options["thread_ts"] = thread_ts;
   }
@@ -62,8 +75,21 @@ export const sendSlackMessage = async function (
 
   // The result contains an identifier for the message, `ts`.
   console.log(
-    `Successfully send message ${result.ts} in conversation ${BOT_TEST_CHANNEL}`
+    `Successfully send message ${result.ts} in conversation ${channel}`
   );
+};
+
+export const createBlock = function (text: string) {
+  // TODO: This currently only supports SectionBlock. Make it more dynamic?
+  const result: any = {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: text,
+    },
+  };
+
+  return result;
 };
 
 export const getUserIDInText = function (text: string) {
@@ -90,7 +116,7 @@ export const getConversationId = async function (
   cursor: string = ""
 ): Promise<string> {
   // Get the channels list from slack
-  const options: { [k: string]: any } = {
+  const options: ConversationsListArguments = {
     types: types_list,
     cursor: cursor,
     exclude_archived: true,
@@ -126,6 +152,24 @@ export const getConversationId = async function (
   }
 };
 
+export const getMessagePermalink = async function (
+  channel_id: string,
+  message_ts: string
+): Promise<string> {
+  const options: ChatGetPermalinkArguments = {
+    channel: channel_id,
+    message_ts: message_ts,
+  };
+
+  const response = await web.chat.getPermalink(options);
+  if (response.ok) {
+    return response.permalink;
+  } else {
+    console.log("getMessagePermalink got bad response", response);
+    return "";
+  }
+};
+
 export const getConversationHistory = async function (
   channel_id: string,
   // latest: string = "now", // End of time range of messages to include in results.
@@ -136,11 +180,9 @@ export const getConversationHistory = async function (
   // TODO: Handle a 'channel not found' error / 'not_in_channel' error
 
   // Get the channels list from slack
-  const options: { [k: string]: any } = {
-    // cursor: cursor,
+  const options: ConversationsHistoryArguments = {
     channel: channel_id,
-    oldest: oldest, // Convert ms to seconds
-    // oldest: "1600630749.827",
+    oldest: oldest,
     limit: 100,
   };
 
@@ -148,8 +190,8 @@ export const getConversationHistory = async function (
 
   let response = await web.conversations.history(options);
   response.messages.forEach(function (message: any) {
-    // Filter out messages that has a subtype (like 'channel_join')
-    if (!message.subtype) {
+    // Filter out messages that has a subtype (like 'channel_join') and messages that are commands to the bot
+    if (!message.subtype && !message.text.includes(`<@${BOT_SLACK_ID}>`)) {
       results.push(message);
     }
   });
@@ -159,9 +201,10 @@ export const getConversationHistory = async function (
     response = await web.conversations.history(options);
 
     // Add the messages
+    // TODO: Remove redundancy / extract the logic
     response.messages.forEach(function (message: any) {
-      // Filter out messages that has a subtype (like 'channel_join')
-      if (!message.subtype) {
+      // Filter out messages that has a subtype (like 'channel_join') and messages that are commands to the bot
+      if (!message.subtype && !message.text.includes(`<@${BOT_SLACK_ID}>`)) {
         results.push(message);
       }
     });

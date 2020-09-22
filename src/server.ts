@@ -1,4 +1,4 @@
-import { post_init, post_shutdown, app_mention } from "./bot_actions";
+import { post_init, post_shutdown, handle_event } from "./bot_actions";
 import { slackEvents } from "./slack";
 
 const config = require("../config.json");
@@ -47,7 +47,7 @@ app.post("/commands", async (req: any, res: any) => {
 
   switch (command.event.type) {
     case "app_mention":
-      await app_mention(command.event);
+      await handle_event(command.event);
       res.sendStatus(200);
       // Handle an app_mention event
       break;
