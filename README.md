@@ -34,7 +34,8 @@ A slack bot for engineering teams (to get various stats and perform team related
 * Add a command to 'who should I talk to in case of emergency?' (Who's the oncall unicorn ATM)
 * Announce feature -
 * Get stats on team channels (how many #ask-unicorn messages we got during X timeframe, how many we've checked off, what is still open)
-
+* JIRA Integration - Sprint progress tracking, tasks assignment, alerting on not meeting our sprint goals?
+* Connect to our KPIs  
 
 ### Miscellaneous
 * Before responding, verify that the requestor is a unicorn member?

@@ -3,9 +3,9 @@ import { what_can_you_do_action } from "./actions/what_can_you_do";
 const { sendSlackMessage, BOT_LOGGING_CHANNEL_ID } = require("./slack");
 import { compliment_action } from "./actions/compliment";
 import { introduce_yourself_action } from "./actions/introduce_yourself";
-import { ask_channel_stats_action } from "./actions/asks_channel_stats";
+import { ask_channel_stats_action } from "./actions/ask_channel_stats";
 
-const config = require("../../config.json");
+const config = require("../config.json");
 
 const BOT_NAME = config.BOT_NAME;
 

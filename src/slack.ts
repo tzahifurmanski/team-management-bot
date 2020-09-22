@@ -17,7 +17,6 @@ const SLACK_USER_FORMAT = /<@.*>/;
 export const BOT_LOGGING_CHANNEL_ID = config.BOT_LOGGING_CHANNEL_ID;
 
 const token = config.BOT_USER_OAUTH_ACCESS_TOKEN;
-console.log("Token", config.BOT_USER_OAUTH_ACCESS_TOKEN);
 
 const { createEventAdapter } = require("@slack/events-api");
 const slackSigningSecret = config.SLACK_SIGNING_SECRET;
