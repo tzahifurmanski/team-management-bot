@@ -28,13 +28,18 @@ export const handle_event = async function (event: any) {
     return;
   }
 
-  if (event.text.includes("compliment")) {
-    await compliment_action(event);
+  if (event.text.includes("what can you do")) {
+    await what_can_you_do_action(event);
     return;
   }
 
-  if (event.text.includes("what can you do")) {
-    await what_can_you_do_action(event);
+  if (event.text.includes("meaning of life")) {
+    await sendSlackMessage(`42`, event.channel, event.thread_ts);
+    return;
+  }
+
+  if (event.text.includes("compliment")) {
+    await compliment_action(event);
     return;
   }
 

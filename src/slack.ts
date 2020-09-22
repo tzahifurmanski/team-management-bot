@@ -93,6 +93,8 @@ export const createBlock = function (text: string) {
 
 export const getUserIDInText = function (text: string) {
   // Remove the bot id and look for other slack users
+  // TODO: This currently has a 'bug' where we can grab multiple users and compliment multiple users in one go
+  //       it can create a corrupted output for 'compliment @Yossi and also say hi to @Zigi
   const slack_users = text
     .replace(`<@${BOT_SLACK_ID}>`, "")
     .match(SLACK_USER_FORMAT);
@@ -119,7 +121,6 @@ export const getConversationId = async function (
     types: types_list,
     cursor: cursor,
     exclude_archived: true,
-    // limit: 1000 // TODO: Not sure I need it
   };
   if (cursor) {
     options["cursor"] = cursor;
@@ -133,7 +134,6 @@ export const getConversationId = async function (
 
   // If we've found it, return the ID.
   if (filtered.length > 0) {
-    // console.log(filtered);
     // TODO: If there's more than 1, we'll return the first
     return filtered[0].id;
   } else {
@@ -171,10 +171,7 @@ export const getMessagePermalink = async function (
 
 export const getConversationHistory = async function (
   channel_id: string,
-  // latest: string = "now", // End of time range of messages to include in results.
   oldest: string = "" // Start of time range of messages to include in results (in seconds).
-  // inclusive: boolean = true, // Include messages with latest or oldest timestamp in results only when either timestamp is specified.
-  // cursor: string = ""
 ): Promise<any[]> {
   // TODO: Handle a 'channel not found' error / 'not_in_channel' error
 
