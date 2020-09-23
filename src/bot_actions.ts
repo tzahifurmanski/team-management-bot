@@ -38,7 +38,10 @@ export const handle_event = async function (event: any) {
     return;
   }
 
-  if (event.text.includes("compliment")) {
+  if (
+    event.text.includes("compliment") ||
+    event.text.includes("say something nice")
+  ) {
     await compliment_action(event);
     return;
   }

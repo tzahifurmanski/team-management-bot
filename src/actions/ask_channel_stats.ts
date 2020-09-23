@@ -45,7 +45,6 @@ export const ask_channel_stats_action = async function (event: any) {
 
   await Promise.all(
     unchecked_messages.map(async (message: any) => {
-      console.log("processing message", message);
       let permalink = await getMessagePermalink(
         TEAM_ASK_CHANNEL_ID,
         message.ts
