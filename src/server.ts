@@ -1,5 +1,4 @@
-import { post_shutdown } from "./bot_actions";
-import { slackEvents } from "./slack";
+import { slackEvents } from "./integrations/slack/events";
 
 const config = require("../config.json");
 const { createServer } = require("http");
@@ -42,6 +41,5 @@ process.on("SIGTERM", () => {
 
   server.close(() => {
     console.log("Process terminated");
-    post_shutdown();
   });
 });

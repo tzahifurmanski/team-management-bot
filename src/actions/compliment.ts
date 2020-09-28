@@ -1,4 +1,9 @@
-const { sendSlackMessage, getUserIDInText } = require("../slack");
+import { getBotSlackId } from "../integrations/slack/consts";
+
+const {
+  sendSlackMessage,
+  getUserIDInText,
+} = require("../integrations/slack/messsages");
 
 // TODO: Add more / make it funnier :)
 // Got compliments from various sources:
@@ -111,11 +116,18 @@ export const compliment_action = async function (event: any) {
   // TODO: Think of a better way to use the sender / receiver in the message
   const compliment = getRandomCompliment();
 
-  const receiver = getUserIDInText(event.text);
+  let receiver = getUserIDInText(event.text);
 
   // If there is no receiver, ignore the compliment request
   if (!receiver) {
-    return;
+    // Handle a 'compliment yourself' sitation
+    if (event.text.includes("compliment yourself")) {
+      receiver = `<@${getBotSlackId()}>`;
+      console.log(receiver);
+    } else {
+      console.log(`Did not find a receiver in ${event.text}`);
+      return;
+    }
   }
 
   await sendSlackMessage(

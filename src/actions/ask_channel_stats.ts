@@ -1,6 +1,12 @@
-import { createBlock, getMessagePermalink } from "../slack";
+import {
+  createBlock,
+  getMessagePermalink,
+} from "../integrations/slack/messsages";
 
-const { sendSlackMessage, getConversationHistory } = require("../slack");
+const {
+  sendSlackMessage,
+  getConversationHistory,
+} = require("../integrations/slack/messsages");
 
 const config = require("../../config.json");
 
@@ -36,12 +42,14 @@ export const ask_channel_stats_action = async function (event: any) {
       el.reactions.filter(function (reaction: any) {
         return (
           reaction.name === "white_check_mark" ||
-          reaction.name === "heavy_check_mark"
+          reaction.name === "heavy_check_mark" ||
+          reaction.name === "in-progress"
         );
       }).length == 0
     );
   });
-  const blocks: string[] = [];
+
+  const unchecked_blocks: string[] = [];
 
   await Promise.all(
     unchecked_messages.map(async (message: any) => {
@@ -50,7 +58,36 @@ export const ask_channel_stats_action = async function (event: any) {
         message.ts
       );
       if (permalink) {
-        blocks.push(
+        unchecked_blocks.push(
+          createBlock(
+            `<${permalink}|Link to message> from <@${
+              message.user
+            }> at ${toDateTime(message.ts).toLocaleDateString()}`
+          )
+        );
+      }
+    })
+  );
+
+  // Go over all unchecked messages and get the permalinks
+  const in_progress_messages = messages.filter(function (el: any) {
+    return (
+      el?.reactions?.filter(function (reaction: any) {
+        return reaction.name === "in-progress";
+      }).length > 0
+    );
+  });
+
+  const in_progress_blocks: string[] = [];
+
+  await Promise.all(
+    in_progress_messages.map(async (message: any) => {
+      let permalink = await getMessagePermalink(
+        TEAM_ASK_CHANNEL_ID,
+        message.ts
+      );
+      if (permalink) {
+        in_progress_blocks.push(
           createBlock(
             `<${permalink}|Link to message> from <@${
               message.user
@@ -65,15 +102,31 @@ export const ask_channel_stats_action = async function (event: any) {
     `<#${TEAM_ASK_CHANNEL_ID}> had a *total of ${
       messages.length
     } messages* since ${d.toUTCString()}.\nOut of those, *${
-      messages.length - unchecked_messages.length
-    } were handled* and *${unchecked_messages.length} were not unhandled*.`,
+      messages.length - unchecked_messages.length - in_progress_messages.length
+    } were handled*, *${in_progress_messages.length} are in progress* and *${
+      unchecked_messages.length
+    } were not handled*.`,
     event.channel,
     event.thread_ts
   );
-  await sendSlackMessage(
-    `These are the open asks we currently have:`,
-    event.channel,
-    event.thread_ts,
-    blocks
-  );
+
+  if (in_progress_messages.length > 0) {
+    // TODO: Add a text block?
+    await sendSlackMessage(
+      `These are the in progress asks we currently have:`,
+      event.channel,
+      event.thread_ts,
+      in_progress_blocks
+    );
+  }
+
+  if (unchecked_messages.length > 0) {
+    // TODO: Add a text block?
+    await sendSlackMessage(
+      `These are the open asks we currently have:`,
+      event.channel,
+      event.thread_ts,
+      unchecked_blocks
+    );
+  }
 };

@@ -31,7 +31,7 @@ A slack bot for engineering teams (to get various stats and perform team related
 * Comment on a thread when someone tags the team Slack group (except for specific channels) / Instead maybe capture it in the team's asks channel
 * See all pull requests that the team has been asked to review?
 * Add a command to 'who should I talk to in case of emergency?' (Who's the oncall team member ATM)
-* Announce feature - Publish some info about a team feature?
+* Announce a feature - Publish some info about a team feature?
 * Get stats on team channels (how many asks we got during X timeframe, how many we've checked off, what is still open)
 * Tasks Management System Integration - Sprint progress tracking, tasks assignment, alerting on not meeting our sprint goals?
 * Connect to our KPIs  
@@ -45,4 +45,3 @@ A slack bot for engineering teams (to get various stats and perform team related
 * Resolve Slack ids on initialization
 * Provide a way to 'reload' dynamic in memory data (config, ids) 
 * Healthcheck endpoint (in preparation to being deployed on a docker)
-* Separate the slack.ts module to multiple modules (chat, conversation, init, etc)
