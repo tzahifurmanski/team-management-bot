@@ -1,4 +1,4 @@
-const { sendSlackMessage } = require("../integrations/slack/messsages");
+const { sendSlackMessage } = require("../integrations/slack/messages");
 
 export const what_can_you_do_action = async function (event: any) {
   await sendSlackMessage(

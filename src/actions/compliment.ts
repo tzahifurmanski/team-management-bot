@@ -3,7 +3,7 @@ import { getBotSlackId } from "../integrations/slack/consts";
 const {
   sendSlackMessage,
   getUserIDInText,
-} = require("../integrations/slack/messsages");
+} = require("../integrations/slack/messages");
 
 // TODO: Add more / make it funnier :)
 // Got compliments from various sources:

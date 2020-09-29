@@ -1,12 +1,10 @@
 import {
   createBlock,
   getMessagePermalink,
-} from "../integrations/slack/messsages";
+} from "../integrations/slack/messages";
+import { getConversationHistory } from "../integrations/slack/conversations";
 
-const {
-  sendSlackMessage,
-  getConversationHistory,
-} = require("../integrations/slack/messsages");
+const { sendSlackMessage } = require("../integrations/slack/messages");
 
 const config = require("../../config.json");
 
@@ -30,9 +28,10 @@ export const ask_channel_stats_action = async function (event: any) {
   d.setUTCMilliseconds(0);
 
   // const channel_id = await getConversationId(TEAM_ASK_CHANNEL_NAME);
+  console.log(d.getTime() / 1000);
   const messages = await getConversationHistory(
     TEAM_ASK_CHANNEL_ID,
-    d.getTime() / 1000
+    (d.getTime() / 1000).toString()
   );
 
   // Go over all unchecked messages and get the permalinks

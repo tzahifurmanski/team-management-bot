@@ -1,4 +1,4 @@
-const { sendSlackMessage } = require("../integrations/slack/messsages");
+const { sendSlackMessage } = require("../integrations/slack/messages");
 const config = require("../../config.json");
 
 const TEAM_NAME = config.TEAM_NAME;

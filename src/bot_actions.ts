@@ -1,6 +1,6 @@
 import { what_can_you_do_action } from "./actions/what_can_you_do";
 
-const { sendSlackMessage } = require("./integrations/slack/messsages");
+const { sendSlackMessage } = require("./integrations/slack/messages");
 import { compliment_action } from "./actions/compliment";
 import { introduce_yourself_action } from "./actions/introduce_yourself";
 import { ask_channel_stats_action } from "./actions/ask_channel_stats";
