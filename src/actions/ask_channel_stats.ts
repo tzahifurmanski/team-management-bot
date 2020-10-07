@@ -21,7 +21,7 @@ function toDateTime(secs: any): Date {
 export const ask_channel_stats_action = async function (event: any) {
   // TODO: Pass the number of days back to go via the event text. Right now taking a week back
   const d = new Date();
-  d.setDate(d.getDate() - 7);
+  d.setDate(d.getDate() - 14);
   d.setUTCHours(0);
   d.setUTCMinutes(0);
   d.setUTCSeconds(0);
