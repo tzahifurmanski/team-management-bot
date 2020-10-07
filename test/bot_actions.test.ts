@@ -1,5 +1,5 @@
 // TODO: Write the tests, they are just stubs ATM
-import { handle_event } from "../src/bot_actions";
+import { handle_direct_event } from "../src/bot_actions";
 import { introduce_yourself_action } from "../src/actions/introduce_yourself";
 
 describe("handle_event", () => {
@@ -19,7 +19,7 @@ describe("handle_event", () => {
       text: "Super Weird Command that does not match anything :(",
     };
 
-    handle_event(event);
+    handle_direct_event(event);
     expect(console.log).toHaveBeenCalledWith("Unsupported event", event);
   });
 });
