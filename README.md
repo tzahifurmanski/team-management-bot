@@ -17,15 +17,24 @@ A slack bot for engineering teams (to get various stats and perform team related
 ## Ideas:
 
 ### Fun stuff
-* An 'Assemble' function (that posts a DM message to the team)
+* Give it a personality (A name, a picture, character description)
+* Post a funny quotes / gifs when someone uses a predefined keyword/emoji (SSO/team member)
+
+* 'Surprise me'
+* Show X a gif that is funny / sad
+* In team channels, we can put a funny picture of the team (should be sustainable)
+ 
 * Bat signal - A user can signal 'I need help' and the bot will post it in the team channel.
+* Add a command to 'speak'
+
+
 * Add an option to 'introduce yourself' to someone (and tag them) 
-* Post a funny quote when someone uses a predefined keyword (SSO/team member)
-* Add a command to 'say hi'
+
 
 
 ### Utils
-* Status command (to see if the bot is alive) 
+* An 'Assemble' function (that posts a DM message to the team)
+* Status command (to see if the bot is alive. We can use the 'introduce yourself' command ATM) 
 * A command to return all team specific help desk tickets (a parameter to include the last comment for each / another command to get the details for a ticket)
 * Get monitoring / push notifications for flaky tests?
 * Comment on a thread when someone tags the team Slack group (except for specific channels) / Instead maybe capture it in the team's asks channel
@@ -44,4 +53,5 @@ A slack bot for engineering teams (to get various stats and perform team related
 * Add the app permission to custom the sending user details and support providing the bot name / icon via config
 * Resolve Slack ids on initialization
 * Provide a way to 'reload' dynamic in memory data (config, ids) 
-* Healthcheck endpoint (in preparation to being deployed on a docker)
+* Gather usage stats on activities (what feature is used the most)
+* Gather a list of commands that bot does not know how to answer (Collect requests for features)
