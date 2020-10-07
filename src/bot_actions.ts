@@ -1,5 +1,5 @@
 import { what_can_you_do_action } from "./actions/what_can_you_do";
-const config = require("../../../config.json");
+const config = require("../config.json");
 const { sendSlackMessage } = require("./integrations/slack/messages");
 import { compliment_action } from "./actions/compliment";
 import { introduce_yourself_action } from "./actions/introduce_yourself";
@@ -24,9 +24,9 @@ export const handle_channel_event = async function (event: any) {
 
   if (event.text.toLowerCase().startsWith("folks")) {
     await sendSlackMessage(
-      "https://media.giphy.com/media/C5eDFesCSregw/giphy.gif",
+      "https://media.giphy.com/media/9D7Jr7o9TjKta/giphy.gif",
       event.channel,
-      event.thread_ts
+      event.thread_ts ? event.thread_ts : event.ts
     );
     return;
   }
@@ -38,6 +38,8 @@ export const handle_channel_event = async function (event: any) {
     event.text.toLowerCase().includes("help") ||
     event.text.toLowerCase().includes("review")
   ) {
+    // TODO: Add a chaos element (only show gif at X % of the cases)
+
     await review_request_action(event);
     return;
   }
@@ -47,6 +49,8 @@ export const handle_channel_event = async function (event: any) {
     event.text.toLowerCase().includes("bug") ||
     event.text.toLowerCase().includes("issue")
   ) {
+    // TODO: Add a chaos element (only show gif at X % of the cases)
+
     await bug_action(event);
     return;
   }
@@ -69,7 +73,11 @@ export const handle_direct_event = async function (event: any) {
   }
 
   if (event.text.includes("meaning of life")) {
-    await sendSlackMessage(`42`, event.channel, event.thread_ts);
+    await sendSlackMessage(
+      `42`,
+      event.channel,
+      event.thread_ts ? event.thread_ts : event.ts
+    );
     return;
   }
 

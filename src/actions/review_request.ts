@@ -17,7 +17,7 @@ export const review_request_action = async function (event: any) {
     // This is a thread, do nothing
     return;
   }
-  // TODO: Think of a better way to use the sender / receiver in the message
+
   const gif = getRandomGif();
 
   // Reply in a thread
