@@ -5,6 +5,7 @@ import { compliment_action } from "./actions/compliment";
 import { introduce_yourself_action } from "./actions/introduce_yourself";
 import { ask_channel_stats_action } from "./actions/ask_channel_stats";
 import { review_request_action } from "./actions/review_request";
+import { genuine_compliment_action } from "./actions/genuine_compliment";
 
 // TODO: Convert to new format: https://api.slack.com/changelog/2020-09-15-events-api-truncate-authed-users
 
@@ -43,6 +44,13 @@ export const handle_channel_event = async function (event: any) {
     return;
   }
 
+  if (
+    event.text.toLowerCase().includes("good") ||
+    event.text.toLowerCase().includes("nice") ||
+    event.text.toLowerCase().includes("job")
+  ) {
+  }
+
   //
   // await ask_channel_stats_action(event);
   console.log("Unsupported event", event);
@@ -73,6 +81,11 @@ export const handle_direct_event = async function (event: any) {
     event.text.includes("say something nice")
   ) {
     await compliment_action(event);
+    return;
+  }
+
+  if (event.text.includes("genuine compliment")) {
+    await genuine_compliment_action(event);
     return;
   }
 

@@ -112,7 +112,7 @@ const getRandomCompliment = function () {
   return COMPLIMENTS_POOL[random];
 };
 
-export const compliment_action = async function (event: any) {
+export const genuine_compliment_action = async function (event: any) {
   // TODO: Think of a better way to use the sender / receiver in the message
   const compliment = getRandomCompliment();
 
