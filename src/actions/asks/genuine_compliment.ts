@@ -1,9 +1,11 @@
-import { getBotSlackId } from "../integrations/slack/consts";
+import { getBotSlackId } from "../../integrations/slack/consts";
+import { getRandomFromArray } from "../utils";
+import { BotAction } from "../base_action";
 
 const {
   sendSlackMessage,
   getUserIDInText,
-} = require("../integrations/slack/messages");
+} = require("../../integrations/slack/messages");
 
 // TODO: Add more / make it funnier :)
 // Got compliments from various sources:
@@ -107,33 +109,36 @@ const COMPLIMENTS_POOL = [
   "Is there anything you can’t do!?",
 ];
 
-const getRandomCompliment = function () {
-  const random = Math.floor(Math.random() * COMPLIMENTS_POOL.length);
-  return COMPLIMENTS_POOL[random];
-};
-
-export const genuine_compliment_action = async function (event: any) {
-  // TODO: Think of a better way to use the sender / receiver in the message
-  const compliment = getRandomCompliment();
-
-  let receiver = getUserIDInText(event.text);
-
-  // If there is no receiver, ignore the compliment request
-  if (!receiver) {
-    // Handle a 'compliment yourself' situation
-    if (event.text.includes("compliment yourself")) {
-      receiver = `<@${getBotSlackId()}>`;
-      console.log(receiver);
-    } else {
-      console.log(`Did not find a receiver in ${event.text}`);
-      return;
-    }
+export class GenuineCompliment implements BotAction {
+  doesMatch(event: any): boolean {
+    return (
+      event.text.includes("genuine compliment") || event.text.includes("hug")
+    );
   }
 
-  // If this is part of a thread then keep the original thread, otherwise compliment in a thread
-  await sendSlackMessage(
-    `${receiver} ${compliment}`,
-    event.channel,
-    event.thread_ts ? event.thread_ts : event.ts
-  );
-};
+  async performAction(event: any): Promise<void> {
+    // TODO: Think of a better way to use the sender / receiver in the message
+    const compliment = getRandomFromArray(COMPLIMENTS_POOL);
+
+    let receiver = getUserIDInText(event.text);
+
+    // If there is no receiver, ignore the compliment request
+    if (!receiver) {
+      // Handle a 'compliment yourself' situation
+      if (event.text.includes("compliment yourself")) {
+        receiver = `<@${getBotSlackId()}>`;
+        console.log(receiver);
+      } else {
+        console.log(`Did not find a receiver in ${event.text}`);
+        return;
+      }
+    }
+
+    // If this is part of a thread then keep the original thread, otherwise compliment in a thread
+    await sendSlackMessage(
+      `${receiver} ${compliment}`,
+      event.channel,
+      event.thread_ts ? event.thread_ts : event.ts
+    );
+  }
+}
