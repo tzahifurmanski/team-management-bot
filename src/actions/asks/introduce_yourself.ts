@@ -14,7 +14,7 @@ export class IntroduceYourself implements BotAction {
 
   async performAction(event: any): Promise<void> {
     await sendSlackMessage(
-      `Hi, I'm ${BOT_NAME}, ${BOT_DESCRIPTION} I serve at the pleasure of ${TEAM_NAME}`,
+      `Hi, I'm ${BOT_NAME}, ${BOT_DESCRIPTION}. I serve at the pleasure of ${TEAM_NAME}`,
       event.channel,
       event.thread_ts
     );
