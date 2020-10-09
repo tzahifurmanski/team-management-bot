@@ -1,14 +1,37 @@
-import { what_can_you_do_action } from "./actions/what_can_you_do";
-const config = require("../config.json");
-const { sendSlackMessage } = require("./integrations/slack/messages");
-import { compliment_action } from "./actions/compliment";
-import { introduce_yourself_action } from "./actions/introduce_yourself";
-import { ask_channel_stats_action } from "./actions/ask_channel_stats";
-import { review_request_action } from "./actions/review_request";
-import { genuine_compliment_action } from "./actions/genuine_compliment";
-import { bug_action } from "./actions/bug";
+import { BotAction } from "./actions/base_action";
 
-// TODO: Convert to new format: https://api.slack.com/changelog/2020-09-15-events-api-truncate-authed-users
+const config = require("../config.json");
+import {
+  AskChannelStats,
+  Compliment,
+  GenuineCompliment,
+  IntroduceYourself,
+  MeaningOfLife,
+  WhatCanYouDo,
+} from "./actions/asks";
+import {
+  BugResponse,
+  FolksResponse,
+  ReviewRequestResponse,
+} from "./actions/responses";
+
+// TODO: Convert events handling to new format: https://api.slack.com/changelog/2020-09-15-events-api-truncate-authed-users
+
+// TODO: Load the actions and responses dynamically
+const RESPONSES: BotAction[] = [
+  new BugResponse(),
+  new ReviewRequestResponse(),
+  new FolksResponse(),
+];
+
+const ASKS: BotAction[] = [
+  new Compliment(),
+  new GenuineCompliment(),
+  new IntroduceYourself(),
+  new WhatCanYouDo(),
+  new AskChannelStats(),
+  new MeaningOfLife(),
+];
 
 // This method handles events that are posted directly inside a channel
 export const handle_channel_event = async function (event: any) {
@@ -22,83 +45,28 @@ export const handle_channel_event = async function (event: any) {
 
   console.log("Got new event", event);
 
-  if (event.text.toLowerCase().startsWith("folks")) {
-    await sendSlackMessage(
-      "https://media.giphy.com/media/9D7Jr7o9TjKta/giphy.gif",
-      event.channel,
-      event.thread_ts ? event.thread_ts : event.ts
-    );
-    return;
-  }
+  await runActions(event, RESPONSES);
 
-  // When someone asks for a review
-  if (
-    event.text.toLowerCase().startsWith("can i") ||
-    event.text.toLowerCase().includes("please") ||
-    event.text.toLowerCase().includes("help") ||
-    event.text.toLowerCase().includes("review")
-  ) {
-    // TODO: Add a chaos element (only show gif at X % of the cases)
-
-    await review_request_action(event);
-    return;
-  }
-
-  // When someone reports on a bug
-  if (
-    event.text.toLowerCase().includes("bug") ||
-    event.text.toLowerCase().includes("issue")
-  ) {
-    // TODO: Add a chaos element (only show gif at X % of the cases)
-
-    await bug_action(event);
-    return;
-  }
-
-  console.log("Unsupported event", event);
+  // TODO: Reply to good morning / great day / good weekend things
 };
 
 // This method handles events that are with direct interaction with the bot (like a DM or when the bot is tagged)
 export const handle_direct_event = async function (event: any) {
   console.log("Got new event", event);
 
-  if (event.text.includes("introduce yourself")) {
-    await introduce_yourself_action(event);
-    return;
-  }
+  await runActions(event, ASKS);
+};
 
-  if (event.text.includes("what can you do")) {
-    await what_can_you_do_action(event);
-    return;
-  }
-
-  if (event.text.includes("meaning of life")) {
-    await sendSlackMessage(
-      `42`,
-      event.channel,
-      event.thread_ts ? event.thread_ts : event.ts
-    );
-    return;
-  }
-
-  //
-  if (
-    event.text.includes("compliment") ||
-    event.text.includes("say something nice")
-  ) {
-    await compliment_action(event);
-    return;
-  }
-
-  if (event.text.includes("genuine compliment") || event.text.includes("hug")) {
-    await genuine_compliment_action(event);
-    return;
-  }
-
-  if (event.text.includes("ask channel stats")) {
-    await ask_channel_stats_action(event);
-    return;
+async function runActions(event: any, actions: BotAction[]) {
+  // TODO: Feels like there should be a prettier way to iterate on the actions and execute the native functions but did not find one
+  let action: BotAction;
+  for (let index = 0; index < actions.length; index++) {
+    action = actions[index];
+    if (action.doesMatch(event)) {
+      await action.performAction(event);
+      return;
+    }
   }
 
   console.log("Unsupported event", event);
-};
+}

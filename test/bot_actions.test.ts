@@ -1,6 +1,6 @@
 // TODO: Write the tests, they are just stubs ATM
 import { handle_direct_event } from "../src/bot_actions";
-import { introduce_yourself_action } from "../src/actions/introduce_yourself";
+import { introduce_yourself_action } from "../src/actions/asks/introduce_yourself";
 
 describe("handle_event", () => {
   test("Command that matches", () => {
