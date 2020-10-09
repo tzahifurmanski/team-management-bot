@@ -12,6 +12,8 @@ import {
 import {
   BugResponse,
   FolksResponse,
+  HelpResponse,
+  MergeResponse,
   ReviewRequestResponse,
 } from "./actions/responses";
 
@@ -22,6 +24,8 @@ const RESPONSES: BotAction[] = [
   new BugResponse(),
   new ReviewRequestResponse(),
   new FolksResponse(),
+  new MergeResponse(),
+  new HelpResponse(),
 ];
 
 const ASKS: BotAction[] = [

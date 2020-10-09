@@ -8,6 +8,7 @@ const GIFS = [
   "https://media.giphy.com/media/A1RLR7qFez5du/giphy.gif",
   "https://media.giphy.com/media/xThuWoKw5OEcotAY9O/giphy.gif",
   "https://media.giphy.com/media/l2YOgvtL2Fq8McnJu/giphy.gif",
+  "https://media.giphy.com/media/3orieT6Hpsj44lo35K/giphy.gif",
 ];
 
 // TODO: Add a chaos element (only show gif at X % of the cases)

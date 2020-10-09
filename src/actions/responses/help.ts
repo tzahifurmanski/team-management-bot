@@ -4,22 +4,15 @@ import { BotAction } from "../base_action";
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
 const GIFS = [
-  "https://media.giphy.com/media/3o7aCVYdxJUQmWI0z6/giphy.gif",
-  "https://media.giphy.com/media/l2SpMfndsgbXOl0Sk/giphy.gif",
-  "https://media.giphy.com/media/uVz7iwTMSDR5e/giphy.gif",
-  "https://media.giphy.com/media/3o7WTwUXv4hsQ5bhEk/giphy.gif",
-  "https://media.giphy.com/media/l0Iyar3pbHoNY2VJC/giphy.gif",
-  "https://media.giphy.com/media/3oz8xUHb6xKC1FzbRC/giphy.gif",
+  "https://media.giphy.com/media/3o7WTQ41Zz7v6WmRrO/giphy.gif",
+  "https://media.giphy.com/media/xThuVZxBOqyDxJkm3u/giphy.gif",
 ];
 
 // TODO: Add a chaos element (only show gif at X % of the cases)
 
-export class BugResponse implements BotAction {
+export class HelpResponse implements BotAction {
   doesMatch(event: any): boolean {
-    return (
-      event.text.toLowerCase().includes("bug") ||
-      event.text.toLowerCase().includes("issue")
-    );
+    return event.text.toLowerCase().includes("help");
   }
 
   async performAction(event: any): Promise<void> {
