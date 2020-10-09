@@ -17,9 +17,6 @@ A slack bot for engineering teams (to get various stats and perform team related
 ## Ideas:
 
 ### Fun stuff
-* Give it a personality (A name, a picture, character description)
-* Post a funny quotes / gifs when someone uses a predefined keyword/emoji (SSO/team member)
-
 * 'Surprise me'
 * Show X a gif that is funny / sad
 * In team channels, we can put a funny picture of the team (should be sustainable)
@@ -27,9 +24,8 @@ A slack bot for engineering teams (to get various stats and perform team related
 * Bat signal - A user can signal 'I need help' and the bot will post it in the team channel.
 * Add a command to 'speak'
 
-
 * Add an option to 'introduce yourself' to someone (and tag them) 
-
+* Support multiple personalities (choose via configuration)
 
 
 ### Utils
