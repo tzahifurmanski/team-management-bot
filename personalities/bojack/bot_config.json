@@ -1,6 +1,7 @@
 {
   "BOT_NAME": "BoJack the Unicorn",
-  "BOT_DESCRIPTION": "a mostly sober Unicorn bot.",
+  "BOT_IMAGE_URL": "https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F6%2F2020%2F02%2Fbjh-still-26.jpg",
+  "ACTION_INTRODUCE_YOURSELF_TEXT": "Hi, I'm BoJack the Unicorn, a mostly sober bot.",
   "ACTION_COMPLIMENT_POOL": [
   "I would delete your browser history for you if you suddenly died.",
   "You have the capacity to do worse, so this is actually a good result for you",

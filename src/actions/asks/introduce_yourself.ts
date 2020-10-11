@@ -6,8 +6,6 @@ const config = require("../../../config.json");
 import { botConfig } from "../../bot_config";
 
 const TEAM_NAME = config.TEAM_NAME;
-const BOT_NAME = botConfig.BOT_NAME;
-const BOT_DESCRIPTION = botConfig.BOT_DESCRIPTION;
 
 export class IntroduceYourself implements BotAction {
   doesMatch(event: any): boolean {
@@ -16,7 +14,7 @@ export class IntroduceYourself implements BotAction {
 
   async performAction(event: any): Promise<void> {
     await sendSlackMessage(
-      `Hi, I'm ${BOT_NAME}, ${BOT_DESCRIPTION} I serve at the pleasure of ${TEAM_NAME}`,
+      `${botConfig.ACTION_INTRODUCE_YOURSELF_TEXT} I serve at the pleasure of the ${TEAM_NAME} team.`,
       event.channel,
       event.thread_ts
     );

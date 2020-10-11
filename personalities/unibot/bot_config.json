@@ -1,6 +1,7 @@
 {
   "BOT_NAME": "Unibot",
-  "BOT_DESCRIPTION": "a friendly Unicorn bot!",
+  "BOT_IMAGE_URL": "imgix.bustle.com/2017/4/20/1784b6b6-aeb9-4d39-8b74-852f6c7f6ca3.png",
+  "ACTION_INTRODUCE_YOURSELF_TEXT": "Hi, I'm Unibot, a friendly Unicorn bot!",
   "ACTION_COMPLIMENT_POOL" : [
     "Just so you'll know - I thinks you're as bright as a button! :purple_heart:",
     "Are you a beaver? Because damn!",

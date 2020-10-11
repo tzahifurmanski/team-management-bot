@@ -2,6 +2,7 @@ import { handle_channel_event, handle_direct_event } from "../../bot_actions";
 
 import { BOT_ID, setSlackIds } from "./consts";
 import { getBotId, getConversationId } from "./conversations";
+import { botConfig } from "../../bot_config";
 
 const config = require("../../../config.json");
 
@@ -34,7 +35,7 @@ slackEventsSetup.on("app_mention", async (event: any) => {
 
 slackEventsSetup.on("message", async (event: any) => {
   // Ignore messages that the bot post in the conversation
-  if (event.user === BOT_ID) {
+  if (event.user === BOT_ID || event.username === botConfig.BOT_NAME) {
     console.log("Got a message from bot, ignoring...");
     return;
   }

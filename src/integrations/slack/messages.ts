@@ -5,6 +5,7 @@ import {
 
 import { Block, KnownBlock } from "@slack/types";
 import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from "./consts";
+import { botConfig } from "../../bot_config";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
@@ -17,6 +18,8 @@ export const sendSlackMessage = async function (
   const options: ChatPostMessageArguments = {
     text: text,
     channel: channel,
+    username: botConfig.BOT_NAME,
+    icon_url: botConfig.BOT_IMAGE_URL, // TODO: This should work but for some reason, it doesn't :(
   };
 
   // If there are blocks, add them
@@ -29,7 +32,7 @@ export const sendSlackMessage = async function (
     options["thread_ts"] = thread_ts;
   }
   const result = await SlackWebClient.chat.postMessage(options);
-
+  console.log(result);
   // The result contains an identifier for the message, `ts`.
   console.log(
     `Successfully send message ${result.ts} in conversation ${channel}`
