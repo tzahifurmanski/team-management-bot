@@ -1,4 +1,4 @@
-import { getBotSlackId } from "../../integrations/slack/consts";
+import { BOT_ID } from "../../integrations/slack/consts";
 import { getRandomFromArray } from "../utils";
 import { BotAction } from "../base_action";
 
@@ -126,7 +126,7 @@ export class GenuineCompliment implements BotAction {
     if (!receiver) {
       // Handle a 'compliment yourself' situation
       if (event.text.includes("compliment yourself")) {
-        receiver = `<@${getBotSlackId()}>`;
+        receiver = `<@${BOT_ID}>`;
         console.log(receiver);
       } else {
         console.log(`Did not find a receiver in ${event.text}`);

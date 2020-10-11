@@ -1,6 +1,4 @@
 import { BotAction } from "./actions/base_action";
-
-const config = require("../config.json");
 import {
   AskChannelStats,
   Compliment,
@@ -16,6 +14,8 @@ import {
   MergeResponse,
   ReviewRequestResponse,
 } from "./actions/responses";
+
+const config = require("../config.json");
 
 // TODO: Convert events handling to new format: https://api.slack.com/changelog/2020-09-15-events-api-truncate-authed-users
 
@@ -49,7 +49,9 @@ export const handle_channel_event = async function (event: any) {
 
   console.log("Got new event", event);
 
-  await runActions(event, RESPONSES);
+  if (!(await runActions(event, RESPONSES))) {
+    console.log("Unsupported event", event);
+  }
 
   // TODO: Reply to good morning / great day / good weekend things
 };
@@ -58,7 +60,11 @@ export const handle_channel_event = async function (event: any) {
 export const handle_direct_event = async function (event: any) {
   console.log("Got new event", event);
 
-  await runActions(event, ASKS);
+  if (!(await runActions(event, ASKS))) {
+    console.log("Unsupported event", event);
+
+    // TODO: Save the unsupported event for later debrief
+  }
 };
 
 async function runActions(event: any, actions: BotAction[]) {
@@ -68,9 +74,9 @@ async function runActions(event: any, actions: BotAction[]) {
     action = actions[index];
     if (action.doesMatch(event)) {
       await action.performAction(event);
-      return;
+      return true;
     }
   }
 
-  console.log("Unsupported event", event);
+  return false;
 }

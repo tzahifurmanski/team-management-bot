@@ -1,10 +1,11 @@
 // This is a util function that is able to look for the ID of a conversation / channel by name
-import { BOT_SLACK_ID, SlackWebClient } from "./consts";
+import { BOT_ID, SlackWebClient } from "./consts";
 import {
   ConversationsHistoryArguments,
   ConversationsListArguments,
 } from "@slack/web-api";
 
+// If something is not found, we'll have to go over everything
 export const getConversationId = async function (
   name: string,
   types_list: string = "public_channel",
@@ -65,8 +66,8 @@ export const getConversationHistory = async function (
     // Filter out messages that has a subtype (like 'channel_join') and messages that are commands to the bot
     if (
       !message.subtype &&
-      !message.text.includes(`<@${BOT_SLACK_ID}>`) &&
-      message.user != BOT_SLACK_ID
+      !message.text.includes(`<@${BOT_ID}>`) &&
+      message.user != BOT_ID
     ) {
       results.push(message);
     }
@@ -82,8 +83,8 @@ export const getConversationHistory = async function (
       // Filter out messages that has a subtype (like 'channel_join') and messages that are commands to the bot
       if (
         !message.subtype &&
-        !message.text.includes(`<@${BOT_SLACK_ID}>`) &&
-        !message.user != BOT_SLACK_ID
+        !message.text.includes(`<@${BOT_ID}>`) &&
+        message.user != BOT_ID
       ) {
         results.push(message);
       }
@@ -91,4 +92,10 @@ export const getConversationHistory = async function (
   }
 
   return results;
+};
+
+export const getBotId = async function () {
+  // This can also return response.user with the bot user name
+  let response = await SlackWebClient.auth.test();
+  return response?.user_id;
 };

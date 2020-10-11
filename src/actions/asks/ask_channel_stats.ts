@@ -5,13 +5,9 @@ import {
 import { getConversationHistory } from "../../integrations/slack/conversations";
 import { BotAction } from "../base_action";
 import { toDateTime } from "../utils";
+import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");
-
-const config = require("../../../config.json");
-
-// TODO: Resolve this on bot initialization
-const TEAM_ASK_CHANNEL_ID = config.TEAM_ASK_CHANNEL_ID;
 
 export class AskChannelStats implements BotAction {
   doesMatch(event: any): boolean {
@@ -27,7 +23,6 @@ export class AskChannelStats implements BotAction {
     d.setUTCSeconds(0);
     d.setUTCMilliseconds(0);
 
-    // const channel_id = await getConversationId(TEAM_ASK_CHANNEL_NAME);
     console.log(d.getTime() / 1000);
     const messages = await getConversationHistory(
       TEAM_ASK_CHANNEL_ID,

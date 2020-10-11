@@ -1,8 +1,18 @@
+import { loadSlackConfig } from "./integrations/slack/events";
+
 const config = require("../config.json");
 const { createServer } = require("http");
 const express_app = require("./server_init");
 
 const SERVER_PORT = config.SERVER_PORT || 3000;
+
+(async () => {
+  const loadResult = await loadSlackConfig();
+  if (!loadResult) {
+    console.log("Loading failed!");
+    process.exit(0);
+  }
+})();
 
 const server = createServer(express_app);
 server.listen(SERVER_PORT, () => {

@@ -1,18 +1,6 @@
 # team-slack-bot
 A slack bot for engineering teams (to get various stats and perform team related actions).
  
- Things it does:
- * TBD
-
-
-## Installation
-* Create a Slack app 
-* TBD
-
-
-## Commands
-* TBD
-
 
 ## Ideas:
 
@@ -45,9 +33,7 @@ A slack bot for engineering teams (to get various stats and perform team related
 
 ### Miscellaneous
 * Before responding, verify that the person talking to the bot is a team member?
-* Make it configurable as possible (so that can later be used by others as well)
 * Add the app permission to custom the sending user details and support providing the bot name / icon via config
-* Resolve Slack ids on initialization
 * Provide a way to 'reload' dynamic in memory data (config, ids) 
-* Gather usage stats on activities (what feature is used the most)
+* Gather usage stats on activities (what feature is in use the most)
 * Gather a list of commands that bot does not know how to answer (Collect requests for features)

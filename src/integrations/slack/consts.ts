@@ -1,16 +1,16 @@
 const config = require("../../../config.json");
-
-export const SLACK_USER_FORMAT = /<@.*>/;
-
-export const BOT_LOGGING_CHANNEL_ID = config.BOT_LOGGING_CHANNEL_ID;
-export const BOT_SLACK_ID = config.BOT_SLACK_ID;
-
-// TODO: See if I can remove this (BOT_SLACK_ID was imported before the config was loaded)
-export const getBotSlackId = function () {
-  return BOT_SLACK_ID;
-};
-
 const { WebClient } = require("@slack/web-api");
+
+export const SLACK_USER_FORMAT: RegExp = /<@.*>/;
+
+// These will be filled by the loading process
+export let BOT_ID: string;
+export let TEAM_ASK_CHANNEL_ID: string;
+
+export const setSlackIds = function (botId: string, teamAskChannelId: string) {
+  BOT_ID = botId;
+  TEAM_ASK_CHANNEL_ID = teamAskChannelId;
+};
 
 const token = config.BOT_USER_OAUTH_ACCESS_TOKEN;
 export const SlackWebClient = new WebClient(token);

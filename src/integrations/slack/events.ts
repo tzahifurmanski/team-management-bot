@@ -1,11 +1,31 @@
-import { handle_direct_event, handle_channel_event } from "../../bot_actions";
+import { handle_channel_event, handle_direct_event } from "../../bot_actions";
 
-import { BOT_SLACK_ID } from "./consts";
+import { BOT_ID, setSlackIds } from "./consts";
+import { getBotId, getConversationId } from "./conversations";
+
 const config = require("../../../config.json");
 
 const { createEventAdapter } = require("@slack/events-api");
 const slackSigningSecret = config.SLACK_SIGNING_SECRET;
 const slackEventsSetup = createEventAdapter(slackSigningSecret);
+
+// Resolve the slack dynamic variables
+export const loadSlackConfig = async function () {
+  try {
+    const botId = await getBotId();
+
+    const teamAskChannelId = await getConversationId(
+      config.TEAM_ASK_CHANNEL_NAME
+    );
+
+    setSlackIds(botId, teamAskChannelId);
+  } catch (err) {
+    console.log("Error while loading Slack Dynamic vars!", err);
+    return false;
+  }
+
+  return true;
+};
 
 slackEventsSetup.on("app_mention", async (event: any) => {
   console.log("GOT AN APP MENTION!");
@@ -14,7 +34,7 @@ slackEventsSetup.on("app_mention", async (event: any) => {
 
 slackEventsSetup.on("message", async (event: any) => {
   // Ignore messages that the bot post in the conversation
-  if (event.user === BOT_SLACK_ID) {
+  if (event.user === BOT_ID) {
     console.log("Got a message from bot, ignoring...");
     return;
   }
