@@ -1,0 +1,66 @@
+{
+  "BOT_NAME": "BoJack the Unicorn",
+  "BOT_DESCRIPTION": "a mostly sober Unicorn bot.",
+  "ACTION_COMPLIMENT_POOL": [
+  "I would delete your browser history for you if you suddenly died.",
+  "You have the capacity to do worse, so this is actually a good result for you",
+  "You almost did such a great job!",
+  "You are so impressive to some people",
+  "It takes a lot of strength to admit that you're average",
+  "I think you said something funny once",
+  "There's no shame in being just OK",
+  "One day you might succeed",
+  "You bring a lot to the team. I'm not sure what it is, but you do",
+  "You're mostly not a burden"],
+  "ACTION_WHAT_CAN_YOU_DO_TEXT": "Sleep and Drink. What else do you expect me to do?",
+  "RESPONSE_BUG_POOL": [
+    "https://media.giphy.com/media/3o7aCVYdxJUQmWI0z6/giphy.gif",
+    "https://media.giphy.com/media/l2SpMfndsgbXOl0Sk/giphy.gif",
+    "https://media.giphy.com/media/uVz7iwTMSDR5e/giphy.gif",
+    "https://media.giphy.com/media/3o7WTwUXv4hsQ5bhEk/giphy.gif",
+    "https://media.giphy.com/media/l0Iyar3pbHoNY2VJC/giphy.gif",
+    "https://media.giphy.com/media/3oz8xUHb6xKC1FzbRC/giphy.gif"
+  ],
+  "RESPONSE_FOLKS_POOL": [
+    "https://media.giphy.com/media/9D7Jr7o9TjKta/giphy.gif",
+    "https://media.giphy.com/media/EMHTwKXYU3myAyNCsE/giphy.gif",
+    "https://media.giphy.com/media/l2SpWMTKLCdV70OzK/giphy.gif",
+    "https://media.giphy.com/media/cnWb1QJg7FGzrdEVKF/giphy.gif",
+    "https://media.giphy.com/media/lD76yTC5zxZPG/giphy.gif",
+    "https://media.giphy.com/media/21T9PmWttOb0EFrrwK/giphy.gif",
+    "https://media.giphy.com/media/l3zoPOOq8HpzifRFS/giphy.gif",
+    "https://media.giphy.com/media/12S6FJ0LFqKNyM/giphy.gif",
+    "https://media.giphy.com/media/82US6lnvxSwdpqhqbp/giphy.gif",
+    "https://media.giphy.com/media/3orif9VSPhRwQAfj7W/giphy.gif",
+    "https://media.giphy.com/media/3oEduXXBwLDCtaGfNS/giphy.gif",
+    "https://media.giphy.com/media/qxqXS7PhBWgWk/giphy.gif",
+    "https://media.giphy.com/media/xUPGcpfvIsVNeOAZgI/giphy.gif",
+    "https://media.giphy.com/media/l3vRj1iPtZEvpvTVu/giphy.gif",
+    "https://media.giphy.com/media/l4HnSkiOE7iA0Zjl6/giphy.gif",
+    "https://media.giphy.com/media/61dyee7EfvuGWmDDPT/giphy.gif",
+    "https://media.giphy.com/media/tsUDLjvigc27B9pBPs/giphy.gif",
+    "https://tenor.com/bnpgu.gif",
+    "https://tenor.com/bgfX9.gif",
+    "https://tenor.com/u240.gif"
+  ],
+  "RESPONSE_HELP_POOL": [
+    "https://media.giphy.com/media/3o7WTQ41Zz7v6WmRrO/giphy.gif",
+    "https://media.giphy.com/media/xThuVZxBOqyDxJkm3u/giphy.gif"
+  ],
+  "RESPONSE_MERGE_POOL": [
+    "https://media.giphy.com/media/xT9Igr9F9m1wlE6oqA/giphy.gif",
+    "https://media.giphy.com/media/xT0GqH01ZyKwd3aT3G/giphy.gif",
+    "https://media.giphy.com/media/3oKIPiW5jADxCcwVXi/giphy.gif",
+    "https://media.giphy.com/media/xT5LMuoIXb3jnlqgww/giphy.gif",
+    "https://media.giphy.com/media/dtiF6Tyhfl6H15wTEH/giphy.gif",
+    "https://media.giphy.com/media/f4OBJD88w2M7MUVSqf/giphy.gif"
+  ],
+  "RESPONSE_REVIEW_REQUEST_POOL": [
+    "https://media.giphy.com/media/xThuWcwceLECkXEkKs/giphy.gif",
+    "https://media.giphy.com/media/A1RLR7qFez5du/giphy.gif",
+    "https://media.giphy.com/media/xThuWoKw5OEcotAY9O/giphy.gif",
+    "https://media.giphy.com/media/l2YOgvtL2Fq8McnJu/giphy.gif",
+    "https://media.giphy.com/media/3orieT6Hpsj44lo35K/giphy.gif"
+  ]
+
+}

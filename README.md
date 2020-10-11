@@ -1,6 +1,15 @@
 # team-slack-bot
 A slack bot for engineering teams (to get various stats and perform team related actions).
- 
+
+## Setup:
+* Create a 'config.json' file and setup the bot (use 'config.example.json' for example).
+
+### Personalities setup
+* The bot supports multiple personalities.
+* Currently, you can choose from 'BoJack Horseman' and 'Unibot' (A friendly unicorn bot).
+* Setup the personality with the 'BOT_PERSONALITY' config var.
+Note: The personality should be exactly as the folder name under 'personalities'    
+
 
 ## Ideas:
 

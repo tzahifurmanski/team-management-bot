@@ -2,7 +2,6 @@ import { BotAction } from "./actions/base_action";
 import {
   AskChannelStats,
   Compliment,
-  GenuineCompliment,
   IntroduceYourself,
   MeaningOfLife,
   WhatCanYouDo,
@@ -30,7 +29,6 @@ const RESPONSES: BotAction[] = [
 
 const ASKS: BotAction[] = [
   new Compliment(),
-  new GenuineCompliment(),
   new IntroduceYourself(),
   new WhatCanYouDo(),
   new AskChannelStats(),
@@ -60,7 +58,11 @@ export const handle_channel_event = async function (event: any) {
 export const handle_direct_event = async function (event: any) {
   console.log("Got new event", event);
 
-  if (!(await runActions(event, ASKS))) {
+  // TODO: Remove this later - For DM messages check events as well
+  if (
+    !(await runActions(event, ASKS)) &&
+    !(await runActions(event, RESPONSES))
+  ) {
     console.log("Unsupported event", event);
 
     // TODO: Save the unsupported event for later debrief

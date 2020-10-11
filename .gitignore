@@ -5,4 +5,4 @@ ngrok/
 node_modules/
 
 .idea/
-config*
+config.json

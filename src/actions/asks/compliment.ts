@@ -1,6 +1,7 @@
 import { BOT_ID } from "../../integrations/slack/consts";
 import { BotAction } from "../base_action";
 import { getRandomFromArray } from "../utils";
+import { botConfig } from "../../bot_config";
 
 const config = require("../../../config.json");
 
@@ -10,18 +11,9 @@ const {
 } = require("../../integrations/slack/messages");
 
 // Use a predefined compliments pool and anything that is team specific
-const CHEEKY_COMPLIMENTS_POOL = [
-  "I would delete your browser history for you if you suddenly died.",
-  "You have the capacity to do worse, so this is actually a good result for you",
-  "You almost did such a great job!",
-  "You are so impressive to some people",
-  "It takes a lot of strength to admit that you're average",
-  "I think you said something funny once",
-  "There's no shame in being just OK",
-  "One day you might succeed",
-  "You bring a lot to the team. I'm not sure what it is, but you do",
-  "You're mostly not a burden",
-].concat(config.TEAM_SPECIFIC_CHEEKY_COMPLIMENTS);
+const COMPLIMENTS = botConfig.ACTION_COMPLIMENT_POOL.concat(
+  config.TEAM_SPECIFIC_COMPLIMENTS
+);
 
 export class Compliment implements BotAction {
   doesMatch(event: any): boolean {
@@ -33,7 +25,7 @@ export class Compliment implements BotAction {
 
   async performAction(event: any): Promise<void> {
     // TODO: Think of a better way to use the sender / receiver in the message
-    const compliment = getRandomFromArray(CHEEKY_COMPLIMENTS_POOL);
+    const compliment = getRandomFromArray(COMPLIMENTS);
 
     let receiver = getUserIDInText(event.text);
 

@@ -1,11 +1,13 @@
 import { BotAction } from "../base_action";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");
+
 const config = require("../../../config.json");
+import { botConfig } from "../../bot_config";
 
 const TEAM_NAME = config.TEAM_NAME;
-const BOT_NAME = config.BOT_NAME;
-const BOT_DESCRIPTION = config.BOT_DESCRIPTION;
+const BOT_NAME = botConfig.BOT_NAME;
+const BOT_DESCRIPTION = botConfig.BOT_DESCRIPTION;
 
 export class IntroduceYourself implements BotAction {
   doesMatch(event: any): boolean {
@@ -14,7 +16,7 @@ export class IntroduceYourself implements BotAction {
 
   async performAction(event: any): Promise<void> {
     await sendSlackMessage(
-      `Hi, I'm ${BOT_NAME}, ${BOT_DESCRIPTION}. I serve at the pleasure of ${TEAM_NAME}`,
+      `Hi, I'm ${BOT_NAME}, ${BOT_DESCRIPTION} I serve at the pleasure of ${TEAM_NAME}`,
       event.channel,
       event.thread_ts
     );

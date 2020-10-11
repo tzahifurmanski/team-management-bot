@@ -1,13 +1,12 @@
 {
   "BOT_USER_OAUTH_ACCESS_TOKEN": "ENTER CODE HERE",
   "SLACK_SIGNING_SECRET": "ENTER CODE HERE",
-  "BOT_NAME": "Zigi Master",
-  "BOT_DESCRIPTION": "just a regular Zigi",
+
+  "BOT_PERSONALITY": "bojack",
+
   "TEAM_ASK_CHANNEL_NAME": "ask-zigi",
+
   "TEAM_NAME": "Team Zigi",
-  "TEAM_SPECIFIC_CHEEKY_COMPLIMENTS": [
-    "You're almost as funny as Zigi",
-    "Be yourself, unless you can be David"
-  ],
+  "TEAM_SPECIFIC_COMPLIMENTS": ["You're almost as funny as Zigi", "Be yourself, unless you can be David"],
   "SERVER_PORT": 3000
 }

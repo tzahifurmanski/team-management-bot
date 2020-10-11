@@ -12,5 +12,5 @@ export const setSlackIds = function (botId: string, teamAskChannelId: string) {
   TEAM_ASK_CHANNEL_ID = teamAskChannelId;
 };
 
-const token = config.BOT_USER_OAUTH_ACCESS_TOKEN;
+const token: string = config.BOT_USER_OAUTH_ACCESS_TOKEN;
 export const SlackWebClient = new WebClient(token);

@@ -1,12 +1,10 @@
 import { getRandomFromArray } from "../utils";
 import { BotAction } from "../base_action";
+import { botConfig } from "../../bot_config";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
-const GIFS = [
-  "https://media.giphy.com/media/3o7WTQ41Zz7v6WmRrO/giphy.gif",
-  "https://media.giphy.com/media/xThuVZxBOqyDxJkm3u/giphy.gif",
-];
+const GIFS = botConfig.RESPONSE_HELP_POOL;
 
 // TODO: Add a chaos element (only show gif at X % of the cases)
 
