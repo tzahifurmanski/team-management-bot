@@ -11,9 +11,8 @@ const GIFS = botConfig.RESPONSE_REVIEW_REQUEST_POOL;
 export class ReviewRequestResponse implements BotAction {
   doesMatch(event: any): boolean {
     return (
-      event.text.toLowerCase().startsWith("can i") ||
-      event.text.toLowerCase().includes("please") ||
-      event.text.toLowerCase().includes("help") ||
+      (event.text.toLowerCase().includes("https://github.com/snyk") &&
+        event.text.toLowerCase().includes("/pull/")) ||
       event.text.toLowerCase().includes("review")
     );
   }
@@ -30,5 +29,3 @@ export class ReviewRequestResponse implements BotAction {
     await sendSlackMessage(gif, event.channel, event.ts);
   }
 }
-
-export const review_request_action = async function (event: any) {};

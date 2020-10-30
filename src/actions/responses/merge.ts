@@ -10,7 +10,11 @@ const GIFS = botConfig.RESPONSE_MERGE_POOL;
 
 export class MergeResponse implements BotAction {
   doesMatch(event: any): boolean {
-    return event.text.startsWith("Pull request merged");
+    return (
+      event.bot_profile?.name === "GitHub" &&
+      event.attachments?.length > 0 &&
+      event.attachments[0].pretext.startsWith("Pull request merged")
+    );
   }
 
   async performAction(event: any): Promise<void> {

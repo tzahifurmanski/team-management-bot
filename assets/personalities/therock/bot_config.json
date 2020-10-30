@@ -1,0 +1,66 @@
+{
+  "BOT_NAME": "The Rock",
+  "BOT_IMAGE_URL": "https://i.redd.it/os0kxad3db041.jpg",
+  "ACTION_INTRODUCE_YOURSELF_TEXT": "Finally….. The Rock, Has come back to Slack!",
+  "ACTION_COMPLIMENT_POOL": [
+  "Well if The Rock’s memory serves him correctly, it was The Rock that tossed your little hamburger monkey ass right over the top rope!",
+  "Let The Rock remind you of something. You ain’t no super hero. Not like the Scorpion King.",
+  "Excuse The Rock for one second, his cell phone is going off. Hello? Hey it’s nothing. He says he knows you!",
+  "Seeing that The Rock wasn’t done speaking, you should know your role and shut your mouth!",
+  "The Rock says this: if The Rock hits you, he’ll kill you. If he misses, the wind behind the punch will give you pneumonia and you’ll die anyway, so the choice is yours, Jabroni!",
+  "Just, who in the blue Hell are you?",
+  "You look like a homeless Power Ranger",
+  "Let me tell you how this works. You and you’re Rock’s wanna be hair cut get out of The Rock’s face! Who cut your hair? Ray Charles?"],
+  "ACTION_WHAT_CAN_YOU_DO_TEXT": "The Rock will take you down to Know Your Role Boulevard, which is on the corner of Jabroni Drive, and check you directly into the Smackdown Hotel!",
+  "RESPONSE_BUG_POOL": [
+    "https://am22.mediaite.com/tms/cnt/uploads/2016/02/The-Rock.gif",
+    "https://i.pinimg.com/originals/80/fd/86/80fd8671185beb946cb8b7caab67938f.gif",
+    "https://tenor.com/VTTy.gif",
+    "https://tenor.com/JR35.gif",
+    "https://tenor.com/7FaE.gif",
+    "https://tenor.com/bbXqL.gif",
+    "https://tenor.com/vJgx.gif",
+    "https://tenor.com/R9Vu.gif",
+    "https://tenor.com/bnnfS.gif"
+  ],
+  "RESPONSE_FOLKS_POOL": [
+    "https://tenor.com/Q4KF.gif",
+    "https://tenor.com/baySt.gif",
+    "https://tenor.com/boXDf.gif",
+    "https://tenor.com/P8ZL.gif",
+    "https://tenor.com/4PIN.gif"
+  ],
+  "RESPONSE_HELP_POOL": [
+    "https://tenor.com/JR35.gif",
+    "https://tenor.com/H0O2.gif",
+    "https://tenor.com/Vyec.gif",
+    "https://tenor.com/Q4J6.gif",
+    "https://tenor.com/bpRAw.gif",
+    "https://tenor.com/bru2y.gif"
+  ],
+  "RESPONSE_MERGE_POOL": [
+    "https://media.giphy.com/media/zBuQUdIDLCxBC/giphy-downsized.gif",
+    "https://static.independent.co.uk/s3fs-public/thumbnails/image/2018/03/27/15/giphy.gif?width=668",
+    "https://tenor.com/vKHE.gif",
+    "https://tenor.com/beWQn.gif",
+    "https://tenor.com/xv1X.gif",
+    "https://tenor.com/bkIWa.gif",
+    "https://tenor.com/0bff.gif",
+    "https://tenor.com/X4Iy.gif",
+    "https://tenor.com/0WfZ.gif",
+    "https://tenor.com/w8PD.gif",
+    "https://tenor.com/brzi5.gif"
+  ],
+  "RESPONSE_REVIEW_REQUEST_POOL": [
+    "https://hips.hearstapps.com/esquireuk.cdnds.net/16/40/1475748509-giphy.gif",
+    "https://tenor.com/JR35.gif",
+    "https://tenor.com/0eq3.gif",
+    "https://tenor.com/ZQN8.gif",
+    "https://tenor.com/Wuoc.gif",
+    "https://tenor.com/brful.gif",
+    "https://tenor.com/bogMD.gif"
+  ],
+  "RESPONSE_I_THINK_POOL": [
+    "https://tenor.com/bbXqL.gif"
+  ]
+}

@@ -1,5 +1,16 @@
-export { FolksResponse } from "./folks";
-export { ReviewRequestResponse } from "./review_request";
-export { BugResponse } from "./bug";
-export { MergeResponse } from "./merge";
-export { HelpResponse } from "./help";
+import { BotAction } from "../base_action";
+import { BugResponse } from "./bug";
+import { ReviewRequestResponse } from "./review_request";
+import { FolksResponse } from "./folks";
+import { MergeResponse } from "./merge";
+import { HelpResponse } from "./help";
+import { IThinkResponse } from "./i_think";
+
+export const RESPONSE_ACTIONS: BotAction[] = [
+  new BugResponse(),
+  new ReviewRequestResponse(),
+  new FolksResponse(),
+  new MergeResponse(),
+  new HelpResponse(),
+  new IThinkResponse(),
+];

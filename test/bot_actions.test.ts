@@ -12,14 +12,14 @@ describe("handle_event", () => {
     // expect(2).toBe(2);
   });
 
-  test("Command that does not match", () => {
+  test("Command that does not match", async () => {
     console.log = jest.fn();
 
     const event = {
       text: "Super Weird Command that does not match anything :(",
     };
 
-    handle_direct_event(event);
+    await handle_direct_event(event);
     expect(console.log).toHaveBeenCalledWith("Unsupported event", event);
   });
 });
