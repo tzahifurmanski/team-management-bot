@@ -1,15 +1,12 @@
 // This is a util function that is able to look for the ID of a conversation / channel by name
-import { BOT_ID, SlackWebClient } from "./consts";
-import {
-  ConversationsHistoryArguments,
-  ConversationsListArguments,
-} from "@slack/web-api";
+import { BOT_ID, SlackWebClient } from './consts';
+import { ConversationsHistoryArguments, ConversationsListArguments } from '@slack/web-api';
 
 // If something is not found, we'll have to go over everything
-export const getConversationId = async function (
+export const getConversationId = async function(
   name: string,
-  types_list: string = "public_channel",
-  cursor: string = ""
+  types_list: string = 'public_channel',
+  cursor: string = '',
 ): Promise<string> {
   // Get the channels list from slack
   const options: ConversationsListArguments = {
@@ -46,9 +43,10 @@ export const getConversationId = async function (
   }
 };
 
-export const getConversationHistory = async function (
+export const getConversationHistory = async function(
   channel_id: string,
-  oldest: string = "" // Start of time range of messages to include in results (in seconds).
+  oldest: string = '', // Start of time range of messages to include in results (in seconds).
+  latest?: string,
 ): Promise<any[]> {
   // TODO: Handle a 'channel not found' error / 'not_in_channel' error
 
@@ -59,10 +57,14 @@ export const getConversationHistory = async function (
     limit: 100,
   };
 
+  if (latest) {
+    options.latest = latest;
+  }
+
   const results: any[] = [];
 
   let response = await SlackWebClient.conversations.history(options);
-  response.messages.forEach(function (message: any) {
+  response.messages.forEach(function(message: any) {
     // Filter out messages that has a subtype (like 'channel_join') and messages that are commands to the bot
     if (
       !message.subtype &&

@@ -1,7 +1,8 @@
-import { getRandomFromArray } from "../utils";
-import { BotAction } from "../base_action";
-import { botConfig } from "../../bot_config";
-const { sendSlackMessage } = require("../../integrations/slack/messages");
+import { getRandomFromArray } from '../utils';
+import { BotAction } from '../base_action';
+import { botConfig } from '../../bot_config';
+
+const { sendSlackMessage } = require('../../integrations/slack/messages');
 
 const GIFS: string[] = botConfig.RESPONSE_BUG_POOL;
 
@@ -10,8 +11,12 @@ const GIFS: string[] = botConfig.RESPONSE_BUG_POOL;
 export class BugResponse implements BotAction {
   doesMatch(event: any): boolean {
     return (
-      event.text.toLowerCase().includes("bug") ||
-      event.text.toLowerCase().includes("issue")
+      event.text.toLowerCase().includes('found a bug') ||
+      event.text.toLowerCase().includes('we have a bug') ||
+      event.text.toLowerCase().includes('might be a bug') ||
+      event.text.toLowerCase().includes('created a bug') ||
+      event.text.toLowerCase().includes('there is a bug') ||
+      event.text.toLowerCase().includes('there is a small bug')
     );
   }
 

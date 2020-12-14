@@ -1,17 +1,17 @@
-import { handle_channel_event, handle_direct_event } from "../../bot_actions";
+import { handle_channel_event, handle_direct_event } from '../../bot_actions';
 
-import { BOT_ID, setSlackIds } from "./consts";
-import { getBotId, getConversationId } from "./conversations";
-import { botConfig } from "../../bot_config";
+import { BOT_ID, setSlackIds } from './consts';
+import { getBotId, getConversationId } from './conversations';
+import { botConfig } from '../../bot_config';
 
-const config = require("../../../config.json");
+const config = require('../../../config.json');
 
-const { createEventAdapter } = require("@slack/events-api");
+const { createEventAdapter } = require('@slack/events-api');
 const slackSigningSecret = config.SLACK_SIGNING_SECRET;
 const slackEventsSetup = createEventAdapter(slackSigningSecret);
 
 // Resolve the slack dynamic variables
-export const loadSlackConfig = async function () {
+export const loadSlackConfig = async function() {
   try {
     const botId = await getBotId();
 
@@ -35,17 +35,21 @@ slackEventsSetup.on("app_mention", async (event: any) => {
 
 slackEventsSetup.on("message", async (event: any) => {
   // Ignore messages that the bot post in the conversation
-  if (event.user === BOT_ID || event.username === botConfig.BOT_NAME) {
-    console.log("Got a message from bot, ignoring...");
+  if (
+    event.user === BOT_ID ||
+    event.username === botConfig.BOT_NAME ||
+    event.message?.username === botConfig.BOT_NAME
+  ) {
+    console.log('Got a message from bot, ignoring...');
     return;
   }
 
   // Ignore specific messages types that were changed
   if (
-    event.subtype === "message_changed" ||
-    event.subtype === "message_deleted"
+    event.subtype === 'message_changed' ||
+    event.subtype === 'message_deleted'
   ) {
-    console.log("Got a message change event, ignoring...");
+    console.log('Got a message change event, ignoring...');
     return;
   }
 

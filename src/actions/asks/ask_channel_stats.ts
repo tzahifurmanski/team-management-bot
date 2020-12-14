@@ -1,129 +1,85 @@
-import {
-  createBlock,
-  getMessagePermalink,
-} from "../../integrations/slack/messages";
-import { getConversationHistory } from "../../integrations/slack/conversations";
-import { BotAction } from "../base_action";
-import { toDateTime } from "../utils";
-import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
+import { createBlock, getMessagePermalink } from '../../integrations/slack/messages';
+import { BotAction } from '../base_action';
+import { removeTimeInfoFromDate, setDateToSunday, toDateTime } from '../utils';
+import { TEAM_ASK_CHANNEL_ID } from '../../integrations/slack/consts';
+import { AsksChannelStatsResult, getAskChannelStats } from '../../logic/asks_channel';
 
-const { sendSlackMessage } = require("../../integrations/slack/messages");
+const { sendSlackMessage } = require('../../integrations/slack/messages');
 
 export class AskChannelStats implements BotAction {
   doesMatch(event: any): boolean {
-    return event.text.includes("ask channel stats");
+    return event.text.includes('ask channel stats');
   }
 
   async performAction(event: any): Promise<void> {
     // TODO: Pass the number of days back to go via the event text. Right now taking a week back
-    const d = new Date();
-    d.setDate(d.getDate() - 14);
-    d.setUTCHours(0);
-    d.setUTCMinutes(0);
-    d.setUTCSeconds(0);
-    d.setUTCMilliseconds(0);
 
-    console.log(d.getTime() / 1000);
-    const messages = await getConversationHistory(
-      TEAM_ASK_CHANNEL_ID,
-      (d.getTime() / 1000).toString()
-    );
+    // Set the starting date to be Sunday of this week
+    const startingDate = setDateToSunday(new Date());
+    // startingDate.setDate(startingDate.getDate() - 7);
+    removeTimeInfoFromDate(startingDate);
 
-    // Go over all unchecked messages and get the permalinks
-    const unchecked_messages = messages.filter(function (el: any) {
-      return (
-        !el.reactions ||
-        el.reactions.filter(function (reaction: any) {
-          return (
-            reaction.name === "white_check_mark" ||
-            reaction.name === "heavy_check_mark" ||
-            reaction.name === "in-progress"
-          );
-        }).length == 0
-      );
-    });
-
-    const unchecked_blocks: string[] = [];
-
-    await Promise.all(
-      unchecked_messages.map(async (message: any) => {
-        let permalink = await getMessagePermalink(
-          TEAM_ASK_CHANNEL_ID,
-          message.ts
-        );
-        if (permalink) {
-          unchecked_blocks.push(
-            createBlock(
-              `<${permalink}|Link to message> from <@${
-                message.user
-              }> at ${toDateTime(message.ts).toLocaleDateString()}`
-            )
-          );
-        }
-      })
-    );
-
-    // Go over all unchecked messages and get the permalinks
-    const in_progress_messages = messages.filter(function (el: any) {
-      return (
-        el?.reactions?.filter(function (reaction: any) {
-          return reaction.name === "in-progress";
-        }).length > 0
-      );
-    });
-
-    const in_progress_blocks: string[] = [];
-
-    await Promise.all(
-      in_progress_messages.map(async (message: any) => {
-        let permalink = await getMessagePermalink(
-          TEAM_ASK_CHANNEL_ID,
-          message.ts
-        );
-        if (permalink) {
-          in_progress_blocks.push(
-            createBlock(
-              `<${permalink}|Link to message> from <@${
-                message.user
-              }> at ${toDateTime(message.ts).toLocaleDateString()}`
-            )
-          );
-        }
-      })
+    const stats: AsksChannelStatsResult = await getAskChannelStats(
+      startingDate,
     );
 
     await sendSlackMessage(
-      `<#${TEAM_ASK_CHANNEL_ID}> had a *total of ${
-        messages.length
-      } messages* since ${d.toUTCString()}.\nOut of those, *${
-        messages.length -
-        unchecked_messages.length -
-        in_progress_messages.length
-      } were handled*, *${in_progress_messages.length} are in progress* and *${
-        unchecked_messages.length
-      } were not handled*.`,
+      `<#${TEAM_ASK_CHANNEL_ID}> had a *total of ${stats.totalMessages} messages* since ${stats.startDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`,
       event.channel,
-      event.thread_ts
+      event.thread_ts,
     );
 
-    if (in_progress_messages.length > 0) {
+    if (stats.totalNumProcessed > 0) {
+      const in_progress_blocks: string[] = await getPermalinkBlocks(
+        stats.messagesInProgress,
+      );
+
       // TODO: Add a text block?
       await sendSlackMessage(
         `These are the in progress asks we currently have:`,
         event.channel,
         event.thread_ts,
-        in_progress_blocks
+        in_progress_blocks,
       );
     }
 
-    if (unchecked_messages.length > 0) {
+    if (stats.totalNumUnchecked > 0) {
+      const unchecked_blocks: string[] = await getPermalinkBlocks(
+        stats.messagesUnchecked,
+      );
+
       // TODO: Add a text block?
       await sendSlackMessage(
         `These are the open asks we currently have:`,
         event.channel,
         event.thread_ts,
-        unchecked_blocks
+        unchecked_blocks,
       );
     }
   }
 }
+
+// This method gets a list of messages and creates a permalink string for displaying the message.
+const getPermalinkBlocks = async function(messages: any[]): Promise<string[]> {
+  const block: string[] = [];
+
+  await Promise.all(
+    messages.map(async (message: any) => {
+      let permalink = await getMessagePermalink(
+        TEAM_ASK_CHANNEL_ID,
+        message.ts,
+      );
+      if (permalink) {
+        block.push(
+          createBlock(
+            `<${permalink}|Link to message> from <@${
+              message.user
+            }> at ${toDateTime(message.ts).toLocaleDateString()}`,
+          ),
+        );
+      }
+    }),
+  );
+
+  return block;
+};
