@@ -15,11 +15,10 @@ export const handle_channel_event = async function (event: any) {
     return;
   }
 
-  console.log("Got new channel event", event);
+  // console.log("Got new channel event", event);
 
   if (!(await runActions(event, RESPONSE_ACTIONS))) {
-    console.log("Unsupported event", event);
-
+    // console.log("Unsupported event", event);
     // TODO: Save the unsupported event for later debrief
   }
 
@@ -28,13 +27,11 @@ export const handle_channel_event = async function (event: any) {
 
 // This method handles events that are with direct interaction with the bot (like a DM or when the bot is tagged)
 export const handle_direct_event = async function (event: any) {
-  console.log("Got new direct event", event.type, event);
+  // console.log("Got new direct event", event.type, event);
 
   if (!(await runActions(event, ASKS_ACTIONS))) {
-    console.log("Unsupported event", event);
-
+    // console.log("Unsupported event", event);
     // TODO: Save the unsupported event for later debrief
-
     // TODO: Reply to unsupported events with a quote
   }
 };
@@ -42,6 +39,7 @@ export const handle_direct_event = async function (event: any) {
 async function runActions(event: any, actions: BotAction[]) {
   const result = actions.find((action) => action.doesMatch(event));
   if (result) {
+    console.log(`Got a '${result.constructor.name}' command!`);
     await result.performAction(event);
     return true;
   }

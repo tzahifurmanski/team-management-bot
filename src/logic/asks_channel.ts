@@ -1,11 +1,22 @@
-import { getConversationHistory } from '../integrations/slack/conversations';
-import { TEAM_ASK_CHANNEL_ID } from '../integrations/slack/consts';
+import { getConversationHistory } from "../integrations/slack/conversations";
+import { TEAM_ASK_CHANNEL_ID } from "../integrations/slack/consts";
+import {
+  createBlock,
+  getMessagePermalink,
+  sendSlackMessage,
+} from "../integrations/slack/messages";
+import {
+  removeTimeInfoFromDate,
+  setDateToSunday,
+  toDateTime,
+} from "../actions/utils";
+import { SectionBlock } from "@slack/web-api";
 
 export interface AsksChannelStatsResult {
   startDateInUTC: string;
   endDateInUTC?: string;
   totalMessages: number;
-  totalNumProcessed: number; // Processed message is one that is either done or in progress
+  totalNumProcessed: number; // Processed message is one that is done / accomplished / handled
   totalNumInProgress: number;
   totalNumUnchecked: number;
   messages: any[];
@@ -13,51 +24,57 @@ export interface AsksChannelStatsResult {
   messagesUnchecked: any[];
 }
 
-export const getAskChannelStats = async function(
+// This method gets two dates and returns all the messages that were received in the asks channel during this timeframe
+// TODO: I THINK THAT THE SNYK SUPPORT MESSAGES ARE NOT COUNTED!!!!
+export const getAskChannelMessages = async function (
   startingDate: Date,
-  endDate?: Date,
-): Promise<AsksChannelStatsResult> {
-  console.log(
-    `Getting ask channels stats between '${startingDate.toUTCString()}' and '${endDate?.toUTCString()}'`,
-  );
+  endDate?: Date
+): Promise<any[any]> {
+  // console.log(
+  //   `Getting ask channels messages between '${startingDate.toUTCString()}' and '${endDate?.toUTCString()}'`
+  // );
   const oldestMessage = (startingDate.getTime() / 1000).toString();
   const latestMessage = endDate && (endDate.getTime() / 1000).toString();
 
-  console.log(
-    `Getting ask channels stats between '${oldestMessage}' and '${latestMessage}'`,
-  );
-
-  const messages = await getConversationHistory(
+  return await getConversationHistory(
     TEAM_ASK_CHANNEL_ID,
     oldestMessage,
-    latestMessage,
+    latestMessage
   );
+};
 
-  const unchecked_messages = messages.filter(function(el: any) {
+// This method gets a list of messages and a timeframe and returns stats on these messages
+export const getStatsForMessages = function (
+  messages: any,
+  startingDateInUTC: string,
+  endDateInUTC?: string
+): AsksChannelStatsResult {
+  const unchecked_messages = messages.filter(function (el: any) {
+    // console.log(el);
     return (
       !el.reactions ||
-      el.reactions.filter(function(reaction: any) {
+      el.reactions.filter(function (reaction: any) {
         return (
-          reaction.name === 'white_check_mark' ||
-          reaction.name === 'heavy_check_mark' ||
-          reaction.name === 'in-progress'
+          reaction.name === "white_check_mark" ||
+          reaction.name === "heavy_check_mark" ||
+          reaction.name === "in-progress"
         );
       }).length == 0
     );
   });
 
   // Go over all unchecked messages and get the permalinks
-  const in_progress_messages = messages.filter(function(el: any) {
+  const in_progress_messages = messages.filter(function (el: any) {
     return (
-      el?.reactions?.filter(function(reaction: any) {
-        return reaction.name === 'in-progress';
+      el?.reactions?.filter(function (reaction: any) {
+        return reaction.name === "in-progress";
       }).length > 0
     );
   });
 
   return {
-    startDateInUTC: startingDate.toUTCString(),
-    endDateInUTC: endDate?.toUTCString(),
+    startDateInUTC: startingDateInUTC,
+    endDateInUTC: endDateInUTC,
     messages: messages,
     messagesInProgress: in_progress_messages,
     messagesUnchecked: unchecked_messages,
@@ -67,4 +84,192 @@ export const getAskChannelStats = async function(
     totalNumInProgress: in_progress_messages.length,
     totalNumUnchecked: unchecked_messages.length,
   };
+};
+
+export interface AsksChannelWeeklyStatsResult extends AsksChannelStatsResult {}
+
+// TODO: Add a check that if the end date is after now, return now as the end date (as it's irrelevant)
+export const getBucketRange = function (
+  messageDate: Date,
+  type: string
+): Date[] {
+  if (type === "week") {
+    // Build the starting and end dates for the bucket
+    const weekStartDate = new Date(messageDate.getTime());
+    setDateToSunday(weekStartDate);
+    removeTimeInfoFromDate(weekStartDate);
+
+    const weekEndDate = new Date(weekStartDate.getTime() - 1);
+    weekEndDate.setDate(weekEndDate.getDate() + 7);
+
+    return [weekStartDate, weekEndDate];
+  } else if (type === "month") {
+    const dayStartDate = new Date(
+      Date.UTC(messageDate.getFullYear(), messageDate.getMonth(), 1)
+    );
+
+    const tempDate = new Date(
+      messageDate.getFullYear(),
+      messageDate.getMonth() + 1,
+      1
+    );
+    const dayEndDate = new Date(tempDate.getTime() - 1);
+
+    return [dayStartDate, dayEndDate];
+  } else if (type === "day") {
+    // Build the starting and end dates for the bucket
+    const dayStartDate = new Date(messageDate.getTime());
+    removeTimeInfoFromDate(dayStartDate);
+
+    const dayEndDate = new Date(dayStartDate.getTime() - 1);
+    dayEndDate.setDate(dayEndDate.getDate() + 1);
+
+    return [dayStartDate, dayEndDate];
+  }
+
+  return [];
+};
+
+export const getStatsBuckets = async function (
+  messages: any[],
+  type: string // This can either bet 'week' or 'day'. This is the variable by which we're going to 'group by' the buckets
+): Promise<AsksChannelWeeklyStatsResult[]> {
+  let buckets = new Map<string, any[]>();
+  let bucketsRanges: any = {};
+
+  messages.map(async (message: any) => {
+    // Check the date on the message
+    const messageDate: Date = toDateTime(message.ts);
+
+    const [bucketStartDate, bucketEndDate] = getBucketRange(messageDate, type);
+    bucketsRanges[bucketStartDate.toUTCString()] = bucketEndDate.toUTCString();
+
+    // console.log(
+    //   `For message ${messageDate.toUTCString()} we got bucket range of ${bucketStartDate} to ${bucketEndDate}`
+    // );
+
+    const bucketKey = bucketStartDate.toUTCString();
+    // Put the message in the relevant bucket
+    if (buckets.has(bucketKey)) {
+      const bucket = buckets.get(bucketKey);
+      // @ts-ignore
+      bucket.push(message);
+    } else {
+      const bucket: any[any] = [message];
+      buckets.set(bucketKey, bucket);
+    }
+  });
+
+  let results: AsksChannelWeeklyStatsResult[] = [];
+
+  // Convert the buckets to a list of stats
+  for (let [key, currBucketMessages] of buckets.entries()) {
+    // TODO: Find a way to pass the end date as well (right now it's empty)
+    // const [startDate, endDate] = key;
+
+    const stats: AsksChannelStatsResult = getStatsForMessages(
+      currBucketMessages,
+      key,
+      bucketsRanges[key]
+      // startDate,
+      // endDate
+    );
+    results.push(stats);
+  }
+
+  return results;
+};
+
+export const reportStatsToSlack = async function (
+  stats: AsksChannelStatsResult,
+  channel: any,
+  thread_ts: any
+) {
+  // console.log("Time in utc - start", stats.startDateInUTC);
+  // console.log("Time in utc - end", stats.endDateInUTC);
+
+  // TODO: Send only one message, send all the text in blocks
+  const message_blocks: SectionBlock[] = [
+    createBlock(
+      `<#${TEAM_ASK_CHANNEL_ID}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`
+    ),
+  ];
+
+  //   await sendSlackMessage(
+  //   `<#${TEAM_ASK_CHANNEL_ID}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`,
+  //   channel,
+  //   thread_ts
+  // );
+
+  if (stats.totalNumInProgress > 0) {
+    message_blocks.push(
+      createBlock("These are the in progress asks we currently have:")
+    );
+    // const in_progress_blocks: SectionBlock[] = [
+    //   ,
+    // ];
+    message_blocks.push(
+      ...(await getPermalinkBlocks(stats.messagesInProgress))
+    );
+
+    // // TODO: Add a text block? Text does not show when there are blocks present (It's used as a fallback)
+    // await sendSlackMessage(
+    //   `These are the in progress asks we currently have:`,
+    //   channel,
+    //   thread_ts,
+    //   in_progress_blocks
+    // );
+  }
+
+  if (stats.totalNumUnchecked > 0) {
+    message_blocks.push(
+      createBlock("These are the open asks we currently have:")
+    );
+    message_blocks.push(...(await getPermalinkBlocks(stats.messagesUnchecked)));
+  }
+
+  await sendSlackMessage(
+    `<#${TEAM_ASK_CHANNEL_ID}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.\nUnable to display further details.`,
+    channel,
+    thread_ts,
+    message_blocks
+  );
+};
+
+// This method gets a list of messages and creates a permalink string for displaying the message.
+const getPermalinkBlocks = async function (
+  messages: any[]
+): Promise<SectionBlock[]> {
+  const block: SectionBlock[] = [];
+  const dateToday = new Date();
+
+  await Promise.all(
+    messages.map(async (message: any) => {
+      let permalink = await getMessagePermalink(
+        TEAM_ASK_CHANNEL_ID,
+        message.ts
+      );
+      if (permalink) {
+        const messageDate = toDateTime(message.ts);
+        const daysDifference = Math.round(
+          (dateToday.getTime() - messageDate.getTime()) / (1000 * 3600 * 24)
+        );
+        const daysMessage =
+          daysDifference == 0
+            ? " (earlier today)"
+            : daysDifference == 1
+            ? " (1 day ago)"
+            : ` (${daysDifference} days ago)`;
+        block.push(
+          createBlock(
+            `<${permalink}|Link to message> from ${
+              message.user ? `<@${message.user}>` : message.username
+            } at ${messageDate.toLocaleDateString()}${daysMessage}`
+          )
+        );
+      }
+    })
+  );
+
+  return block;
 };

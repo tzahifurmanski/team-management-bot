@@ -1,25 +1,46 @@
-import { handle_channel_event, handle_direct_event } from '../../bot_actions';
+import { handle_channel_event, handle_direct_event } from "../../bot_actions";
 
-import { BOT_ID, setSlackIds } from './consts';
-import { getBotId, getConversationId } from './conversations';
-import { botConfig } from '../../bot_config';
+import { BOT_ID, setSlackIds } from "./consts";
+import { getBotId, getConversationId } from "./conversations";
+import { botConfig } from "../../bot_config";
 
-const config = require('../../../config.json');
+const config = require("../../../config.json");
 
-const { createEventAdapter } = require('@slack/events-api');
+const { createEventAdapter } = require("@slack/events-api");
 const slackSigningSecret = config.SLACK_SIGNING_SECRET;
 const slackEventsSetup = createEventAdapter(slackSigningSecret);
 
 // Resolve the slack dynamic variables
-export const loadSlackConfig = async function() {
+export const loadSlackConfig = async function () {
+  // console.log("Starting Slack config load...");
   try {
     const botId = await getBotId();
 
-    const teamAskChannelId = await getConversationId(
-      config.TEAM_ASK_CHANNEL_NAME
+    const teamAskChannelId =
+      config.TEAM_ASK_CHANNEL_ID ||
+      (await getConversationId(config.TEAM_ASK_CHANNEL_NAME));
+
+    const teamChatterChannelId =
+      config.TEAM_CHATTER_CHANNEL_ID ||
+      (await getConversationId(config.TEAM_CHATTER_CHANNEL_NAME));
+
+    const teamLeadsChannelId =
+      config.TEAM_LEADS_CHANNEL_ID ||
+      (await getConversationId(config.TEAM_LEADS_CHANNEL_NAME));
+
+    const botTestsChannelId =
+      config.BOT_TESTS_CHANNEL_ID ||
+      (await getConversationId(config.BOT_TESTS_CHANNEL_NAME));
+
+    setSlackIds(
+      botId,
+      teamAskChannelId,
+      teamChatterChannelId,
+      teamLeadsChannelId,
+      botTestsChannelId
     );
 
-    setSlackIds(botId, teamAskChannelId);
+    // console.log("Slack config completed successfully.");
   } catch (err) {
     console.log("Error while loading Slack Dynamic vars!", err);
     return false;
@@ -29,35 +50,31 @@ export const loadSlackConfig = async function() {
 };
 
 slackEventsSetup.on("app_mention", async (event: any) => {
-  console.log("GOT AN APP MENTION!");
+  // console.log("GOT AN APP MENTION!");
   await handle_direct_event(event);
 });
 
 slackEventsSetup.on("message", async (event: any) => {
   // Ignore messages that the bot post in the conversation
-  if (
-    event.user === BOT_ID ||
-    event.username === botConfig.BOT_NAME ||
-    event.message?.username === botConfig.BOT_NAME
-  ) {
-    console.log('Got a message from bot, ignoring...');
+  if (isBotMessage(event)) {
+    console.log("Got a message from bot, ignoring...");
     return;
   }
 
   // Ignore specific messages types that were changed
   if (
-    event.subtype === 'message_changed' ||
-    event.subtype === 'message_deleted'
+    event.subtype === "message_changed" ||
+    event.subtype === "message_deleted"
   ) {
-    console.log('Got a message change event, ignoring...');
+    // console.log("Got a message change event, ignoring...");
     return;
   }
 
   if (event.channel_type == "channel") {
-    console.log("GOT A channel event!");
+    // console.log("GOT A channel event!");
     await handle_channel_event(event);
   } else if (event.channel_type == "im") {
-    console.log("GOT A MESSAGE!");
+    // console.log("GOT A MESSAGE!");
     await handle_direct_event(event);
   }
 });
@@ -68,4 +85,11 @@ slackEventsSetup.on("error", (error: any) => {
   console.log("Had an error!", error.name); // TypeError
 });
 
+export const isBotMessage = function (event: any): boolean {
+  return (
+    event.user === BOT_ID ||
+    event.username === botConfig.BOT_NAME ||
+    event.message?.username === botConfig.BOT_NAME
+  );
+};
 export const slackEvents = slackEventsSetup;

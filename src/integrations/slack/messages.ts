@@ -1,6 +1,7 @@
 import {
   ChatGetPermalinkArguments,
   ChatPostMessageArguments,
+  SectionBlock,
 } from "@slack/web-api";
 
 import { Block, KnownBlock } from "@slack/types";
@@ -19,7 +20,7 @@ export const sendSlackMessage = async function (
     text: text,
     channel: channel,
     username: botConfig.BOT_NAME,
-    icon_url: botConfig.BOT_IMAGE_URL, // TODO: This should work but for some reason, it doesn't :(
+    icon_url: botConfig.BOT_IMAGE_URL,
   };
 
   // If there are blocks, add them
@@ -32,16 +33,16 @@ export const sendSlackMessage = async function (
     options["thread_ts"] = thread_ts;
   }
   const result = await SlackWebClient.chat.postMessage(options);
-  console.log(result);
+  // console.log(result);
   // The result contains an identifier for the message, `ts`.
   console.log(
     `Successfully send message ${result.ts} in conversation ${channel}`
   );
 };
 
-export const createBlock = function (text: string) {
+export const createBlock = function (text: string): SectionBlock {
   // TODO: This currently only supports SectionBlock. Make it more dynamic?
-  const result: any = {
+  const result: SectionBlock = {
     type: "section",
     text: {
       type: "mrkdwn",
@@ -49,6 +50,7 @@ export const createBlock = function (text: string) {
     },
   };
 
+  // console.log("Text is - ", text);
   return result;
 };
 
