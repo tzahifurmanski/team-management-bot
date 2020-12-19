@@ -1,18 +1,12 @@
-import {
-  createBlock,
-  getMessagePermalink,
-} from "../../integrations/slack/messages";
 import { BotAction } from "../base_action";
-import { removeTimeInfoFromDate, setDateToSunday, toDateTime } from "../utils";
-import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
+import { removeTimeInfoFromDate, setDateToSunday } from "../utils";
 import {
   AsksChannelStatsResult,
-  getAskChannelMessages,
+  getChannelMessages,
   getStatsBuckets,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
-
-const { sendSlackMessage } = require("../../integrations/slack/messages");
+import { BOT_ID } from "../../integrations/slack/consts";
 
 export class AskChannelWeeklyStats implements BotAction {
   doesMatch(event: any): boolean {
@@ -23,13 +17,15 @@ export class AskChannelWeeklyStats implements BotAction {
   async performAction(event: any): Promise<void> {
     // Get the number of weeks back from event.text. Default is 0 (Beginning of this week).
     // Added 1 as default so I can reduce the user input by 1 (because week 0 is the first week)
-    const numOfWeeks = (event.text.split(" ")[4] || 1) - 1;
+    // TODO: Make this prettier - This is needed because we need to count for a scenario where the text starts with @unibot so we needs to exclude it
+    const numOfWeeks =
+      (event.text.replace(`<@${BOT_ID}> `, "").split(" ")[4] || 1) - 1;
 
     const startingDate = setDateToSunday(new Date());
     startingDate.setDate(startingDate.getDate() - 7 * numOfWeeks);
     removeTimeInfoFromDate(startingDate);
 
-    const messages: any[any] = await getAskChannelMessages(startingDate);
+    const messages: any[any] = await getChannelMessages(startingDate);
 
     const statsArray: AsksChannelStatsResult[] = await getStatsBuckets(
       messages,

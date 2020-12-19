@@ -79,12 +79,16 @@ export const getMessagePermalink = async function (
     channel: channel_id,
     message_ts: message_ts,
   };
-
-  const response = await SlackWebClient.chat.getPermalink(options);
-  if (response.ok) {
-    return response.permalink;
-  } else {
-    console.log("getMessagePermalink got bad response", response);
+  try {
+    const response = await SlackWebClient.chat.getPermalink(options);
+    if (response.ok) {
+      return response.permalink;
+    } else {
+      console.log("getMessagePermalink got bad response", response);
+      return "";
+    }
+  } catch (error) {
+    console.log("Error in message", message_ts, error);
     return "";
   }
 };

@@ -1,16 +1,19 @@
 import { BotAction } from "./actions/base_action";
 import { ASKS_ACTIONS } from "./actions/asks";
 import { RESPONSE_ACTIONS } from "./actions/responses";
-import { TEAM_ASK_CHANNEL_ID } from "./integrations/slack/consts";
+import {
+  TEAM_ASK_CHANNEL_ID,
+  TEAM_CHATTER_CHANNEL_ID,
+} from "./integrations/slack/consts";
 
 // TODO: Convert events handling to new format: https://api.slack.com/changelog/2020-09-15-events-api-truncate-authed-users
 
 // This method handles events that are posted directly inside a channel
 export const handle_channel_event = async function (event: any) {
-  // TODO: Limit this functionality to specific channels?
-  if (event.channel == TEAM_ASK_CHANNEL_ID) {
+  // Limit this functionality to specific channels
+  if (event.channel != TEAM_CHATTER_CHANNEL_ID) {
     console.log(
-      "This is the asks channel, we don't want to respond there just yet..."
+      "We only want to reply in the chatter channel (otherwise we'll spam tons of channels)"
     );
     return;
   }
@@ -39,7 +42,9 @@ export const handle_direct_event = async function (event: any) {
 async function runActions(event: any, actions: BotAction[]) {
   const result = actions.find((action) => action.doesMatch(event));
   if (result) {
-    console.log(`Got a '${result.constructor.name}' command!`);
+    console.log(
+      `Got a '${result.constructor.name}' event in channel ${event.channel}!`
+    );
     await result.performAction(event);
     return true;
   }

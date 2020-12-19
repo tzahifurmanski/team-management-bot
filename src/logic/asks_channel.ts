@@ -15,6 +15,7 @@ import { SectionBlock } from "@slack/web-api";
 export interface AsksChannelStatsResult {
   startDateInUTC: string;
   endDateInUTC?: string;
+  channelId: string;
   totalMessages: number;
   totalNumProcessed: number; // Processed message is one that is done / accomplished / handled
   totalNumInProgress: number;
@@ -25,10 +26,10 @@ export interface AsksChannelStatsResult {
 }
 
 // This method gets two dates and returns all the messages that were received in the asks channel during this timeframe
-// TODO: I THINK THAT THE SNYK SUPPORT MESSAGES ARE NOT COUNTED!!!!
-export const getAskChannelMessages = async function (
+export const getChannelMessages = async function (
   startingDate: Date,
-  endDate?: Date
+  endDate?: Date,
+  askChannelId: string = TEAM_ASK_CHANNEL_ID
 ): Promise<any[any]> {
   // console.log(
   //   `Getting ask channels messages between '${startingDate.toUTCString()}' and '${endDate?.toUTCString()}'`
@@ -36,8 +37,10 @@ export const getAskChannelMessages = async function (
   const oldestMessage = (startingDate.getTime() / 1000).toString();
   const latestMessage = endDate && (endDate.getTime() / 1000).toString();
 
+  // console.log(`Timeframe between '${oldestMessage}' and '${latestMessage}'`);
+
   return await getConversationHistory(
-    TEAM_ASK_CHANNEL_ID,
+    askChannelId,
     oldestMessage,
     latestMessage
   );
@@ -45,6 +48,7 @@ export const getAskChannelMessages = async function (
 
 // This method gets a list of messages and a timeframe and returns stats on these messages
 export const getStatsForMessages = function (
+  channelId: string,
   messages: any,
   startingDateInUTC: string,
   endDateInUTC?: string
@@ -83,6 +87,7 @@ export const getStatsForMessages = function (
       messages.length - unchecked_messages.length - in_progress_messages.length,
     totalNumInProgress: in_progress_messages.length,
     totalNumUnchecked: unchecked_messages.length,
+    channelId: channelId,
   };
 };
 
@@ -132,7 +137,8 @@ export const getBucketRange = function (
 
 export const getStatsBuckets = async function (
   messages: any[],
-  type: string // This can either bet 'week' or 'day'. This is the variable by which we're going to 'group by' the buckets
+  type: string,
+  channelId: string = TEAM_ASK_CHANNEL_ID // This can either bet 'week' or 'day'. This is the variable by which we're going to 'group by' the buckets
 ): Promise<AsksChannelWeeklyStatsResult[]> {
   let buckets = new Map<string, any[]>();
   let bucketsRanges: any = {};
@@ -168,11 +174,10 @@ export const getStatsBuckets = async function (
     // const [startDate, endDate] = key;
 
     const stats: AsksChannelStatsResult = getStatsForMessages(
+      channelId,
       currBucketMessages,
       key,
       bucketsRanges[key]
-      // startDate,
-      // endDate
     );
     results.push(stats);
   }
@@ -182,8 +187,9 @@ export const getStatsBuckets = async function (
 
 export const reportStatsToSlack = async function (
   stats: AsksChannelStatsResult,
-  channel: any,
-  thread_ts: any
+  destinationChannel: any,
+  destinationThreadTS: any,
+  includeDetails: boolean = true
 ) {
   // console.log("Time in utc - start", stats.startDateInUTC);
   // console.log("Time in utc - end", stats.endDateInUTC);
@@ -191,53 +197,44 @@ export const reportStatsToSlack = async function (
   // TODO: Send only one message, send all the text in blocks
   const message_blocks: SectionBlock[] = [
     createBlock(
-      `<#${TEAM_ASK_CHANNEL_ID}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`
+      `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`
     ),
   ];
 
-  //   await sendSlackMessage(
-  //   `<#${TEAM_ASK_CHANNEL_ID}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`,
-  //   channel,
-  //   thread_ts
-  // );
+  if (includeDetails) {
+    if (stats.totalNumInProgress > 0) {
+      message_blocks.push(
+        createBlock("These are the in progress asks we currently have:")
+      );
+      // const in_progress_blocks: SectionBlock[] = [
+      //   ,
+      // ];
+      message_blocks.push(
+        ...(await getPermalinkBlocks(stats.channelId, stats.messagesInProgress))
+      );
+    }
 
-  if (stats.totalNumInProgress > 0) {
-    message_blocks.push(
-      createBlock("These are the in progress asks we currently have:")
-    );
-    // const in_progress_blocks: SectionBlock[] = [
-    //   ,
-    // ];
-    message_blocks.push(
-      ...(await getPermalinkBlocks(stats.messagesInProgress))
-    );
-
-    // // TODO: Add a text block? Text does not show when there are blocks present (It's used as a fallback)
-    // await sendSlackMessage(
-    //   `These are the in progress asks we currently have:`,
-    //   channel,
-    //   thread_ts,
-    //   in_progress_blocks
-    // );
-  }
-
-  if (stats.totalNumUnchecked > 0) {
-    message_blocks.push(
-      createBlock("These are the open asks we currently have:")
-    );
-    message_blocks.push(...(await getPermalinkBlocks(stats.messagesUnchecked)));
+    if (stats.totalNumUnchecked > 0) {
+      message_blocks.push(
+        createBlock("These are the open asks we currently have:")
+      );
+      message_blocks.push(
+        ...(await getPermalinkBlocks(stats.channelId, stats.messagesUnchecked))
+      );
+    }
   }
 
   await sendSlackMessage(
-    `<#${TEAM_ASK_CHANNEL_ID}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.\nUnable to display further details.`,
-    channel,
-    thread_ts,
+    `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.\nUnable to display further details.`,
+    destinationChannel,
+    destinationThreadTS,
     message_blocks
   );
 };
 
 // This method gets a list of messages and creates a permalink string for displaying the message.
 const getPermalinkBlocks = async function (
+  channelId: string,
   messages: any[]
 ): Promise<SectionBlock[]> {
   const block: SectionBlock[] = [];
@@ -245,10 +242,7 @@ const getPermalinkBlocks = async function (
 
   await Promise.all(
     messages.map(async (message: any) => {
-      let permalink = await getMessagePermalink(
-        TEAM_ASK_CHANNEL_ID,
-        message.ts
-      );
+      let permalink = await getMessagePermalink(channelId, message.ts);
       if (permalink) {
         const messageDate = toDateTime(message.ts);
         const daysDifference = Math.round(

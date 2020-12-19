@@ -1,6 +1,6 @@
 import { handle_channel_event, handle_direct_event } from "../../bot_actions";
 
-import { BOT_ID, setSlackIds } from "./consts";
+import { BOT_ID, setSlackConfiguration } from "./consts";
 import { getBotId, getConversationId } from "./conversations";
 import { botConfig } from "../../bot_config";
 
@@ -32,15 +32,25 @@ export const loadSlackConfig = async function () {
       config.BOT_TESTS_CHANNEL_ID ||
       (await getConversationId(config.BOT_TESTS_CHANNEL_NAME));
 
-    setSlackIds(
+    // TODO: Allow to add defaults
+    let groupAsksChannelsList = new Map<string, string>();
+    config.GROUP_ASK_CHANNELS.forEach((channelDetails: string) => {
+      const details = channelDetails.split(":");
+      groupAsksChannelsList.set(details[0], details[1]);
+    });
+
+    groupAsksChannelsList.set(config.TEAM_ASK_CHANNEL_NAME, teamAskChannelId);
+
+    setSlackConfiguration(
       botId,
       teamAskChannelId,
       teamChatterChannelId,
       teamLeadsChannelId,
-      botTestsChannelId
+      botTestsChannelId,
+      groupAsksChannelsList
     );
 
-    // console.log("Slack config completed successfully.");
+    console.log("Slack config completed successfully.");
   } catch (err) {
     console.log("Error while loading Slack Dynamic vars!", err);
     return false;

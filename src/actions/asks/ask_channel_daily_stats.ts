@@ -1,18 +1,12 @@
-import {
-  createBlock,
-  getMessagePermalink,
-} from "../../integrations/slack/messages";
 import { BotAction } from "../base_action";
-import { removeTimeInfoFromDate, setDateToSunday, toDateTime } from "../utils";
-import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
+import { removeTimeInfoFromDate } from "../utils";
 import {
   AsksChannelStatsResult,
-  getAskChannelMessages,
+  getChannelMessages,
   getStatsBuckets,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
-
-const { sendSlackMessage } = require("../../integrations/slack/messages");
+import { BOT_ID } from "../../integrations/slack/consts";
 
 export class AskChannelDailyStats implements BotAction {
   doesMatch(event: any): boolean {
@@ -23,13 +17,15 @@ export class AskChannelDailyStats implements BotAction {
   async performAction(event: any): Promise<void> {
     // Get the number of days back from event.text. Default is 0 (this day)
     // Added 1 as default so I can reduce the user input by 1 (because day 0 is the first day)
-    const numOfDays = (event.text.split(" ")[4] || 1) - 1;
+    // TODO: Make this prettier - This is needed because we need to count for a scenario where the text starts with @unibot so we needs to exclude it
+    const numOfDays =
+      (event.text.replace(`<@${BOT_ID}> `, "").split(" ")[4] || 1) - 1;
 
     const startingDate = new Date();
     startingDate.setDate(startingDate.getDate() - numOfDays);
     removeTimeInfoFromDate(startingDate);
 
-    const messages: any[any] = await getAskChannelMessages(startingDate);
+    const messages: any[any] = await getChannelMessages(startingDate);
 
     const statsArray: AsksChannelStatsResult[] = await getStatsBuckets(
       messages,

@@ -1,29 +1,24 @@
-import {
-  createBlock,
-  getMessagePermalink,
-} from "../../integrations/slack/messages";
 import { BotAction } from "../base_action";
-import { removeTimeInfoFromDate, setDateToSunday, toDateTime } from "../utils";
-import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
 import {
   AsksChannelStatsResult,
-  getAskChannelMessages,
+  getChannelMessages,
   getStatsBuckets,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
-
-const { sendSlackMessage } = require("../../integrations/slack/messages");
+import { BOT_ID } from "../../integrations/slack/consts";
 
 export class AskChannelMonthlyStats implements BotAction {
   doesMatch(event: any): boolean {
-    // TODO: ask channel weekly?
+    // TODO: ask channel monthly?
     return event.text.includes("ask channel monthly stats");
   }
 
   async performAction(event: any): Promise<void> {
     // Get the number of weeks back from event.text. Default is 0 (Beginning of this month).
     // Added 1 as default so I can reduce the user input by 1 (because week 0 is the first month)
-    const numOfMonths = (event.text.split(" ")[4] || 1) - 1;
+    // TODO: Make this prettier - This is needed because we need to count for a scenario where the text starts with @unibot so we needs to exclude it
+    const numOfMonths =
+      (event.text.replace(`<@${BOT_ID}> `, "").split(" ")[4] || 1) - 1;
 
     // Get the timeframe for the beginning of the month
     const date = new Date();
@@ -31,11 +26,9 @@ export class AskChannelMonthlyStats implements BotAction {
       Date.UTC(date.getFullYear(), date.getMonth() - numOfMonths, 1, 0)
     );
 
-    // TODO: THIS IS NOT GOOD
-    console.log("Monthly - ", startingDate.toUTCString());
-    // removeTimeInfoFromDate(startingDate);
+    // Create a list of channels to get stats on
 
-    const messages: any[any] = await getAskChannelMessages(startingDate);
+    const messages: any[any] = await getChannelMessages(startingDate);
 
     const statsArray: AsksChannelStatsResult[] = await getStatsBuckets(
       messages,

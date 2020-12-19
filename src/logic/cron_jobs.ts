@@ -1,7 +1,7 @@
 import { removeTimeInfoFromDate } from "../actions/utils";
 import {
   AsksChannelStatsResult,
-  getAskChannelMessages,
+  getChannelMessages,
   getStatsForMessages,
 } from "./asks_channel";
 import { sendSlackMessage } from "../integrations/slack/messages";
@@ -27,9 +27,10 @@ export const getAskChannelStatsForYesterday = async function () {
   //   `timeframe is ${startingDate.toUTCString()} to ${endingDate}.toUTCString()`
   // );
 
-  const messages: any[any] = await getAskChannelMessages(startingDate);
+  const messages: any[any] = await getChannelMessages(startingDate);
 
   const stats: AsksChannelStatsResult = await getStatsForMessages(
+    TEAM_ASK_CHANNEL_ID,
     messages,
     startingDate.toUTCString(),
     endingDate.toUTCString()
@@ -51,10 +52,11 @@ export const getAskChannelStatsForYesterday = async function () {
   removeTimeInfoFromDate(beginningOfMonthDate);
   const now = new Date();
 
-  const monthMessages: any[any] = await getAskChannelMessages(
+  const monthMessages: any[any] = await getChannelMessages(
     beginningOfMonthDate
   );
   const monthStats: AsksChannelStatsResult = await getStatsForMessages(
+    TEAM_ASK_CHANNEL_ID,
     monthMessages,
     beginningOfMonthDate.toUTCString(),
     now.toUTCString()
@@ -79,8 +81,9 @@ export const postWeeklyLeadsStats = async function () {
   removeTimeInfoFromDate(tempDate);
   const endingDate = new Date(tempDate.getTime() - 1);
 
-  const monthMessages: any[any] = await getAskChannelMessages(startTimeframe);
+  const monthMessages: any[any] = await getChannelMessages(startTimeframe);
   const monthStats: AsksChannelStatsResult = await getStatsForMessages(
+    TEAM_ASK_CHANNEL_ID,
     monthMessages,
     startTimeframe.toUTCString(),
     endingDate.toUTCString()

@@ -7,11 +7,15 @@ import { MeaningOfLife } from "./meaning_of_life";
 import { AskChannelWeeklyStats } from "./ask_channel_weekly_stats";
 import { AskChannelDailyStats } from "./ask_channel_daily_stats";
 import { AskChannelMonthlyStats } from "./ask_channel_monthly_stats";
+import { GroupAskChannelMonthlyStats } from "./group_ask_channel_monthly_stats";
+import { MonitoredChannelSummaryStats } from "./monitored_channel_stats";
 
 export const ASKS_ACTIONS: BotAction[] = [
   new Compliment(),
   new IntroduceYourself(),
   new WhatCanYouDo(),
+  new MonitoredChannelSummaryStats(),
+  new GroupAskChannelMonthlyStats(),
   new AskChannelSummaryStats(),
   new AskChannelDailyStats(),
   new AskChannelWeeklyStats(),
