@@ -10,7 +10,7 @@ const cron = require("node-cron");
 const { createServer } = require("http");
 const express_app = require("./server_init");
 
-const SERVER_PORT = process.env.SERVER_PORT || 3000;
+const SERVER_PORT = process.env.PORT || 3000;
 
 async function init() {
   // TODO: Loading takes time now - I think this is the issue
