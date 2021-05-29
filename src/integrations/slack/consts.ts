@@ -1,4 +1,3 @@
-const config = require("../../../config.json");
 const { WebClient } = require("@slack/web-api");
 
 export const SLACK_USER_FORMAT: RegExp = /<@.*>/;
@@ -12,14 +11,14 @@ export let TEAM_LEADS_CHANNEL_ID: string;
 export let BOT_TESTS_CHANNEL_ID: string;
 export let GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
 
-export const setSlackConfiguration = function(
+export const setSlackConfiguration = function (
   botId: string,
   teamAskChannelId: string,
   teamChatterChannelId: string,
   teamCodeReviewChannelId: string,
   teamLeadsChannelId: string,
   botTestsChannelId: string,
-  groupAskChannelsList: Map<string, string>,
+  groupAskChannelsList: Map<string, string>
 ) {
   BOT_ID = botId;
   TEAM_ASK_CHANNEL_ID = teamAskChannelId;
@@ -30,5 +29,5 @@ export const setSlackConfiguration = function(
   GROUP_ASK_CHANNELS_LIST = groupAskChannelsList;
 };
 
-const token: string = config.BOT_USER_OAUTH_ACCESS_TOKEN;
+const token: string = process.env.BOT_USER_OAUTH_ACCESS_TOKEN || "";
 export const SlackWebClient = new WebClient(token);

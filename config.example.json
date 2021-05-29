@@ -1,9 +1,0 @@
-{
-  "BOT_USER_OAUTH_ACCESS_TOKEN": "ENTER CODE HERE",
-  "SLACK_SIGNING_SECRET": "ENTER CODE HERE",
-  "BOT_PERSONALITY": "bojack",
-  "TEAM_ASK_CHANNEL_NAME": "ask-zigi",
-  "TEAM_NAME": "Warlords",
-  "TEAM_SPECIFIC_COMPLIMENTS": "You're almost as funny as Zigi,Always Be yourself - unless you can be David",
-  "SERVER_PORT": 3000
-}

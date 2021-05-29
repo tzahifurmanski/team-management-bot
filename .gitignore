@@ -3,6 +3,6 @@ ngrok/
 
 # Dependency directories
 node_modules/
-
+.env
 .idea/
 config.json

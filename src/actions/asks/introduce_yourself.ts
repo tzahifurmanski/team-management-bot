@@ -2,10 +2,9 @@ import { BotAction } from "../base_action";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
-const config = require("../../../config.json");
 import { botConfig } from "../../bot_config";
 
-const TEAM_NAME = config.TEAM_NAME;
+const TEAM_NAME = process.env.TEAM_NAME;
 
 export class IntroduceYourself implements BotAction {
   doesMatch(event: any): boolean {

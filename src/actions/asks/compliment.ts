@@ -3,8 +3,6 @@ import { BotAction } from "../base_action";
 import { getRandomFromArray } from "../utils";
 import { botConfig } from "../../bot_config";
 
-const config = require("../../../config.json");
-
 const {
   sendSlackMessage,
   getUserIDInText,
@@ -12,7 +10,7 @@ const {
 
 // Use a predefined compliments pool and anything that is team specific
 const COMPLIMENTS = botConfig.ACTION_COMPLIMENT_POOL.concat(
-  (config.TEAM_SPECIFIC_COMPLIMENTS || "").split(",")
+  (process.env.TEAM_SPECIFIC_COMPLIMENTS || "").split(",")
 );
 
 export class Compliment implements BotAction {

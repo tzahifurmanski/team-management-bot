@@ -11,8 +11,6 @@ import {
   TEAM_LEADS_CHANNEL_ID,
 } from "../integrations/slack/consts";
 
-const config = require("../../config.json");
-
 export const getAskChannelStatsForYesterday = async function () {
   console.log("Posting the daily asks channel stats summary");
 
@@ -38,7 +36,7 @@ export const getAskChannelStatsForYesterday = async function () {
   );
 
   await sendSlackMessage(
-    `Good morning ${config.TEAM_FOLKS}:sunny:\nYesterday, <#${TEAM_ASK_CHANNEL_ID}> received a *total of ${stats.totalMessages} new asks*. Out of those, *${stats.totalNumProcessed} were answered*, *${stats.totalNumInProgress} are in progress*, and *${stats.totalNumUnchecked} were not handled*.`,
+    `Good morning ${process.env.TEAM_FOLKS}:sunny:\nYesterday, <#${TEAM_ASK_CHANNEL_ID}> received a *total of ${stats.totalMessages} new asks*. Out of those, *${stats.totalNumProcessed} were answered*, *${stats.totalNumInProgress} are in progress*, and *${stats.totalNumUnchecked} were not handled*.`,
     TEAM_CHATTER_CHANNEL_ID
   );
 
@@ -92,7 +90,7 @@ export const postWeeklyLeadsStats = async function () {
     endingDate.toUTCString()
   );
   await sendSlackMessage(
-    `Good morning ${config.TEAM_LEADS}:sunny:\nIn the previous ${DAYS_BACK} days, team ${config.TEAM_NAME} had a *total of ${monthStats.totalMessages} asks*. Out of those, *${monthStats.totalNumProcessed} were answered*, *${monthStats.totalNumInProgress} are in progress*, and *${monthStats.totalNumUnchecked} were not handled*.`,
+    `Good morning ${process.env.TEAM_LEADS}:sunny:\nIn the previous ${DAYS_BACK} days, team ${process.env.TEAM_NAME} had a *total of ${monthStats.totalMessages} asks*. Out of those, *${monthStats.totalNumProcessed} were answered*, *${monthStats.totalNumInProgress} are in progress*, and *${monthStats.totalNumUnchecked} were not handled*.`,
     TEAM_LEADS_CHANNEL_ID
   );
 };

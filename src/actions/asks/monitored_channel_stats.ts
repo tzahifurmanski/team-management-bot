@@ -1,5 +1,5 @@
 import { BotAction } from "../base_action";
-import { removeTimeInfoFromDate, setDateToSunday } from "../utils";
+import { removeTimeInfoFromDate } from "../utils";
 import { getChannelMessages } from "../../logic/asks_channel";
 import {
   getMonitoredChannelStatsForMessages,
@@ -8,12 +8,10 @@ import {
 } from "../../logic/monitored_channel";
 import { BOT_ID } from "../../integrations/slack/consts";
 
-const config = require("../../../config.json");
-
 export class MonitoredChannelSummaryStats implements BotAction {
   doesMatch(event: any): boolean {
     // TODO: ask channel summary?
-    return event.text.includes(config.MONITORED_CHANNEL_TRIGGER);
+    return event.text.includes(process.env.MONITORED_CHANNEL_TRIGGER);
   }
 
   async performAction(event: any): Promise<void> {
@@ -23,7 +21,7 @@ export class MonitoredChannelSummaryStats implements BotAction {
     // TODO: Make this prettier - This is needed because we need to count for a scenario where the text starts with @unibot so we needs to exclude it
     const numOfDays =
       (event.text.replace(`<@${BOT_ID}> `, "").split(" ")[
-        config.MONITORED_CHANNEL_DAYS_INDEX
+        process.env.MONITORED_CHANNEL_DAYS_INDEX || 0
       ] || 1) - 1;
     const startingDate = new Date();
     startingDate.setDate(startingDate.getDate() - numOfDays);
@@ -34,17 +32,17 @@ export class MonitoredChannelSummaryStats implements BotAction {
     const messages: any[any] = await getChannelMessages(
       startingDate,
       endingDate,
-      config.MONITORED_CHANNEL_ID
+      process.env.MONITORED_CHANNEL_ID
     );
 
     const stats: MonitoredChannelStatsResult = await getMonitoredChannelStatsForMessages(
-      config.MONITORED_CHANNEL_ID,
+      process.env.MONITORED_CHANNEL_ID || "",
       messages,
       startingDate.toUTCString(),
       endingDate.toUTCString(),
-      config.MONITORED_CHANNEL_CONDITION_USERNAME,
-      config.MONITORED_CHANNEL_CONDITION_MESSAGE_SUCCESS,
-      config.MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE
+      process.env.MONITORED_CHANNEL_CONDITION_USERNAME,
+      process.env.MONITORED_CHANNEL_CONDITION_MESSAGE_SUCCESS,
+      process.env.MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE
     );
 
     await reportMonitoredChannelStatsToSlack(
