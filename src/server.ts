@@ -1,8 +1,7 @@
 import { loadSlackConfig } from "./integrations/slack/events";
 import { getAskChannelStatsForYesterday } from "./logic/cron_jobs";
 
-// import config from
-
+// Load the .env file config
 require("dotenv").config();
 
 const cron = require("node-cron");
@@ -13,7 +12,6 @@ const express_app = require("./server_init");
 const SERVER_PORT = process.env.PORT || 3000;
 
 async function init() {
-  // TODO: Loading takes time now - I think this is the issue
   const loadResult = await loadSlackConfig();
   if (!loadResult) {
     console.log("Loading failed!");

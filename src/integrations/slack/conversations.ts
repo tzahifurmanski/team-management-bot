@@ -12,6 +12,11 @@ export const getConversationId = async function (
   types_list: string = "public_channel,private_channel",
   cursor: string = ""
 ): Promise<string> {
+  // Return fast if there's no name
+  if (!name) {
+    return "";
+  }
+
   console.log("Resolving conversation id for channel", name);
   // Get the channels list from slack
   const options: ConversationsListArguments = {
