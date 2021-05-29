@@ -30,8 +30,10 @@
     "typescript": "4.0.3"
   },
   "scripts": {
-    "start": "tsc && node dist/server.js",
-    "dev": "tsc-watch --project tsconfig.json --onSuccess 'node dist/server.js'",
+    "start": "node dist/server.js",
+    "postinstall": "tsc",
+    "dev-start": "tsc && node dist/server.js",
+    "debug": "tsc-watch --project tsconfig.json --onSuccess 'node dist/server.js'",
     "test": "cross-env NODE_ENV=test jest --testTimeout=10000"
   },
   "jest": {
