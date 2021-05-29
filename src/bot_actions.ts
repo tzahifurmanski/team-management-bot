@@ -1,12 +1,15 @@
-import { BotAction } from './actions/base_action';
-import { ASKS_ACTIONS } from './actions/asks';
-import { RESPONSE_ACTIONS } from './actions/responses';
-import { TEAM_CHATTER_CHANNEL_ID, TEAM_CODE_REVIEW_CHANNEL_ID } from './integrations/slack/consts';
+import { BotAction } from "./actions/base_action";
+import { ASKS_ACTIONS } from "./actions/asks";
+import { RESPONSE_ACTIONS } from "./actions/responses";
+import {
+  TEAM_CHATTER_CHANNEL_ID,
+  TEAM_CODE_REVIEW_CHANNEL_ID,
+} from "./integrations/slack/consts";
 
 // TODO: Convert events handling to new format: https://api.slack.com/changelog/2020-09-15-events-api-truncate-authed-users
 
 // This method handles events that are posted directly inside a channel
-export const handle_channel_event = async function(event: any) {
+export const handle_channel_event = async function (event: any) {
   // Limit this functionality to specific channels (otherwise we'll spam tons of channels)
   if (
     event.channel != TEAM_CHATTER_CHANNEL_ID &&

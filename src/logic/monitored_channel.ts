@@ -1,4 +1,4 @@
-import { sendSlackMessage } from '../integrations/slack/messages';
+import { sendSlackMessage } from "../integrations/slack/messages";
 
 export interface MonitoredChannelStatsResult {
   startDateInUTC: string;
@@ -31,7 +31,7 @@ export const getMonitoredChannelStatsForMessages = function (
     !conditionFailureMessage
   ) {
     console.log(
-      'No monitored channels stats conditions, so stats grouping is unavailable.',
+      "No monitored channels stats conditions, so stats grouping is unavailable."
     );
 
     return {
@@ -44,10 +44,10 @@ export const getMonitoredChannelStatsForMessages = function (
     };
   }
 
-  const success_messages = messages.filter(function(el: any) {
+  const success_messages = messages.filter(function (el: any) {
     return (
       (!conditionUsername || el.username === conditionUsername) &&
-      el.attachments?.filter(function(attachment: any) {
+      el.attachments?.filter(function (attachment: any) {
         return attachment.title?.includes(conditionSuccessMessage);
       }).length > 0
     );

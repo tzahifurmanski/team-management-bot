@@ -1,12 +1,20 @@
-import { removeTimeInfoFromDate } from '../actions/utils';
-import { AsksChannelStatsResult, getChannelMessages, getStatsForMessages } from './asks_channel';
-import { sendSlackMessage } from '../integrations/slack/messages';
-import { TEAM_ASK_CHANNEL_ID, TEAM_CHATTER_CHANNEL_ID, TEAM_LEADS_CHANNEL_ID } from '../integrations/slack/consts';
+import { removeTimeInfoFromDate } from "../actions/utils";
+import {
+  AsksChannelStatsResult,
+  getChannelMessages,
+  getStatsForMessages,
+} from "./asks_channel";
+import { sendSlackMessage } from "../integrations/slack/messages";
+import {
+  TEAM_ASK_CHANNEL_ID,
+  TEAM_CHATTER_CHANNEL_ID,
+  TEAM_LEADS_CHANNEL_ID,
+} from "../integrations/slack/consts";
 
-const config = require('../../config.json');
+const config = require("../../config.json");
 
-export const getAskChannelStatsForYesterday = async function() {
-  console.log('Posting the daily asks channel stats summary');
+export const getAskChannelStatsForYesterday = async function () {
+  console.log("Posting the daily asks channel stats summary");
 
   // Set the timeframe range to be yesterday
   const startingDate = new Date();
@@ -52,11 +60,11 @@ export const getAskChannelStatsForYesterday = async function() {
     TEAM_ASK_CHANNEL_ID,
     monthMessages,
     beginningOfMonthDate.toUTCString(),
-    now.toUTCString(),
+    now.toUTCString()
   );
   await sendSlackMessage(
     `In the last ${DAYS_BACK} days, <#${TEAM_ASK_CHANNEL_ID}> had a *total of ${monthStats.totalMessages} asks*. Out of those, *${monthStats.totalNumProcessed} were answered*, *${monthStats.totalNumInProgress} are in progress*, and *${monthStats.totalNumUnchecked} were not handled*.`,
-    TEAM_CHATTER_CHANNEL_ID,
+    TEAM_CHATTER_CHANNEL_ID
   );
 
   // TODO: Add thread messages with the details

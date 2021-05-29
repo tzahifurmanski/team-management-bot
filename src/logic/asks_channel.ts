@@ -1,8 +1,16 @@
-import { getConversationHistory } from '../integrations/slack/conversations';
-import { TEAM_ASK_CHANNEL_ID } from '../integrations/slack/consts';
-import { createBlock, getMessagePermalink, sendSlackMessage } from '../integrations/slack/messages';
-import { removeTimeInfoFromDate, setDateToSunday, toDateTime } from '../actions/utils';
-import { SectionBlock } from '@slack/web-api';
+import { getConversationHistory } from "../integrations/slack/conversations";
+import { TEAM_ASK_CHANNEL_ID } from "../integrations/slack/consts";
+import {
+  createBlock,
+  getMessagePermalink,
+  sendSlackMessage,
+} from "../integrations/slack/messages";
+import {
+  removeTimeInfoFromDate,
+  setDateToSunday,
+  toDateTime,
+} from "../actions/utils";
+import { SectionBlock } from "@slack/web-api";
 
 export interface AsksChannelStatsResult {
   startDateInUTC: string;
@@ -61,13 +69,13 @@ export const getStatsForMessages = function (
   // Go over all unchecked messages and get the permalinks
   const in_progress_messages = messages.filter(function (el: any) {
     return (
-      el?.reactions?.filter(function(reaction: any) {
-        return reaction.name === 'in-progress';
+      el?.reactions?.filter(function (reaction: any) {
+        return reaction.name === "in-progress";
       }).length > 0 &&
-      el?.reactions.filter(function(reaction: any) {
+      el?.reactions.filter(function (reaction: any) {
         return (
-          reaction.name === 'white_check_mark' ||
-          reaction.name === 'heavy_check_mark'
+          reaction.name === "white_check_mark" ||
+          reaction.name === "heavy_check_mark"
         );
       }).length == 0
     );

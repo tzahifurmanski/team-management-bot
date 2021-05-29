@@ -1,16 +1,20 @@
-import { ChatGetPermalinkArguments, ChatPostMessageArguments, SectionBlock } from '@slack/web-api';
+import {
+  ChatGetPermalinkArguments,
+  ChatPostMessageArguments,
+  SectionBlock,
+} from "@slack/web-api";
 
-import { Block, KnownBlock } from '@slack/types';
-import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from './consts';
-import { botConfig } from '../../bot_config';
+import { Block, KnownBlock } from "@slack/types";
+import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from "./consts";
+import { botConfig } from "../../bot_config";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
-export const sendSlackMessage = async function(
+export const sendSlackMessage = async function (
   text: string,
   channel: string,
-  thread_ts: string = '',
-  blocks: (KnownBlock | Block)[] = [],
+  thread_ts: string = "",
+  blocks: (KnownBlock | Block)[] = []
 ) {
   const options: ChatPostMessageArguments = {
     text: text,
@@ -23,12 +27,12 @@ export const sendSlackMessage = async function(
   //  the blocks to a separate message
   // If there are blocks, add them
   if (blocks) {
-    options['blocks'] = blocks;
+    options["blocks"] = blocks;
   }
 
   // If we're in a thread, reply in the thread
   if (thread_ts) {
-    options['thread_ts'] = thread_ts;
+    options["thread_ts"] = thread_ts;
   }
   const result = await SlackWebClient.chat.postMessage(options);
   // console.log(result);
