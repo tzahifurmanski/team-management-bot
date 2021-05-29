@@ -1,17 +1,15 @@
 // This is a util function that is able to look for the ID of a conversation / channel by name
-import { BOT_ID, SlackWebClient } from "./consts";
-import {
-  ConversationsHistoryArguments,
-  ConversationsListArguments,
-} from "@slack/web-api";
-import { isBotMessage } from "./events";
+import { BOT_ID, SlackWebClient } from './consts';
+import { ConversationsHistoryArguments, ConversationsListArguments } from '@slack/web-api';
+import { isBotMessage } from './events';
 
 // If something is not found, we'll have to go over everything
-export const getConversationId = async function (
+export const getConversationId = async function(
   name: string,
-  types_list: string = "public_channel,private_channel",
-  cursor: string = ""
+  types_list: string = 'public_channel,private_channel',
+  cursor: string = '',
 ): Promise<string> {
+  console.log('Resolving conversation id for channel', name);
   // Get the channels list from slack
   const options: ConversationsListArguments = {
     types: types_list,
@@ -31,12 +29,22 @@ export const getConversationId = async function (
   // If we've found it, return the ID.
   if (filtered.length > 0) {
     // TODO: If there's more than 1, we'll return the first
+    console.log(
+      'Resolving conversation id for channel \'' +
+      name +
+      '\' with \'' +
+      filtered[0].id +
+      '\'',
+    );
     return filtered[0].id;
   } else {
     //  If possible, get the next cursor and look again
     if (!channelsList.response_metadata.next_cursor) {
       // No more data, we didn't find return empty
-      return "";
+      console.log(
+        'Could not resolve conversation id for channel \'' + name + '\'',
+      );
+      return '';
     } else {
       return getConversationId(
         name,

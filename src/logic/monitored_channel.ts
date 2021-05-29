@@ -1,16 +1,16 @@
-import { sendSlackMessage } from "../integrations/slack/messages";
+import { sendSlackMessage } from '../integrations/slack/messages';
 
 export interface MonitoredChannelStatsResult {
   startDateInUTC: string;
   endDateInUTC?: string;
   channelId: string;
   totalMessages: number;
-  totalNumSuccess: number; // Processed message is one that is done / accomplished / handled
-  totalNumFailure: number;
+  totalNumSuccess?: number; // Processed message is one that is done / accomplished / handled
+  totalNumFailure?: number;
   eventEntity?: string;
   messages: any[];
-  messagesSuccess: any[];
-  messagesFailure: any[];
+  messagesSuccess?: any[];
+  messagesFailure?: any[];
 }
 
 // This method gets a list of messages and a timeframe and returns stats on these messages
@@ -24,10 +24,30 @@ export const getMonitoredChannelStatsForMessages = function (
   conditionFailureMessage?: string,
   eventEntity?: string
 ): MonitoredChannelStatsResult {
-  const success_messages = messages.filter(function (el: any) {
+  // Check if no filter conditions were given. If so, skip filtering and return everything.
+  if (
+    !conditionUsername &&
+    !conditionSuccessMessage &&
+    !conditionFailureMessage
+  ) {
+    console.log(
+      'No monitored channels stats conditions, so stats grouping is unavailable.',
+    );
+
+    return {
+      eventEntity: eventEntity,
+      startDateInUTC: startingDateInUTC,
+      endDateInUTC: endDateInUTC,
+      messages: messages,
+      totalMessages: messages.length,
+      channelId: channelId,
+    };
+  }
+
+  const success_messages = messages.filter(function(el: any) {
     return (
-      el.username === conditionUsername &&
-      el.attachments?.filter(function (attachment: any) {
+      (!conditionUsername || el.username === conditionUsername) &&
+      el.attachments?.filter(function(attachment: any) {
         return attachment.title?.includes(conditionSuccessMessage);
       }).length > 0
     );
@@ -69,6 +89,7 @@ export const reportMonitoredChannelStatsToSlack = async function (
   // console.log("Time in utc - end", stats.endDateInUTC);
 
   await sendSlackMessage(
+    // TODO: Skip the second line if there are no stats.totalNumSuccess and  stats.totalNumFailure
     `<#${stats.channelId}> had a *total of ${stats.totalMessages} ${
       stats.eventEntity ? stats.eventEntity : "events"
     }* between ${stats.startDateInUTC} and ${

@@ -1,18 +1,18 @@
-import { handle_channel_event, handle_direct_event } from "../../bot_actions";
+import { handle_channel_event, handle_direct_event } from '../../bot_actions';
 
-import { BOT_ID, setSlackConfiguration } from "./consts";
-import { getBotId, getConversationId } from "./conversations";
-import { botConfig } from "../../bot_config";
+import { BOT_ID, setSlackConfiguration } from './consts';
+import { getBotId, getConversationId } from './conversations';
+import { botConfig } from '../../bot_config';
 
-const config = require("../../../config.json");
+const config = require('../../../config.json');
 
-const { createEventAdapter } = require("@slack/events-api");
+const { createEventAdapter } = require('@slack/events-api');
 const slackSigningSecret = config.SLACK_SIGNING_SECRET;
 const slackEventsSetup = createEventAdapter(slackSigningSecret);
 
 // Resolve the slack dynamic variables
-export const loadSlackConfig = async function () {
-  // console.log("Starting Slack config load...");
+export const loadSlackConfig = async function() {
+  console.log('Starting Slack config load...');
   try {
     const botId = await getBotId();
 
@@ -24,6 +24,10 @@ export const loadSlackConfig = async function () {
       config.TEAM_CHATTER_CHANNEL_ID ||
       (await getConversationId(config.TEAM_CHATTER_CHANNEL_NAME));
 
+    const teamCodeReviewChannelId =
+      config.TEAM_CODE_REVIEW_CHANNEL_ID ||
+      (await getConversationId(config.TEAM_CODE_REVIEW_CHANNEL_NAME));
+
     const teamLeadsChannelId =
       config.TEAM_LEADS_CHANNEL_ID ||
       (await getConversationId(config.TEAM_LEADS_CHANNEL_NAME));
@@ -34,8 +38,10 @@ export const loadSlackConfig = async function () {
 
     // TODO: Allow to add defaults
     let groupAsksChannelsList = new Map<string, string>();
-    config.GROUP_ASK_CHANNELS.forEach((channelDetails: string) => {
-      const details = channelDetails.split(":");
+
+    const asksChannels = (config.GROUP_ASK_CHANNELS || '').split(',');
+    asksChannels.forEach((channelDetails: string) => {
+      const details = channelDetails.split(':');
       groupAsksChannelsList.set(details[0], details[1]);
     });
 
@@ -45,9 +51,10 @@ export const loadSlackConfig = async function () {
       botId,
       teamAskChannelId,
       teamChatterChannelId,
+      teamCodeReviewChannelId,
       teamLeadsChannelId,
       botTestsChannelId,
-      groupAsksChannelsList
+      groupAsksChannelsList,
     );
 
     console.log("Slack config completed successfully.");

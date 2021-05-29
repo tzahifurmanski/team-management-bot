@@ -12,7 +12,7 @@ const {
 
 // Use a predefined compliments pool and anything that is team specific
 const COMPLIMENTS = botConfig.ACTION_COMPLIMENT_POOL.concat(
-  config.TEAM_SPECIFIC_COMPLIMENTS
+  (config.TEAM_SPECIFIC_COMPLIMENTS || '').split(','),
 );
 
 export class Compliment implements BotAction {
