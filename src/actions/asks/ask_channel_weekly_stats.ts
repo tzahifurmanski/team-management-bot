@@ -10,8 +10,11 @@ import { BOT_ID } from "../../integrations/slack/consts";
 
 export class AskChannelWeeklyStats implements BotAction {
   doesMatch(event: any): boolean {
-    // TODO: ask channel weekly?
-    return event.text.includes("ask channel weekly stats");
+    // Check if the command starts with 'ask channel weekly stats' (even if the bot is mentioned first)
+    return event.text
+      .replace(`<@${BOT_ID}> `, "")
+      .trim()
+      .startsWith("ask channel weekly stats");
   }
 
   async performAction(event: any): Promise<void> {
