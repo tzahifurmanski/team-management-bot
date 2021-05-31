@@ -37,7 +37,7 @@ export const getAskChannelStatsForYesterday = async function () {
 
   await sendSlackMessage(
     `Good morning ${process.env.TEAM_FOLKS}:sunny:\nYesterday, <#${TEAM_ASK_CHANNEL_ID}> received a *total of ${stats.totalMessages} new asks*. Out of those, *${stats.totalNumProcessed} were answered*, *${stats.totalNumInProgress} are in progress*, and *${stats.totalNumUnchecked} were not handled*.`,
-    TEAM_CHATTER_CHANNEL_ID
+    TEAM_ASK_CHANNEL_ID
   );
 
   // Say what's the total of open asks we have in the last 60 days
@@ -62,7 +62,7 @@ export const getAskChannelStatsForYesterday = async function () {
   );
   await sendSlackMessage(
     `In the last ${DAYS_BACK} days, <#${TEAM_ASK_CHANNEL_ID}> had a *total of ${monthStats.totalMessages} asks*. Out of those, *${monthStats.totalNumProcessed} were answered*, *${monthStats.totalNumInProgress} are in progress*, and *${monthStats.totalNumUnchecked} were not handled*.`,
-    TEAM_CHATTER_CHANNEL_ID
+    TEAM_ASK_CHANNEL_ID
   );
 
   // TODO: Add thread messages with the details

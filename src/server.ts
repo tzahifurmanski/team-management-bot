@@ -1,8 +1,5 @@
 // Load the .env file config
-
 require("dotenv").config();
-console.log(`location: ${process.cwd()}`);
-console.log(`env: ${JSON.stringify(process.env)}`);
 
 import { loadSlackConfig } from "./integrations/slack/events";
 import { getAskChannelStatsForYesterday } from "./logic/cron_jobs";
@@ -20,9 +17,6 @@ async function init() {
     console.log("Loading failed!");
     process.exit(0);
   }
-
-  // Cool website for scheduling
-  // https://crontab.guru/#0_12_*_*_2
 
   await scheduleCronJobs();
 
@@ -50,6 +44,8 @@ async function init() {
   });
 }
 
+// Cool website for scheduling
+// https://crontab.guru/#0_12_*_*_2
 const scheduleCronJobs = async function () {
   const askChannelStatsCron = process.env.ASK_CHANNEL_STATS_CRON;
 
