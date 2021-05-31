@@ -1,8 +1,13 @@
+[![Known Vulnerabilities](https://snyk.io/test/github/tzahifurmanski/team-slack-bot/badge.svg)](https://snyk.io/test/github/tzahifurmanski/team-slack-bot)
+
 # team-slack-bot
 A slack bot for engineering teams (to get various stats and perform team related actions).
 
 ## Setup:
-* Create a 'config.json' file and setup the bot (use 'config.example.json' for example).
+To be dynamic, the bot relies on configuration being passed through environment variables. To setup: 
+* For local testing - Create a '.env' file and pass the environment variables through there.
+* For production - Deploy the bot on Heroku (or equivalent service) and pass the environment variables through config variables. 
+
 
 ### Personalities setup
 * The bot supports multiple personalities.
