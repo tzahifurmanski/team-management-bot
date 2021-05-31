@@ -21,17 +21,7 @@ async function init() {
   // Cool website for scheduling
   // https://crontab.guru/#0_12_*_*_2
 
-  // Schedule a cron job to post a daily summary of the requests from yesterday every morning at 10 AM (IL time)
-  // Post in the chatter channel every sun-friday at 10 PM
-  // cron.schedule("25 21 * * * *", () => {
-  cron.schedule("0 10 * * 0-5", () => {
-    getAskChannelStatsForYesterday();
-  });
-
-  // Post in the leads channel every tuesday at 12 PM - DISABLED
-  // cron.schedule("0 12 * * 2", () => {
-  //   postWeeklyLeadsStats();
-  // });
+  await scheduleCronJobs();
 
   const server = createServer(express_app);
   server.listen(SERVER_PORT, () => {
@@ -56,5 +46,25 @@ async function init() {
     });
   });
 }
+
+const scheduleCronJobs = async function () {
+  const askChannelStatsCron = process.env.ASK_CHANNEL_STATS_CRON;
+
+  if (askChannelStatsCron) {
+    console.log(
+      `Setting up a cron to update on ask channels stats (cron:  ${askChannelStatsCron}).`
+    );
+
+    // Schedule a cron job to post a daily summary of the requests from yesterday every morning at 8:30 AM (UK time)
+    cron.schedule("30 08 * * 0-5", () => {
+      getAskChannelStatsForYesterday();
+    });
+  }
+
+  // Post in the leads channel every tuesday at 12 PM - DISABLED
+  // cron.schedule("0 12 * * 2", () => {
+  //   postWeeklyLeadsStats();
+  // });
+};
 
 init().then(() => console.log("Finished initialisation"));
