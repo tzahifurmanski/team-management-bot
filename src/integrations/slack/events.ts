@@ -3,6 +3,7 @@ import { handle_channel_event, handle_direct_event } from "../../bot_actions";
 import { BOT_ID, setSlackConfiguration } from "./consts";
 import { getBotId, getConversationId } from "./conversations";
 import { botConfig } from "../../bot_config";
+import { sendSlackMessage } from "./messages";
 
 const { createEventAdapter } = require("@slack/events-api");
 const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;

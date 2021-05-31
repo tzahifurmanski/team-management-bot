@@ -1,8 +1,11 @@
+// Load the .env file config
+
+require("dotenv").config();
+console.log(`location: ${process.cwd()}`);
+console.log(`env: ${JSON.stringify(process.env)}`);
+
 import { loadSlackConfig } from "./integrations/slack/events";
 import { getAskChannelStatsForYesterday } from "./logic/cron_jobs";
-
-// Load the .env file config
-require("dotenv").config();
 
 const cron = require("node-cron");
 

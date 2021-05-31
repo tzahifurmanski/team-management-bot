@@ -38,7 +38,7 @@ export const getConversationId = async function (
   if (filtered.length > 0) {
     // TODO: If there's more than 1, we'll return the first
     console.log(
-      "Resolving conversation id for channel '" +
+      "Resolved conversation id for channel '" +
         name +
         "' with '" +
         filtered[0].id +
@@ -84,38 +84,32 @@ export const getConversationHistory = async function (
   const results: any[] = [];
 
   let response = await SlackWebClient.conversations.history(options);
-  response.messages.forEach(function (message: any) {
-    // Filter out messages from the bot, and all message events with subtypes that are not bot messages
-    if (
-      !message.text.includes(`<@${BOT_ID}>`) &&
-      !isBotMessage(message) &&
-      (!message.subtype || message.subtype == "bot_message")
-    ) {
-      results.push(message);
-    }
-  });
 
-  while (response.has_more) {
-    options["cursor"] = response.response_metadata.next_cursor;
-    response = await SlackWebClient.conversations.history(options);
-
-    // Add the messages
-    // TODO: Remove redundancy / extract the logic
+  do {
     response.messages.forEach(function (message: any) {
       // Filter out messages from the bot, and all message events with subtypes that are not bot messages
-      if (
-        !message.text.includes(`<@${BOT_ID}>`) &&
-        !isBotMessage(message) &&
-        (!message.subtype || message.subtype == "bot_message")
-      ) {
+      if (!shouldMessageBeSkipped(message)) {
+        // console.log(`Saving ${JSON.stringify(message)} message`);
         results.push(message);
       }
     });
-  }
+
+    options["cursor"] = response.response_metadata.next_cursor;
+    response = await SlackWebClient.conversations.history(options);
+  } while (response.has_more);
 
   return results;
 };
 
+export const shouldMessageBeSkipped = function (message: any) {
+  return (
+    isBotMessage(message) ||
+    message.text.includes(`<@${BOT_ID}>`) || // Skip any messages that refer the bot
+    // TODO: Put this in a env var
+    (message.bot_id && message.bot_id != "B0225LJUK6F") // Skip all bot messages except for a specific one
+    // (message.subtype && message.subtype == "bot_message")
+  );
+};
 export const getBotId = async function () {
   // This can also return response.user with the bot user name
   let response = await SlackWebClient.auth.test();

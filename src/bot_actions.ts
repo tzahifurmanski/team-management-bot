@@ -5,6 +5,7 @@ import {
   TEAM_CHATTER_CHANNEL_ID,
   TEAM_CODE_REVIEW_CHANNEL_ID,
 } from "./integrations/slack/consts";
+import { sendSlackMessage } from "./integrations/slack/messages";
 
 // This method handles events that are posted directly inside a channel
 export const handle_channel_event = async function (event: any) {
@@ -41,10 +42,19 @@ export const handle_direct_event = async function (event: any) {
 async function runActions(event: any, actions: BotAction[]) {
   const result = actions.find((action) => action.doesMatch(event));
   if (result) {
-    console.log(
-      `Got a '${result.constructor.name}' event in channel ${event.channel}!`
-    );
-    await result.performAction(event);
+    try {
+      console.log(
+        `Got a '${result.constructor.name}' event in channel ${event.channel}!`
+      );
+      await result.performAction(event);
+    } catch (E) {
+      await sendSlackMessage(
+        `Sorry, had an error while processing `,
+        event.channel,
+        event.thread_ts ? event.thread_ts : event.ts
+      );
+    }
+    // Return true even if there was an error
     return true;
   }
 
