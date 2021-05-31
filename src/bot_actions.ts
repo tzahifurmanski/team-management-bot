@@ -28,12 +28,18 @@ export const handle_channel_event = async function (event: any) {
   // TODO: Reply to good morning / great day / good weekend things
 };
 
-// This method handles events that are with direct interaction with the bot (like a DM or when the bot is tagged)
+// This method handles events that are with direct interaction with the bot (like a DM or when the bot is mentioned)
 export const handle_direct_event = async function (event: any) {
   // console.log("Got new direct event", event.type, event);
 
   if (!(await runActions(event, ASKS_ACTIONS))) {
-    // console.log("Unsupported event", event);
+    await sendSlackMessage(
+      `Sorry, didn't quite catch that.. :(`,
+      event.channel,
+      event.thread_ts ? event.thread_ts : event.ts
+    );
+
+    console.log("Unsupported event", JSON.stringify(event));
     // TODO: Save the unsupported event for later debrief
     // TODO: Reply to unsupported events with a quote
   }
@@ -48,12 +54,16 @@ async function runActions(event: any, actions: BotAction[]) {
       );
       await result.performAction(event);
     } catch (E) {
+      console.log(
+        `Had an error while executing ${result.constructor.name} action - ${E.message}!`
+      );
       await sendSlackMessage(
-        `Sorry, had an error while processing `,
+        `Sorry, had an error while performing the action.. :sad:\nMaybe check my logs?`,
         event.channel,
         event.thread_ts ? event.thread_ts : event.ts
       );
     }
+
     // Return true even if there was an error
     return true;
   }
