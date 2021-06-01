@@ -89,7 +89,7 @@ export const getConversationHistory = async function (
     response.messages.forEach(function (message: any) {
       // Filter out messages from the bot, and all message events with subtypes that are not bot messages
       if (!shouldMessageBeSkipped(message)) {
-        // console.log(`Saving ${JSON.stringify(message)} message`);
+        console.log(`Saving ${JSON.stringify(message)} message`);
         results.push(message);
       }
     });
@@ -105,6 +105,7 @@ export const shouldMessageBeSkipped = function (message: any) {
   return (
     isBotMessage(message) ||
     message.text.includes(`<@${BOT_ID}>`) || // Skip any messages that refer the bot
+    (message.subtype && message.subtype != "bot_message") || // Skip any message that has a subtype, that is not a bot (We filter the bot later)
     // TODO: Put this in a env var
     (message.bot_id && message.bot_id != "B0225LJUK6F") // Skip all bot messages except for a specific one
     // (message.subtype && message.subtype == "bot_message")
