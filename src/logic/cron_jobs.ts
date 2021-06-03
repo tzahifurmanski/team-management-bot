@@ -7,7 +7,6 @@ import {
 import { sendSlackMessage } from "../integrations/slack/messages";
 import {
   TEAM_ASK_CHANNEL_ID,
-  TEAM_CHATTER_CHANNEL_ID,
   TEAM_LEADS_CHANNEL_ID,
 } from "../integrations/slack/consts";
 
@@ -23,10 +22,10 @@ export const getAskChannelStatsForYesterday = async function () {
   removeTimeInfoFromDate(tempDate);
   const endingDate = new Date(tempDate.getTime() - 1);
   // console.log(
-  //   `timeframe is ${startingDate.toUTCString()} to ${endingDate}.toUTCString()`
+  //   `timeframe is ${startingDate.toUTCString()} to ${endingDate.toUTCString()}`
   // );
 
-  const messages: any[any] = await getChannelMessages(startingDate);
+  const messages: any[any] = await getChannelMessages(startingDate, endingDate);
 
   const stats: AsksChannelStatsResult = await getStatsForMessages(
     TEAM_ASK_CHANNEL_ID,

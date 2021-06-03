@@ -89,7 +89,7 @@ export const getConversationHistory = async function (
     response.messages.forEach(function (message: any) {
       // Filter out messages from the bot, and all message events with subtypes that are not bot messages
       if (!shouldMessageBeSkipped(message)) {
-        console.log(`Saving ${JSON.stringify(message)} message`);
+        // console.log(`Saving ${JSON.stringify(message)} message`);
         results.push(message);
       }
     });
