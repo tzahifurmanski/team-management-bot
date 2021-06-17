@@ -195,17 +195,22 @@ export const reportStatsToSlack = async function (
   stats: AsksChannelStatsResult,
   destinationChannel: any,
   destinationThreadTS: any,
+  includeSummary: boolean = true,
   includeDetails: boolean = true
 ) {
   // console.log("Time in utc - start", stats.startDateInUTC);
   // console.log("Time in utc - end", stats.endDateInUTC);
 
   // TODO: Send only one message, send all the text in blocks
-  const message_blocks: SectionBlock[] = [
-    createBlock(
-      `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`
-    ),
-  ];
+  const message_blocks: SectionBlock[] = [];
+
+  if (includeSummary) {
+    message_blocks.push(
+      createBlock(
+        `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`
+      )
+    );
+  }
 
   if (includeDetails) {
     if (stats.totalNumInProgress > 0) {
@@ -262,9 +267,8 @@ const getPermalinkBlocks = async function (
             : ` (${daysDifference} days ago)`;
         block.push(
           createBlock(
-            `<${permalink}|Link to message> from ${
-              message.user ? `<@${message.user}>` : message.username
-            } at ${messageDate.toLocaleDateString()}${daysMessage}`
+            `<${permalink}|Link to message> from ${message.username} 
+                    at ${messageDate.toLocaleDateString()}${daysMessage}`
           )
         );
       }
