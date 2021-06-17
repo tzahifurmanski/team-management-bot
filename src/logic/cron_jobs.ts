@@ -2,7 +2,9 @@ import { removeTimeInfoFromDate } from "../actions/utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
+  getStatsBuckets,
   getStatsForMessages,
+  reportStatsToSlack,
 } from "./asks_channel";
 import { sendSlackMessage } from "../integrations/slack/messages";
 import {
@@ -64,7 +66,18 @@ export const getAskChannelStatsForYesterday = async function () {
     TEAM_ASK_CHANNEL_ID
   );
 
-  // TODO: Add thread messages with the details
+  // Print messages with the open asks details
+  const statsArray: AsksChannelStatsResult[] = await getStatsBuckets(
+    monthMessages,
+    "month"
+  );
+
+  for (const stats of statsArray) {
+    console.log(
+      `Currently processing block for ${stats.startDateInUTC} to ${stats.endDateInUTC}...`
+    );
+    await reportStatsToSlack(stats, TEAM_ASK_CHANNEL_ID, "");
+  }
 };
 
 export const postWeeklyLeadsStats = async function () {
