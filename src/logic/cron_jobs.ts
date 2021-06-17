@@ -66,18 +66,8 @@ export const getAskChannelStatsForYesterday = async function () {
     TEAM_ASK_CHANNEL_ID
   );
 
-  // Print messages with the open asks details
-  const statsArray: AsksChannelStatsResult[] = await getStatsBuckets(
-    monthMessages,
-    "month"
-  );
-
-  for (const stats of statsArray) {
-    console.log(
-      `Currently processing block for ${stats.startDateInUTC} to ${stats.endDateInUTC}...`
-    );
-    await reportStatsToSlack(stats, TEAM_ASK_CHANNEL_ID, "");
-  }
+  // Post the links for the various open stats
+  await reportStatsToSlack(monthStats, TEAM_ASK_CHANNEL_ID, "");
 };
 
 export const postWeeklyLeadsStats = async function () {
