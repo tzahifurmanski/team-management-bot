@@ -2,9 +2,11 @@
 import { BOT_ID, SlackWebClient } from "./consts";
 import {
   ConversationsHistoryArguments,
+  ConversationsHistoryResponse,
   ConversationsListArguments,
 } from "@slack/web-api";
 import { isBotMessage } from "./events";
+import { Message } from "@slack/web-api/dist/response/ConversationsHistoryResponse";
 
 // If something is not found, we'll have to go over everything
 export const getConversationId = async function (
@@ -83,19 +85,23 @@ export const getConversationHistory = async function (
 
   const results: any[] = [];
 
-  let response = await SlackWebClient.conversations.history(options);
+  let response: ConversationsHistoryResponse = await SlackWebClient.conversations.history(
+    options
+  );
 
   do {
-    response.messages.forEach(function (message: any) {
-      // Filter out messages from the bot, and all message events with subtypes that are not bot messages
-      if (!shouldMessageBeSkipped(message)) {
-        // console.log(`Saving ${JSON.stringify(message)} message`);
-        results.push(message);
-      }
-    });
+    if (response.messages) {
+      response.messages.forEach(function (message: Message) {
+        // Filter out messages from the bot, and all message events with subtypes that are not bot messages
+        if (!shouldMessageBeSkipped(message)) {
+          // console.log(`Saving ${JSON.stringify(message)} message`);
+          results.push(message);
+        }
+      });
 
-    options["cursor"] = response.response_metadata.next_cursor;
-    response = await SlackWebClient.conversations.history(options);
+      options["cursor"] = response.response_metadata?.next_cursor;
+      response = await SlackWebClient.conversations.history(options);
+    }
   } while (response.has_more);
 
   return results;

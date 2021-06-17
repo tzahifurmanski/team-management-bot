@@ -11,6 +11,10 @@ import {
   toDateTime,
 } from "../actions/utils";
 import { SectionBlock } from "@slack/web-api";
+import {
+  getUserDetails,
+  getUserDisplayName,
+} from "../integrations/slack/users";
 
 export interface AsksChannelStatsResult {
   startDateInUTC: string;
@@ -268,7 +272,9 @@ const getPermalinkBlocks = async function (
         block.push(
           createBlock(
             `<${permalink}|Link to message> from ${
-              message.user ? message.user : message.username
+              message.user
+                ? await getUserDisplayName(message.user)
+                : message.username
             } at ${messageDate.toLocaleDateString()}${daysMessage}`
           )
         );
