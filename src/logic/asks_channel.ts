@@ -60,7 +60,8 @@ export const getStatsForMessages = function (
         return (
           reaction.name === "white_check_mark" ||
           reaction.name === "heavy_check_mark" ||
-          reaction.name === "in-progress"
+          reaction.name === "in-progress" ||
+          reaction.name === "spinner"
         );
       }).length == 0
     );
@@ -70,7 +71,7 @@ export const getStatsForMessages = function (
   const in_progress_messages = messages.filter(function (el: any) {
     return (
       el?.reactions?.filter(function (reaction: any) {
-        return reaction.name === "in-progress";
+        return reaction.name === "in-progress" || reaction.name === "spinner";
       }).length > 0 &&
       el?.reactions.filter(function (reaction: any) {
         return (
