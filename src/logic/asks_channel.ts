@@ -267,8 +267,9 @@ const getPermalinkBlocks = async function (
             : ` (${daysDifference} days ago)`;
         block.push(
           createBlock(
-            `<${permalink}|Link to message> from ${message.username} 
-                    at ${messageDate.toLocaleDateString()}${daysMessage}`
+            `<${permalink}|Link to message> from ${
+              message.user ? message.user : message.username
+            } at ${messageDate.toLocaleDateString()}${daysMessage}`
           )
         );
       }
