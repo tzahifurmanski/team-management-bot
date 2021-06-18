@@ -67,7 +67,7 @@ export const getAskChannelStatsForYesterday = async function () {
   );
 
   // Post the links for the various open stats
-  await reportStatsToSlack(monthStats, TEAM_ASK_CHANNEL_ID, "");
+  await reportStatsToSlack(monthStats, TEAM_ASK_CHANNEL_ID, "", false);
 };
 
 export const postWeeklyLeadsStats = async function () {
