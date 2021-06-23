@@ -107,6 +107,7 @@ export const getConversationHistory = async function (
   return results;
 };
 
+// TODO: This currently skips out on 'Snyk Support' bot messages (line 117)
 export const shouldMessageBeSkipped = function (message: any) {
   return (
     isBotMessage(message) ||
