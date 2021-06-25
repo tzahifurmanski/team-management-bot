@@ -107,14 +107,14 @@ export const getConversationHistory = async function (
   return results;
 };
 
-// TODO: This currently skips out on 'Snyk Support' bot messages (line 117)
 export const shouldMessageBeSkipped = function (message: any) {
   return (
     isBotMessage(message) ||
     message.text.includes(`<@${BOT_ID}>`) || // Skip any messages that refer the bot
-    (message.subtype && message.subtype != "bot_message") || // Skip any message that has a subtype, that is not a bot (We filter the bot later)
     // TODO: Put this in a env var
-    (message.bot_id && message.bot_id != "B0225LJUK6F") // Skip all bot messages except for a specific one
+    (message.bot_id && message.bot_id != "B0225LJUK6F") || // Skip all bot messages except for a specific one
+    // TODO: This currently skips out on 'Snyk Support' bot messages (line 117) - Need to fix it
+    (message.subtype && message.subtype != "bot_message") // Skip any message that has a subtype, that is not a bot (We filter the bot later)
     // (message.subtype && message.subtype == "bot_message")
   );
 };

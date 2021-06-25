@@ -239,12 +239,15 @@ export const reportStatsToSlack = async function (
     }
   }
 
-  await sendSlackMessage(
-    `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`,
-    destinationChannel,
-    destinationThreadTS,
-    message_blocks
-  );
+  if (message_blocks.length > 0) {
+    // TODO: Maybe text should be empty here?
+    await sendSlackMessage(
+      `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`,
+      destinationChannel,
+      destinationThreadTS,
+      message_blocks
+    );
+  }
 };
 
 // This method gets a list of messages and creates a permalink string for displaying the message.
