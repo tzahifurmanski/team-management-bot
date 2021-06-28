@@ -14,7 +14,8 @@ export const sendSlackMessage = async function (
   text: string,
   channel: string,
   thread_ts: string = "",
-  blocks: (KnownBlock | Block)[] = []
+  blocks: (KnownBlock | Block)[] = [],
+  disable_unfurl = false
 ) {
   const options: ChatPostMessageArguments = {
     text: text,
@@ -22,6 +23,11 @@ export const sendSlackMessage = async function (
     username: botConfig.BOT_NAME,
     icon_url: botConfig.BOT_IMAGE_URL,
   };
+
+  if (disable_unfurl) {
+    options.unfurl_links = false;
+    options.unfurl_media = false;
+  }
 
   // TODO: If this includes more than 50 blocks, an error will be thrown. We need to identify this scenario and split
   //  the blocks to a separate message

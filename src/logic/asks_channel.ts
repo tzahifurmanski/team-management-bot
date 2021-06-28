@@ -245,7 +245,8 @@ export const reportStatsToSlack = async function (
       `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`,
       destinationChannel,
       destinationThreadTS,
-      message_blocks
+      message_blocks,
+      false
     );
   }
 };
