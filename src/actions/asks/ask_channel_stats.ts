@@ -23,10 +23,10 @@ export class AskChannelSummaryStats implements BotAction {
     const numOfDays =
       event.text.replace(`<@${BOT_ID}> `, "").split(" ")[3] || 7;
 
-    const startingDate = setDateToSunday(new Date());
-    startingDate.setDate(startingDate.getDate() - numOfDays);
+    const startingDate = new Date(
+      new Date().getTime() - numOfDays * 24 * 60 * 60 * 1000
+    );
     removeTimeInfoFromDate(startingDate);
-
     const endingDate = new Date();
 
     const messages: any[any] = await getChannelMessages(

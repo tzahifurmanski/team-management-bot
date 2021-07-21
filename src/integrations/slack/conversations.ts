@@ -97,6 +97,9 @@ export const getConversationHistory = async function (
           // console.log(`Saving ${JSON.stringify(message)} message`);
           results.push(message);
         }
+        // else {
+        // console.log(`Skipped ${JSON.stringify(message)} message`);
+        // }
       });
 
       options["cursor"] = response.response_metadata?.next_cursor;
@@ -110,12 +113,12 @@ export const getConversationHistory = async function (
 export const shouldMessageBeSkipped = function (message: any) {
   return (
     isBotMessage(message) ||
-    message.text.includes(`<@${BOT_ID}>`) || // Skip any messages that refer the bot
     // TODO: Put this in a env var
-    (message.bot_id && message.bot_id != "B0225LJUK6F") || // Skip all bot messages except for a specific one
-    // TODO: This currently skips out on 'Snyk Support' bot messages (line 117) - Need to fix it
-    (message.subtype && message.subtype != "bot_message") // Skip any message that has a subtype, that is not a bot (We filter the bot later)
-    // (message.subtype && message.subtype == "bot_message")
+    message.text.includes(`<@${BOT_ID}>`) || // Skip any messages that refer the bot
+    (message.subtype && message.subtype != "bot_message") || // Skip any message that has a subtype, that is not a bot (We filter the bot later)
+    // TODO: Extract the 'Snyk Support' to an env var
+    ((message.bot_id || message.subtype) &&
+      !(message.username && message.username == "Snyk Support")) // Skip all bot_message except for messages from Snyk Support bot
   );
 };
 export const getBotId = async function () {
