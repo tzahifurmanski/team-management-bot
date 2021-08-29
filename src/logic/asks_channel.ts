@@ -64,6 +64,7 @@ export const getStatsForMessages = function (
         return (
           reaction.name === "white_check_mark" ||
           reaction.name === "heavy_check_mark" ||
+          reaction.name === "green_tick" ||
           reaction.name === "in-progress" ||
           reaction.name === "spinner"
         );
@@ -80,7 +81,8 @@ export const getStatsForMessages = function (
       el?.reactions.filter(function (reaction: any) {
         return (
           reaction.name === "white_check_mark" ||
-          reaction.name === "heavy_check_mark"
+          reaction.name === "heavy_check_mark" ||
+          reaction.name === "green_tick"
         );
       }).length == 0
     );
