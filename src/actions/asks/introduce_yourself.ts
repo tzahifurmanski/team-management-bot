@@ -8,7 +8,9 @@ const TEAM_NAME = process.env.TEAM_NAME;
 
 export class IntroduceYourself implements BotAction {
   doesMatch(event: any): boolean {
-    return event.text.includes("introduce yourself");
+    return (
+      event.text.includes("introduce yourself") || event.text.includes("hello")
+    );
   }
 
   async performAction(event: any): Promise<void> {
