@@ -1,26 +1,24 @@
-import {
-  ChatGetPermalinkArguments,
-  ChatPostMessageArguments,
-  SectionBlock,
-} from "@slack/web-api";
+import { ChatGetPermalinkArguments, ChatPostMessageArguments, SectionBlock } from '@slack/web-api';
 
-import { Block, KnownBlock } from "@slack/types";
-import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from "./consts";
-import { botConfig } from "../../bot_config";
+import { Block, KnownBlock } from '@slack/types';
+import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from './consts';
+import { botConfig } from '../../bot_config';
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
-export const sendSlackMessage = async function (
+export const sendSlackMessage = async function(
   text: string,
   channel: string,
-  thread_ts: string = "",
+  thread_ts: string = '',
   blocks: (KnownBlock | Block)[] = [],
-  disable_unfurl = false
+  disable_unfurl = false,
 ) {
   const options: ChatPostMessageArguments = {
     text: text,
     channel: channel,
     username: botConfig.BOT_NAME,
+    // TODO: Could this be a parameter / config that is passed so it's no longer needed to be defined in bot json?
+    //
     icon_url: botConfig.BOT_IMAGE_URL,
   };
 
@@ -31,6 +29,7 @@ export const sendSlackMessage = async function (
 
   // TODO: If this includes more than 50 blocks, an error will be thrown. We need to identify this scenario and split
   //  the blocks to a separate message
+  // 2021-08-29T13:16:33.906673+00:00 app[web.1]: [ERROR]  web-api:WebClient:0 no more than 50 items allowed [json-pointer:/blocks]
   // If there are blocks, add them
   if (blocks) {
     options["blocks"] = blocks;
