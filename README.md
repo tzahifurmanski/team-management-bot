@@ -6,7 +6,17 @@ A slack bot for engineering teams to get various stats and perform team related 
 
 ## Setup / Deployment:
 
-* Set up a Slack app with relevant permissions (TBD, add permissions list)
+* Set up a Slack app
+  * Configure the with relevant permissions (TBD, add permissions list)
+  * Install to workspace
+  * Enable 'App Home > Always Show My Bot as Online' and 'Allow users to send Slash commands and messages from the
+    messages tab'
+  * Register for event subscriptions
+    * Enable events and set request URL to : BOT_URL/events/slack
+    * Subscribe to bot events
+      * app_mention
+      * message.channels
+      * message.im
 * Setup an Heroku NodeJS app
   * Connect your local git repo to heroku
     * heroku git:remote -a APP_NAME
@@ -25,8 +35,15 @@ To be dynamic, the bot relies on configuration being passed through environment 
 ### Personalities setup
 
 * The bot supports multiple personalities.
-* Currently, you can choose from 'BoJack Horseman' and 'Unibot' (A friendly unicorn bot).
-* Setup the personality with the 'BOT_PERSONALITY' config var.
-Note: The personality should be exactly as the folder name under 'personalities'    
+* Currently, you can choose from 'BoJack Horseman', 'Unibot', 'Rhinobot', 'Narwhalbot' and 'Designbot'
+* Setup the personality with the 'BOT_PERSONALITY' config var. Note: The personality should be exactly as the folder
+  name under 'personalities'
 
+## Known issues:
 
+* ATM, if there are more than 50 asks open, you won't see their details. This is caused by adding too many 'blocks' to
+  one slack message (needs to be fixed). To workaround this issue, you can:
+  Manually look back at your history and :white_check_mark: all the completed tasks (at least for the last 60 days, so
+  they won't be counted as not handled). Ask the bot to give you stats on a specific number of days (like ask channel
+  stats 10 ), find a number that works (less than 50 open asks), handle everything and increase the number of days again
+  - until tasks are handled!

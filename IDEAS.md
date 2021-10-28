@@ -14,6 +14,7 @@
 
 ### Utils
 
+* Convert the app to use 'https://github.com/slackapi/bolt-js', as event API is being deprecated.
 * An 'Assemble' function (that posts a DM message to the team)
 * Status command (to see if the bot is alive. We can use the 'introduce yourself' command ATM)
 * A command to return all team specific help desk tickets (a parameter to include the last comment for each / another

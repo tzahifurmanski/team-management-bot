@@ -47,15 +47,22 @@ export const sendSlackMessage = async function(
   );
 };
 
-export const createBlock = function (text: string): SectionBlock {
+export const createBlock = function(
+  text: string,
+  unfurl: boolean = false,
+): SectionBlock {
   // TODO: This currently only supports SectionBlock. Make it more dynamic?
   const result: SectionBlock = {
-    type: "section",
+    type: 'section',
     text: {
-      type: "mrkdwn",
+      type: 'mrkdwn',
       text: text,
     },
   };
+
+  if (!unfurl) {
+    // result.
+  }
 
   // console.log("Text is - ", text);
   return result;

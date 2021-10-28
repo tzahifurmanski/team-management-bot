@@ -1,20 +1,9 @@
-import { getConversationHistory } from "../integrations/slack/conversations";
-import { TEAM_ASK_CHANNEL_ID } from "../integrations/slack/consts";
-import {
-  createBlock,
-  getMessagePermalink,
-  sendSlackMessage,
-} from "../integrations/slack/messages";
-import {
-  removeTimeInfoFromDate,
-  setDateToSunday,
-  toDateTime,
-} from "../actions/utils";
-import { SectionBlock } from "@slack/web-api";
-import {
-  getUserDetails,
-  getUserDisplayName,
-} from "../integrations/slack/users";
+import { getConversationHistory } from '../integrations/slack/conversations';
+import { TEAM_ASK_CHANNEL_ID } from '../integrations/slack/consts';
+import { createBlock, getMessagePermalink, sendSlackMessage } from '../integrations/slack/messages';
+import { removeTimeInfoFromDate, setDateToSunday, toDateTime } from '../actions/utils';
+import { SectionBlock } from '@slack/web-api';
+import { getUserDisplayName } from '../integrations/slack/users';
 
 export interface AsksChannelStatsResult {
   startDateInUTC: string;
@@ -211,11 +200,8 @@ export const reportStatsToSlack = async function (
   const message_blocks: SectionBlock[] = [];
 
   if (includeSummary) {
-    message_blocks.push(
-      createBlock(
-        `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`
-      )
-    );
+    const text = `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`;
+    message_blocks.push(createBlock(text));
   }
 
   if (includeDetails) {
@@ -248,7 +234,7 @@ export const reportStatsToSlack = async function (
       destinationChannel,
       destinationThreadTS,
       message_blocks,
-      false
+      true,
     );
   }
 };
