@@ -1,11 +1,13 @@
-import { BotAction } from "../base_action";
-import { botConfig } from "../../bot_config";
+import { BotAction } from '../base_action';
+import { botConfig } from '../../bot_config';
 
-const { sendSlackMessage } = require("../../integrations/slack/messages");
+const { sendSlackMessage } = require('../../integrations/slack/messages');
 
 export class WhatCanYouDo implements BotAction {
   doesMatch(event: any): boolean {
-    return event.text.includes("what can you do");
+    return (
+      event.text.includes('what can you do') || event.text.includes('help')
+    );
   }
 
   async performAction(event: any): Promise<void> {
