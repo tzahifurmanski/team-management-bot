@@ -1,17 +1,21 @@
-import { ChatGetPermalinkArguments, ChatPostMessageArguments, SectionBlock } from '@slack/web-api';
+import {
+  ChatGetPermalinkArguments,
+  ChatPostMessageArguments,
+  SectionBlock,
+} from "@slack/web-api";
 
-import { Block, KnownBlock } from '@slack/types';
-import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from './consts';
-import { botConfig } from '../../bot_config';
+import { Block, KnownBlock } from "@slack/types";
+import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from "./consts";
+import { botConfig } from "../../bot_config";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
-export const sendSlackMessage = async function(
+export const sendSlackMessage = async function (
   text: string,
   channel: string,
-  thread_ts: string = '',
+  thread_ts: string = "",
   blocks: (KnownBlock | Block)[] = [],
-  disable_unfurl = false,
+  disable_unfurl = false
 ) {
   const options: ChatPostMessageArguments = {
     text: text,
@@ -22,40 +26,51 @@ export const sendSlackMessage = async function(
     icon_url: botConfig.BOT_IMAGE_URL,
   };
 
+  // If we've been asked to disable unfurling
   if (disable_unfurl) {
     options.unfurl_links = false;
     options.unfurl_media = false;
-  }
-
-  // TODO: If this includes more than 50 blocks, an error will be thrown. We need to identify this scenario and split
-  //  the blocks to a separate message
-  // 2021-08-29T13:16:33.906673+00:00 app[web.1]: [ERROR]  web-api:WebClient:0 no more than 50 items allowed [json-pointer:/blocks]
-  // If there are blocks, add them
-  if (blocks) {
-    options["blocks"] = blocks;
   }
 
   // If we're in a thread, reply in the thread
   if (thread_ts) {
     options["thread_ts"] = thread_ts;
   }
-  const result = await SlackWebClient.chat.postMessage(options);
+
+  // If there are blocks, send only 50 at each message
+  if (blocks) {
+    let i,
+      j,
+      chunk = 50; // Max number of blocks Slack allows to send in 1 message
+    for (i = 0, j = blocks.length; i < j; i += chunk) {
+      // Get blocks batch up to the size of a chunk
+      options["blocks"] = blocks.slice(i, i + chunk);
+      const result = await SlackWebClient.chat.postMessage(options);
+      console.log(
+        `Successfully send message ${result.ts} in conversation ${channel}`
+      );
+    }
+  }
+  // If there are no blocks, just send the message
+  else {
+    const result = await SlackWebClient.chat.postMessage(options);
+    console.log(
+      `Successfully send message ${result.ts} in conversation ${channel}`
+    );
+  }
   // console.log(result);
   // The result contains an identifier for the message, `ts`.
-  console.log(
-    `Successfully send message ${result.ts} in conversation ${channel}`
-  );
 };
 
-export const createBlock = function(
+export const createBlock = function (
   text: string,
-  unfurl: boolean = false,
+  unfurl: boolean = false
 ): SectionBlock {
   // TODO: This currently only supports SectionBlock. Make it more dynamic?
   const result: SectionBlock = {
-    type: 'section',
+    type: "section",
     text: {
-      type: 'mrkdwn',
+      type: "mrkdwn",
       text: text,
     },
   };

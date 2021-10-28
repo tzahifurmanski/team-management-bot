@@ -54,7 +54,7 @@ async function runActions(event: any, actions: BotAction[]) {
       );
       await result.performAction(event);
     } catch (E) {
-      console.log(
+      console.error(
         `Had an error while executing ${result.constructor.name} action - ${E}!`
       );
       await sendSlackMessage(
