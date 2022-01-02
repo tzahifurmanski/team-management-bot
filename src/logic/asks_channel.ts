@@ -136,11 +136,11 @@ export const getBucketRange = function (
   return [];
 };
 
-export const getStatsBuckets = async function (
-  messages: any[],
-  type: string,
-  channelId: string = TEAM_ASK_CHANNEL_ID // This can either bet 'week' or 'day'. This is the variable by which we're going to 'group by' the buckets
-): Promise<AsksChannelWeeklyStatsResult[]> {
+export const getStatsBuckets = async (
+    messages: any[],
+    type: string,
+    channelId: string = TEAM_ASK_CHANNEL_ID // This can either bet 'week' or 'day'. This is the variable by which we're going to 'group by' the buckets
+): Promise<AsksChannelWeeklyStatsResult[]> => {
   let buckets = new Map<string, any[]>();
   let bucketsRanges: any = {};
 
@@ -170,7 +170,7 @@ export const getStatsBuckets = async function (
   let results: AsksChannelWeeklyStatsResult[] = [];
 
   // Convert the buckets to a list of stats
-  for (let [key, currBucketMessages] of buckets.entries()) {
+  for (const [key, currBucketMessages] of buckets.entries()) {
     // TODO: Find a way to pass the end date as well (right now it's empty)
     // const [startDate, endDate] = key;
 
@@ -186,54 +186,54 @@ export const getStatsBuckets = async function (
   return results;
 };
 
-export const reportStatsToSlack = async function (
-  stats: AsksChannelStatsResult,
-  destinationChannel: any,
-  destinationThreadTS: any,
-  includeSummary: boolean = true,
-  includeDetails: boolean = true
-) {
+export const reportStatsToSlack = async (
+    stats: AsksChannelStatsResult,
+    destinationChannel: any,
+    destinationThreadTS: any,
+    includeSummary: boolean = true,
+    includeDetails: boolean = true
+) => {
   // console.log("Time in utc - start", stats.startDateInUTC);
   // console.log("Time in utc - end", stats.endDateInUTC);
 
   // TODO: Send only one message, send all the text in blocks
-  const message_blocks: SectionBlock[] = [];
+  const messageBlocks: SectionBlock[] = [];
 
   if (includeSummary) {
     const text = `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`;
-    message_blocks.push(createBlock(text));
+    messageBlocks.push(createBlock(text));
   }
 
   if (includeDetails) {
     if (stats.totalNumInProgress > 0) {
-      message_blocks.push(
+      messageBlocks.push(
         createBlock("These are the in progress asks we currently have:")
       );
       // const in_progress_blocks: SectionBlock[] = [
       //   ,
       // ];
-      message_blocks.push(
+      messageBlocks.push(
         ...(await getPermalinkBlocks(stats.channelId, stats.messagesInProgress))
       );
     }
 
     if (stats.totalNumUnchecked > 0) {
-      message_blocks.push(
+      messageBlocks.push(
         createBlock("These are the open asks we currently have:")
       );
-      message_blocks.push(
+      messageBlocks.push(
         ...(await getPermalinkBlocks(stats.channelId, stats.messagesUnchecked))
       );
     }
   }
 
-  if (message_blocks.length > 0) {
+  if (messageBlocks.length > 0) {
     // TODO: Maybe text should be empty here?
     await sendSlackMessage(
       `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`,
       destinationChannel,
       destinationThreadTS,
-      message_blocks,
+      messageBlocks,
       true,
     );
   }
