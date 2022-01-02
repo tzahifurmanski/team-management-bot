@@ -10,13 +10,13 @@ import { botConfig } from "../../bot_config";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
-export const sendSlackMessage = async function (
-  text: string,
-  channel: string,
-  thread_ts: string = "",
-  blocks: (KnownBlock | Block)[] = [],
-  disable_unfurl = false
-) {
+export const sendSlackMessage = async (
+    text: string,
+    channel: string,
+    thread_ts: string = "",
+    blocks: (KnownBlock | Block)[] = [],
+    disableUnfurl = false
+) => {
   const options: ChatPostMessageArguments = {
     text: text,
     channel: channel,
@@ -27,7 +27,7 @@ export const sendSlackMessage = async function (
   };
 
   // If we've been asked to disable unfurling
-  if (disable_unfurl) {
+  if (disableUnfurl) {
     options.unfurl_links = false;
     options.unfurl_media = false;
   }
@@ -38,7 +38,7 @@ export const sendSlackMessage = async function (
   }
 
   // If there are blocks, send only 50 at each message
-  if (blocks) {
+  if (blocks && blocks.length > 0) {
     let i,
       j,
       chunk = 50; // Max number of blocks Slack allows to send in 1 message
