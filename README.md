@@ -22,9 +22,7 @@ A slack bot for engineering teams to get various stats and perform team related 
     * heroku git:remote -a APP_NAME
     * git remote rename heroku designbot (TBD, unify the same commands)
   * If you want to add a new profile, add it to the assets/personalities folder (Temporary step)
-  * Set up your config variables (TBD, list the different vars)
-    * ASK_CHANNEL_STATS_CRON
-    *
+  * Set up your config variables - See [config vars list here](config-variables.txt)
 
 To be dynamic, the bot relies on configuration being passed through environment variables. To setup:
 
