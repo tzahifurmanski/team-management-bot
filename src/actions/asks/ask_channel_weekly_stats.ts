@@ -1,5 +1,5 @@
 import { BotAction } from "../base_action";
-import { removeTimeInfoFromDate, setDateToSunday } from "../utils";
+import {removeTimeInfoFromDate, sanitizeCommandInput, setDateToSunday} from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -10,11 +10,7 @@ import { BOT_ID } from "../../integrations/slack/consts";
 
 export class AskChannelWeeklyStats implements BotAction {
   doesMatch(event: any): boolean {
-    // Check if the command starts with 'ask channel weekly stats' (even if the bot is mentioned first)
-    return event.text
-      .replace(`<@${BOT_ID}> `, "")
-      .trim()
-      .startsWith("ask channel weekly stats");
+    return sanitizeCommandInput(event.text).startsWith("ask channel weekly stats");
   }
 
   async performAction(event: any): Promise<void> {

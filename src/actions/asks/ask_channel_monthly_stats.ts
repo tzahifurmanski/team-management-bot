@@ -6,14 +6,11 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import { BOT_ID } from "../../integrations/slack/consts";
+import {sanitizeCommandInput} from "../utils";
 
 export class AskChannelMonthlyStats implements BotAction {
   doesMatch(event: any): boolean {
-    // Check if the command starts with 'ask channel monthly stats' (even if the bot is mentioned first)
-    return event.text
-      .replace(`<@${BOT_ID}> `, "")
-      .trim()
-      .startsWith("ask channel monthly stats");
+    return sanitizeCommandInput(event.text).startsWith("ask channel monthly stats");
   }
 
   async performAction(event: any): Promise<void> {
