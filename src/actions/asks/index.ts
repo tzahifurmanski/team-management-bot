@@ -10,6 +10,7 @@ import { AskChannelMonthlyStats } from "./ask_channel_monthly_stats";
 import { GroupAskChannelMonthlyStats } from "./group_ask_channel_monthly_stats";
 import { MonitoredChannelSummaryStats } from "./monitored_channel_stats";
 import { AskChannelStatsForYesterday } from "./ask_channel_stats_for_yesterday";
+import {OncallTicketsStatus} from "./oncall_tickets_status";
 
 export const ASKS_ACTIONS: BotAction[] = [
   new Compliment(),
@@ -23,4 +24,5 @@ export const ASKS_ACTIONS: BotAction[] = [
   new AskChannelWeeklyStats(),
   new AskChannelMonthlyStats(),
   new MeaningOfLife(),
+  new OncallTicketsStatus()
 ];

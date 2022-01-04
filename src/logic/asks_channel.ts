@@ -1,6 +1,6 @@
 import { getConversationHistory } from '../integrations/slack/conversations';
 import { TEAM_ASK_CHANNEL_ID } from '../integrations/slack/consts';
-import { createBlock, getMessagePermalink, sendSlackMessage } from '../integrations/slack/messages';
+import { createSectionBlock, getMessagePermalink, sendSlackMessage } from '../integrations/slack/messages';
 import { removeTimeInfoFromDate, setDateToSunday, toDateTime } from '../actions/utils';
 import { SectionBlock } from '@slack/web-api';
 import { getUserDisplayName } from '../integrations/slack/users';
@@ -201,13 +201,13 @@ export const reportStatsToSlack = async (
 
   if (includeSummary) {
     const text = `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`;
-    messageBlocks.push(createBlock(text));
+    messageBlocks.push(createSectionBlock(text));
   }
 
   if (includeDetails) {
     if (stats.totalNumInProgress > 0) {
       messageBlocks.push(
-        createBlock("These are the in progress asks we currently have:")
+        createSectionBlock("These are the in progress asks we currently have:")
       );
       // const in_progress_blocks: SectionBlock[] = [
       //   ,
@@ -219,7 +219,7 @@ export const reportStatsToSlack = async (
 
     if (stats.totalNumUnchecked > 0) {
       messageBlocks.push(
-        createBlock("These are the open asks we currently have:")
+        createSectionBlock("These are the open asks we currently have:")
       );
       messageBlocks.push(
         ...(await getPermalinkBlocks(stats.channelId, stats.messagesUnchecked))
@@ -249,7 +249,7 @@ const getPermalinkBlocks = async function (
 
   await Promise.all(
     messages.map(async (message: any) => {
-      let permalink = await getMessagePermalink(channelId, message.ts);
+      const permalink = await getMessagePermalink(channelId, message.ts);
       if (permalink) {
         const messageDate = toDateTime(message.ts);
         const daysDifference = Math.round(
@@ -262,7 +262,7 @@ const getPermalinkBlocks = async function (
             ? " (1 day ago)"
             : ` (${daysDifference} days ago)`;
         block.push(
-          createBlock(
+          createSectionBlock(
             `<${permalink}|Link to message> from ${
               message.user
                 ? await getUserDisplayName(message.user)

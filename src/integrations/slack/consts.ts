@@ -9,6 +9,7 @@ export let TEAM_CHATTER_CHANNEL_ID: string;
 export let TEAM_CODE_REVIEW_CHANNEL_ID: string;
 export let TEAM_LEADS_CHANNEL_ID: string;
 export let BOT_TESTS_CHANNEL_ID: string;
+export let ONCALL_CHANNEL_ID: string;
 export let GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
 
 export const setSlackConfiguration = function (
@@ -18,6 +19,7 @@ export const setSlackConfiguration = function (
   teamCodeReviewChannelId: string,
   teamLeadsChannelId: string,
   botTestsChannelId: string,
+  oncallChannelID: string,
   groupAskChannelsList: Map<string, string>
 ) {
   BOT_ID = botId;
@@ -26,8 +28,13 @@ export const setSlackConfiguration = function (
   TEAM_CODE_REVIEW_CHANNEL_ID = teamCodeReviewChannelId;
   TEAM_LEADS_CHANNEL_ID = teamLeadsChannelId;
   BOT_TESTS_CHANNEL_ID = botTestsChannelId;
+  ONCALL_CHANNEL_ID = oncallChannelID;
   GROUP_ASK_CHANNELS_LIST = groupAskChannelsList;
 };
 
-const token: string = process.env.BOT_USER_OAUTH_ACCESS_TOKEN || "";
-export const SlackWebClient = new WebClient(token);
+const slackToken: string = process.env.BOT_USER_OAUTH_ACCESS_TOKEN || "";
+export const SlackWebClient = new WebClient(slackToken);
+
+export const ZENDESK_TOKEN = process.env.ZENDESK_TOKEN || "";
+export const ZENDESK_BASE_URL = process.env.ZENDESK_BASE_URL || "";
+export const MONITORED_ZENDESK_VIEW = process.env.MONITORED_ZENDESK_VIEW || "";

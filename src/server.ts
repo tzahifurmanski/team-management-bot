@@ -2,7 +2,7 @@
 require("dotenv").config();
 
 import { loadSlackConfig } from "./integrations/slack/events";
-import { getAskChannelStatsForYesterday } from "./logic/cron_jobs";
+import {getAskChannelStatsForYesterday, getOncallTicketsStatus} from "./logic/cron_jobs";
 
 const cron = require("node-cron");
 
@@ -57,6 +57,10 @@ const scheduleCronJobs = async function () {
     // Schedule a cron job to post a daily summary of the requests from yesterday every morning at 8:30 AM (UK time)
     cron.schedule("30 08 * * 0-5", () => {
       getAskChannelStatsForYesterday();
+    })
+
+    cron.schedule("30 09 * * 0-5", () => {
+      getOncallTicketsStatus();
     });
   }
 

@@ -8,10 +8,12 @@ import {
 } from "./asks_channel";
 import { sendSlackMessage } from "../integrations/slack/messages";
 import {
+  ONCALL_CHANNEL_ID,
   TEAM_ASK_CHANNEL_ID,
   TEAM_LEADS_CHANNEL_ID,
 } from "../integrations/slack/consts";
 import { AskChannelStatsForYesterday } from "../actions/asks/ask_channel_stats_for_yesterday";
+import {OncallTicketsStatus} from "../actions/asks/oncall_tickets_status";
 
 export const getAskChannelStatsForYesterday = async function () {
   // Manually run the Get Channel stats for Yesterday action
@@ -20,6 +22,15 @@ export const getAskChannelStatsForYesterday = async function () {
     thread_ts: "",
   };
   await new AskChannelStatsForYesterday().performAction(event);
+};
+
+export const getOncallTicketsStatus = async function () {
+  // Manually run the Get Channel stats for Yesterday action
+  const event: any = {
+    channel: ONCALL_CHANNEL_ID,
+    thread_ts: "",
+  };
+  await new OncallTicketsStatus().performAction(event);
 };
 
 export const postWeeklyLeadsStats = async function () {

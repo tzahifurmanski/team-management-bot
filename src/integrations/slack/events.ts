@@ -37,8 +37,11 @@ export const loadSlackConfig = async function () {
       process.env.BOT_TESTS_CHANNEL_ID ||
       (await getConversationId(process.env.BOT_TESTS_CHANNEL_NAME || ""));
 
+    const oncallChannelId = process.env.ONCALL_CHANNEL_ID ||
+        (await getConversationId(process.env.ONCALL_CHANNEL_NAME || ""));
+
     // TODO: Allow to add defaults
-    let groupAsksChannelsList = new Map<string, string>();
+    const groupAsksChannelsList = new Map<string, string>();
 
     const asksChannels = (process.env.GROUP_ASK_CHANNELS || "").split(",");
     asksChannels.forEach((channelDetails: string) => {
@@ -58,6 +61,7 @@ export const loadSlackConfig = async function () {
       teamCodeReviewChannelId,
       teamLeadsChannelId,
       botTestsChannelId,
+      oncallChannelId,
       groupAsksChannelsList
     );
 

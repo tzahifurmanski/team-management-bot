@@ -34,4 +34,3 @@ export const sanitizeCommandInput = (text: string): string => {
       .replace(`<@${BOT_ID}> `, "")
       .trim();
 }
-

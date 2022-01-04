@@ -1,10 +1,15 @@
 import {
+  Button,
   ChatGetPermalinkArguments,
-  ChatPostMessageArguments,
+  ChatPostMessageArguments, ContextBlock,
   SectionBlock,
 } from "@slack/web-api";
 
-import { Block, KnownBlock } from "@slack/types";
+import {
+  Block,
+  DividerBlock,
+  KnownBlock,
+} from "@slack/types";
 import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from "./consts";
 import { botConfig } from "../../bot_config";
 
@@ -62,26 +67,53 @@ export const sendSlackMessage = async (
   // The result contains an identifier for the message, `ts`.
 };
 
-export const createBlock = function (
-  text: string,
-  unfurl: boolean = false
-): SectionBlock {
+export const createSectionBlock = (
+    text: string,
+    accessory?: Button
+): SectionBlock => {
   // TODO: This currently only supports SectionBlock. Make it more dynamic?
-  const result: SectionBlock = {
+  const section : SectionBlock = {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: text,
+      text,
     },
   };
 
-  if (!unfurl) {
-    // result.
+  if (accessory) {
+    section.accessory = accessory;
   }
 
-  // console.log("Text is - ", text);
-  return result;
+  return section;
 };
+
+export const createDivider = (): DividerBlock => ({
+  "type": "divider"
+})
+
+export const createButton = (text: string, url: string, value?: string): Button => ({
+    "type": "button",
+    "text": {
+      "type": "plain_text",
+      "text": text,
+      "emoji": true
+    },
+    "value": value,
+    "url": url,
+    "action_id": "button-action"
+  // }
+})
+
+export const createContext = (text: string): ContextBlock => ({
+  "type": "context",
+  "elements": [
+    {
+      "type": "plain_text",
+      "text": text
+    }
+  ]
+})
+
 
 export const getUserIDInText = function (text: string) {
   // Remove the bot id and look for other slack users
