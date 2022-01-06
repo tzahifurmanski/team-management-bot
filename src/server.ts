@@ -48,18 +48,21 @@ async function init() {
 // https://crontab.guru/#0_12_*_*_2
 const scheduleCronJobs = async function () {
   const askChannelStatsCron = process.env.ASK_CHANNEL_STATS_CRON;
-
   if (askChannelStatsCron) {
     console.log(
-      `Setting up a cron to update on ask channels stats (cron:  ${askChannelStatsCron}).`
+      `Setting up a cron to update on ask channel stats (cron:  ${askChannelStatsCron}).`
     );
-
-    // Schedule a cron job to post a daily summary of the requests from yesterday every morning at 8:30 AM (UK time)
-    cron.schedule("30 08 * * 0-5", () => {
+    cron.schedule(askChannelStatsCron, () => {
       getAskChannelStatsForYesterday();
     })
+  }
 
-    cron.schedule("30 09 * * 0-5", () => {
+  const oncallTicketsStatsCron = process.env.ONCALL_TICKETS_STATS_CRON;
+  if (oncallTicketsStatsCron) {
+    console.log(
+        `Setting up a cron to update on oncall tickets stats (cron:  ${oncallTicketsStatsCron}).`
+    );
+    cron.schedule(oncallTicketsStatsCron, () => {
       getOncallTicketsStatus();
     });
   }
