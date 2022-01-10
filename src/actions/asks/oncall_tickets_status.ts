@@ -4,11 +4,9 @@ import {
     createSectionBlock,
     createDivider,
     sendSlackMessage,
-    createButton,
-    createContext
 } from "../../integrations/slack/messages";
 import {getUserByID} from "../../integrations/zendesk/users";
-import {getAllTickets, listTicketComments} from "../../integrations/zendesk/tickets";
+import {getAllTickets} from "../../integrations/zendesk/tickets";
 import {getOrganizationByID} from "../../integrations/zendesk/organizations";
 import {ZENDESK_BASE_URL} from "../../integrations/slack/consts";
 
@@ -41,16 +39,17 @@ export class OncallTicketsStatus implements BotAction {
             const assigneeName:any = item.assignee_id ? (await getUserByID(item.assignee_id)).data?.user?.name : 'Unassigned';
             const organizationName:any = item.organization_id ? (await getOrganizationByID(item.organization_id)).data?.organization?.name : 'N/A';
 
-            // Get last comment
-            const comment:any = (await listTicketComments(item.id))[0];
-            const commentText:string = comment.body.replace('\n','').trim();
-            const authorName =comment.author_id ? (await getUserByID(comment.author_id)).data?.user?.name : 'N/A';
-            const lastCommentDate = comment.created_at;
-
             // TODO: Use button instead of link. Button requires interactivity, with requires a server.
             // messageBlocks.push(createSectionBlock(`*${item.subject}* / ${organizationName}.\nAssignee: *${userResponse}*, Priority *${item.priority}*, Status *${item.status}*`, createButton("Details", `${ZENDESK_BASE_URL}agent/tickets/${item.id}`)));
             messageBlocks.push(createSectionBlock(`<${ZENDESK_BASE_URL}agent/tickets/${item.id}|*${item.subject}*> / *${organizationName}*.\nAssignee: *${assigneeName}*, Priority *${item.priority}*, Status *${item.status}*`));
-            messageBlocks.push(createContext(`Last comment - ${authorName}/${lastCommentDate}:\n${commentText}`));
+
+            // TODO: See if we need this
+            // Get last comment details
+            // const comment:any = (await listTicketComments(item.id))[0];
+            // const commentText:string = comment.body.replace('\n','').trim();
+            // const authorName =comment.author_id ? (await getUserByID(comment.author_id)).data?.user?.name : 'N/A';
+            // const lastCommentDate = comment.created_at;
+            // messageBlocks.push(createContext(`Last comment - ${authorName}/${lastCommentDate}:\n${commentText}`));
         }
 
         await sendSlackMessage(
