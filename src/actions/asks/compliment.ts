@@ -1,8 +1,8 @@
 import { BOT_ID } from "../../integrations/slack/consts";
 import { BotAction } from "../base_action";
 import { getRandomFromArray } from "../utils";
-import { botConfig } from "../../bot_config";
-import {TEAM_SPECIFIC_COMPLIMENTS} from "../../consts";
+
+import {botConfig, TEAM_SPECIFIC_COMPLIMENTS} from "../../consts";
 
 const {
   sendSlackMessage,

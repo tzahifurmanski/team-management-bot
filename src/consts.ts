@@ -2,18 +2,14 @@
 
 // Load the .env file config for debug
 if (process.env.NODE_ENV !== 'production') {
-    // If there is a custom env file, use it
-    console.log(process.env.ENV_FILE);
-
-    // if (process.env.ENV_FILE) {
     if (typeof process.env.ENV_FILE !== 'undefined') {
-        // if (process.env.ENV_FILE !== '') {
-        console.log("A");
+        // If there is a custom env file, use it
+        console.log("Loading a custom env file...");
         require('dotenv').config({ path: process.env.ENV_FILE })
     }
     else
     {
-        console.log("B");
+        console.log("Loading default env file...");
         require("dotenv").config();
     }
 }
@@ -21,7 +17,12 @@ if (process.env.NODE_ENV !== 'production') {
 export const PORT = process.env.PORT || 3000;
 
 // Bot Configurations
-export const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "";
+const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "";
+
+// Load the configuration specific to the selected bot personality
+export const botConfig = require(`../assets/personalities/${BOT_PERSONALITY}/bot_config.json`);
+
+
 
 // Scheduling Configurations
 export const ASK_CHANNEL_STATS_CRON = process.env.ASK_CHANNEL_STATS_CRON;

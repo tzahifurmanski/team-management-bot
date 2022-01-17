@@ -1,6 +1,6 @@
 // Remove the name of the bot, in case it was mentioned
 import {BOT_ID} from "./consts";
-import {botConfig} from "../../bot_config";
+import {botConfig} from "../../consts";
 
 export const sanitizeCommandInput = (text: string): string => {
     return text

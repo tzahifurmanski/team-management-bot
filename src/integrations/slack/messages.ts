@@ -11,7 +11,7 @@ import {
   KnownBlock,
 } from "@slack/types";
 import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from "./consts";
-import { botConfig } from "../../bot_config";
+import {botConfig} from "../../consts";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage

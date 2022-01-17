@@ -1,6 +1,5 @@
 import { BotAction } from '../base_action';
-import { botConfig } from '../../bot_config';
-import {TEAM_NAME} from "../../consts";
+import {botConfig, TEAM_NAME} from "../../consts";
 
 const { sendSlackMessage } = require('../../integrations/slack/messages');
 

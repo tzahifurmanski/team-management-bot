@@ -1,6 +1,6 @@
 import { getRandomFromArray } from "../utils";
 import { BotAction } from "../base_action";
-import { botConfig } from "../../bot_config";
+import {botConfig} from "../../consts";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
