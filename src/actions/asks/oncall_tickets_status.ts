@@ -1,5 +1,4 @@
 import {BotAction} from "../base_action";
-import {sanitizeCommandInput} from "../utils";
 import {
     createSectionBlock,
     createDivider,
@@ -9,6 +8,7 @@ import {getUserByID} from "../../integrations/zendesk/users";
 import {getAllTickets} from "../../integrations/zendesk/tickets";
 import {getOrganizationByID} from "../../integrations/zendesk/organizations";
 import {ZENDESK_BASE_URL} from "../../integrations/slack/consts";
+import {sanitizeCommandInput} from "../../integrations/slack/utils";
 
 export class OncallTicketsStatus implements BotAction {
     doesMatch(event: any): boolean {

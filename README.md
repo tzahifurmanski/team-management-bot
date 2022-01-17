@@ -37,6 +37,19 @@ To be dynamic, the bot relies on configuration being passed through environment 
 * Setup the personality with the 'BOT_PERSONALITY' config var. Note: The personality should be exactly as the folder
   name under 'personalities'
 
+### Features setup
+## Zendesk Integration
+In order to integrate the bot with Zendesk, you need to supply two configurations:
+* ZENDESK_TOKEN
+* ZENDESK_BASE_URL
+
+## Oncall Tickets Status
+Oncall tickets status feature does a daily summary of the current tickets currently active for your oncall team.
+In order to enable the feature, you need to:
+* Configure Zendesk Integration
+  * Set up the following configurations:
+    * 
+
 ## Known issues:
 
 * ATM, if there are more than 50 asks open, you won't see their details. This is caused by adding too many 'blocks' to

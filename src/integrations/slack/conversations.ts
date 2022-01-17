@@ -5,8 +5,8 @@ import {
   ConversationsHistoryResponse,
   ConversationsListArguments,
 } from "@slack/web-api";
-import { isBotMessage } from "./events";
 import { Message } from "@slack/web-api/dist/response/ConversationsHistoryResponse";
+import {isBotMessage} from "./utils";
 
 // If something is not found, we'll have to go over everything
 export const getConversationId = async function (

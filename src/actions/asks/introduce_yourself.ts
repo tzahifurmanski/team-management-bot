@@ -1,9 +1,8 @@
 import { BotAction } from '../base_action';
 import { botConfig } from '../../bot_config';
+import {TEAM_NAME} from "../../consts";
 
 const { sendSlackMessage } = require('../../integrations/slack/messages');
-
-const TEAM_NAME = process.env.TEAM_NAME;
 
 export class IntroduceYourself implements BotAction {
   doesMatch(event: any): boolean {
@@ -21,4 +20,3 @@ export class IntroduceYourself implements BotAction {
     );
   }
 }
-export const introduce_yourself_action = async function (event: any) {};

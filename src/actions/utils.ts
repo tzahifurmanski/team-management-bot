@@ -1,5 +1,3 @@
-import {BOT_ID} from "../integrations/slack/consts";
-
 export const getRandomFromArray = (array: any[]) => {
   const random = Math.floor(Math.random() * array.length);
   return array[random];
@@ -27,10 +25,3 @@ export const setDateToSunday = (date: Date): Date => {
   if (day !== 0) date.setHours(-24 * (day - 1));
   return date;
 };
-
-// Remove the name of the bot, in case it was mentioned
-export const sanitizeCommandInput = (text: string): string => {
-  return text
-      .replace(`<@${BOT_ID}> `, "")
-      .trim();
-}

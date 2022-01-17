@@ -1,7 +1,6 @@
-// Load the .env file config
-require("dotenv").config();
-
-import { loadSlackConfig } from "./integrations/slack/events";
+// Always load consts first
+import {ASK_CHANNEL_STATS_CRON, ONCALL_TICKETS_STATS_CRON, PORT} from "./consts";
+import {loadSlackConfig} from "./integrations/slack/consts";
 import {getAskChannelStatsForYesterday, getOncallTicketsStatus} from "./logic/cron_jobs";
 
 const cron = require("node-cron");
@@ -9,7 +8,7 @@ const cron = require("node-cron");
 const { createServer } = require("http");
 const express_app = require("./server_init");
 
-const SERVER_PORT = process.env.PORT || 3000;
+
 
 async function init() {
   const loadResult = await loadSlackConfig();
@@ -21,7 +20,7 @@ async function init() {
   await scheduleCronJobs();
 
   const server = createServer(express_app);
-  server.listen(SERVER_PORT, () => {
+  server.listen(PORT, () => {
     // Log a message when the server is ready
     console.log(`Listening for events on ${server.address().port}`);
   });
@@ -47,22 +46,21 @@ async function init() {
 // Cool website for scheduling
 // https://crontab.guru/#0_12_*_*_2
 const scheduleCronJobs = async function () {
-  const askChannelStatsCron = process.env.ASK_CHANNEL_STATS_CRON;
-  if (askChannelStatsCron) {
+  if (ASK_CHANNEL_STATS_CRON) {
     console.log(
-      `Setting up a cron to update on ask channel stats (cron:  ${askChannelStatsCron}).`
+      `Setting up a cron to update on ask channel stats (cron:  ${ASK_CHANNEL_STATS_CRON}).`
     );
-    cron.schedule(askChannelStatsCron, () => {
+    cron.schedule(ASK_CHANNEL_STATS_CRON, () => {
       getAskChannelStatsForYesterday();
     })
   }
 
-  const oncallTicketsStatsCron = process.env.ONCALL_TICKETS_STATS_CRON;
-  if (oncallTicketsStatsCron) {
+
+  if (ONCALL_TICKETS_STATS_CRON) {
     console.log(
-        `Setting up a cron to update on oncall tickets stats (cron:  ${oncallTicketsStatsCron}).`
+        `Setting up a cron to update on oncall tickets stats (cron:  ${ONCALL_TICKETS_STATS_CRON}).`
     );
-    cron.schedule(oncallTicketsStatsCron, () => {
+    cron.schedule(ONCALL_TICKETS_STATS_CRON, () => {
       getOncallTicketsStatus();
     });
   }

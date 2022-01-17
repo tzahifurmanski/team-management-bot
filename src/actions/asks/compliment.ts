@@ -2,6 +2,7 @@ import { BOT_ID } from "../../integrations/slack/consts";
 import { BotAction } from "../base_action";
 import { getRandomFromArray } from "../utils";
 import { botConfig } from "../../bot_config";
+import {TEAM_SPECIFIC_COMPLIMENTS} from "../../consts";
 
 const {
   sendSlackMessage,
@@ -9,8 +10,7 @@ const {
 } = require("../../integrations/slack/messages");
 
 // Use a predefined compliments pool and anything that is team specific
-const COMPLIMENTS = botConfig.ACTION_COMPLIMENT_POOL.concat(
-  (process.env.TEAM_SPECIFIC_COMPLIMENTS || "").split(",")
+const COMPLIMENTS = botConfig.ACTION_COMPLIMENT_POOL.concat((TEAM_SPECIFIC_COMPLIMENTS || "").split(",")
 );
 
 export class Compliment implements BotAction {

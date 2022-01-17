@@ -1,13 +1,15 @@
 import { BotAction } from "../base_action";
-import {removeTimeInfoFromDate, sanitizeCommandInput, setDateToSunday} from "../utils";
+import {removeTimeInfoFromDate} from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
   getStatsForMessages,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
-import { BOT_ID, TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
+import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
+import {sanitizeCommandInput} from "../../integrations/slack/utils";
+import {TEAM_FOLKS} from "../../consts";
 
 export class AskChannelStatsForYesterday implements BotAction {
   doesMatch(event: any): boolean {
@@ -41,7 +43,7 @@ export class AskChannelStatsForYesterday implements BotAction {
       endingDate.toUTCString()
     );
 
-    const yesterdaySummary = `Good morning ${process.env.TEAM_FOLKS}:sunny:\nYesterday, <#${TEAM_ASK_CHANNEL_ID}> received a *total of ${stats.totalMessages} new asks*. Out of those, *${stats.totalNumProcessed} were answered*, *${stats.totalNumInProgress} are in progress*, and *${stats.totalNumUnchecked} were not handled*.`;
+    const yesterdaySummary = `Good morning ${TEAM_FOLKS}:sunny:\nYesterday, <#${TEAM_ASK_CHANNEL_ID}> received a *total of ${stats.totalMessages} new asks*. Out of those, *${stats.totalNumProcessed} were answered*, *${stats.totalNumInProgress} are in progress*, and *${stats.totalNumUnchecked} were not handled*.`;
 
     // Say what's the total of open asks we have in the last 60 days
     // =============================================================================

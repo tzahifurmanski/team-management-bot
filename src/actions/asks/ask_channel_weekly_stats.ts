@@ -1,5 +1,5 @@
 import { BotAction } from "../base_action";
-import {removeTimeInfoFromDate, sanitizeCommandInput, setDateToSunday} from "../utils";
+import {removeTimeInfoFromDate, setDateToSunday} from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -7,6 +7,7 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import { BOT_ID } from "../../integrations/slack/consts";
+import {sanitizeCommandInput} from "../../integrations/slack/utils";
 
 export class AskChannelWeeklyStats implements BotAction {
   doesMatch(event: any): boolean {

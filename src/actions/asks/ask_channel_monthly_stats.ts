@@ -6,7 +6,7 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import { BOT_ID } from "../../integrations/slack/consts";
-import {sanitizeCommandInput} from "../utils";
+import {sanitizeCommandInput} from "../../integrations/slack/utils";
 
 export class AskChannelMonthlyStats implements BotAction {
   doesMatch(event: any): boolean {

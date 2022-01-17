@@ -2,9 +2,7 @@ import { removeTimeInfoFromDate } from "../actions/utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
-  getStatsBuckets,
   getStatsForMessages,
-  reportStatsToSlack,
 } from "./asks_channel";
 import { sendSlackMessage } from "../integrations/slack/messages";
 import {
@@ -14,6 +12,7 @@ import {
 } from "../integrations/slack/consts";
 import { AskChannelStatsForYesterday } from "../actions/asks/ask_channel_stats_for_yesterday";
 import {OncallTicketsStatus} from "../actions/asks/oncall_tickets_status";
+import {TEAM_LEADS, TEAM_NAME} from "../consts";
 
 export const getAskChannelStatsForYesterday = async function () {
   // Manually run the Get Channel stats for Yesterday action
@@ -55,7 +54,7 @@ export const postWeeklyLeadsStats = async function () {
     endingDate.toUTCString()
   );
   await sendSlackMessage(
-    `Good morning ${process.env.TEAM_LEADS}:sunny:\nIn the previous ${DAYS_BACK} days, team ${process.env.TEAM_NAME} had a *total of ${monthStats.totalMessages} asks*. Out of those, *${monthStats.totalNumProcessed} were answered*, *${monthStats.totalNumInProgress} are in progress*, and *${monthStats.totalNumUnchecked} were not handled*.`,
+    `Good morning ${TEAM_LEADS}:sunny:\nIn the previous ${DAYS_BACK} days, team ${TEAM_NAME} had a *total of ${monthStats.totalMessages} asks*. Out of those, *${monthStats.totalNumProcessed} were answered*, *${monthStats.totalNumInProgress} are in progress*, and *${monthStats.totalNumUnchecked} were not handled*.`,
     TEAM_LEADS_CHANNEL_ID
   );
 };
