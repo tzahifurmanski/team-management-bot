@@ -37,13 +37,7 @@
     "postinstall": "tsc",
     "dev-start": "tsc && node dist/server.js",
     "debug": "tsc-watch --project tsconfig.json --onSuccess 'node dist/server.js'",
-    "test": "cross-env NODE_ENV=test jest --testTimeout=10000"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "coveragePathIgnorePatterns": [
-      "/node_modules/"
-    ]
+    "test": "cross-env NODE_ENV=test ENV_FILE=.tests_env jest --testTimeout=10000"
   },
   "engines": {
     "node": "12.x"
