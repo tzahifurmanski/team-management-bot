@@ -1,8 +1,3 @@
-// TODO: Write the tests, they are just stubs ATM
-//
-// const supertest = require("supertest");
-// const tested_app = require("../src/server_init");
-//
 import {IntroduceYourself} from "../../../src/actions/asks/introduce_yourself";
 
 let testedClass: IntroduceYourself = new IntroduceYourself();
