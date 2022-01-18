@@ -2,7 +2,6 @@ import {IntroduceYourself} from "../../../src/actions/asks/introduce_yourself";
 
 let testedClass: IntroduceYourself = new IntroduceYourself();
 
-
 describe("doesMatch", () => {
   test("Good input", async () => {
     const event : any = {};

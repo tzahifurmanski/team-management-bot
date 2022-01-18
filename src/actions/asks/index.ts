@@ -12,12 +12,12 @@ import { MonitoredChannelSummaryStats } from "./monitored_channel_stats";
 import { AskChannelStatsForYesterday } from "./ask_channel_stats_for_yesterday";
 import {OncallTicketsStatus} from "./oncall_tickets_status";
 import {MONITORED_ZENDESK_VIEW, ZENDESK_BASE_URL, ZENDESK_TOKEN} from "../../integrations/slack/consts";
+import {MONITORED_CHANNEL_ID, MONITORED_CHANNEL_TRIGGER} from "../../consts";
 
 export const ASKS_ACTIONS: BotAction[] = [
   new Compliment(),
   new IntroduceYourself(),
   new WhatCanYouDo(),
-  new MonitoredChannelSummaryStats(),
   new GroupAskChannelMonthlyStats(),
   new AskChannelStatsForYesterday(),
   new AskChannelSummaryStats(),
@@ -26,6 +26,11 @@ export const ASKS_ACTIONS: BotAction[] = [
   new AskChannelMonthlyStats(),
   new MeaningOfLife()
 ];
+
+// Only if monitored channel vars re defined, Load the monitor channel action
+if(MONITORED_CHANNEL_ID && MONITORED_CHANNEL_TRIGGER) {
+  ASKS_ACTIONS.push(new MonitoredChannelSummaryStats());
+}
 
 // Only if Zendesk vars are defined, load the oncall tickets status action
 if(ZENDESK_BASE_URL && ZENDESK_TOKEN && MONITORED_ZENDESK_VIEW) {
