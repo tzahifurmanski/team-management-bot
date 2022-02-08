@@ -48,7 +48,6 @@ export const ONCALL_TICKETS_STATS_CRON = process.env.ONCALL_TICKETS_STATS_CRON;
 // Team Configurations
 export const TEAM_NAME = process.env.TEAM_NAME || "";
 export const TEAM_FOLKS: string = process.env.TEAM_FOLKS || "";
-export const TEAM_LEADS = process.env.TEAM_LEADS || "";
 export const TEAM_SPECIFIC_COMPLIMENTS: string = process.env.TEAM_SPECIFIC_COMPLIMENTS || "";
 
 // Monitored Channel Configurations
