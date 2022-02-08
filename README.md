@@ -53,14 +53,7 @@ In order to integrate the bot with Zendesk, you need to supply two configuration
 Oncall tickets status feature does a daily summary of the current tickets currently active for your oncall team.
 In order to enable the feature, you need to:
 * Configure Zendesk Integration
-  * Set up the following configurations:
-    * 
-
-## Known issues:
-
-* ATM, if there are more than 50 asks open, you won't see their details. This is caused by adding too many 'blocks' to
-  one slack message (needs to be fixed). To workaround this issue, you can:
-  Manually look back at your history and :white_check_mark: all the completed tasks (at least for the last 60 days, so
-  they won't be counted as not handled). Ask the bot to give you stats on a specific number of days (like ask channel
-  stats 10 ), find a number that works (less than 50 open asks), handle everything and increase the number of days again
-  - until tasks are handled!
+* Set up the following configurations:
+  * MONITORED_ZENDESK_VIEW
+  * ONCALL_CHANNEL_ID
+  * ONCALL_CHANNEL_NAME
