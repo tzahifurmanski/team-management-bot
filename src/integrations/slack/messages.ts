@@ -26,8 +26,6 @@ export const sendSlackMessage = async (
     text: text,
     channel: channel,
     username: botConfig.BOT_NAME,
-    // TODO: Could this be a parameter / config that is passed so it's no longer needed to be defined in bot json?
-    //
     icon_url: botConfig.BOT_IMAGE_URL,
   };
 

@@ -6,7 +6,9 @@ NODE_ENV=
 PORT=
 
 // Bot Configurations
-BOT_PERSONALITY=
+BOT_NAME= # The name for the bot to use when posting messages. Should be identical to the name of the bot as was set up in the Slack App.
+BOT_IMAGE_URL= # The URL for the image the bot will use, when posting messages. Default will use the Slack app photo.
+BOT_PERSONALITY= # Default is generic.
 
 // Scheduling Configurations
 ASK_CHANNEL_STATS_CRON=

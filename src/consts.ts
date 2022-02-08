@@ -22,6 +22,25 @@ const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "";
 // Load the configuration specific to the selected bot personality
 export const botConfig = require(`../assets/personalities/${BOT_PERSONALITY}/bot_config.json`);
 
+// Support a generic bot personality
+// =================================
+
+// If we got a bot name, override the default:
+const BOT_NAME_PLACEHOLDER = "<BOT_NAME>";
+const BOT_NAME = process.env.BOT_NAME || "";
+if(BOT_NAME) {
+    botConfig.BOT_NAME=BOT_NAME;
+    botConfig.ACTION_INTRODUCE_YOURSELF_TEXT = botConfig.ACTION_INTRODUCE_YOURSELF_TEXT.replace(BOT_NAME_PLACEHOLDER, BOT_NAME);
+
+    console.log(`Set up ${botConfig.BOT_NAME} as the bot name.`);
+}
+
+// If we got a bot image, override the default:
+const BOT_IMAGE_URL = process.env.BOT_IMAGE_URL || "";
+if (BOT_IMAGE_URL) {
+    botConfig.BOT_IMAGE_URL = BOT_IMAGE_URL
+}
+
 // Scheduling Configurations
 export const ASK_CHANNEL_STATS_CRON = process.env.ASK_CHANNEL_STATS_CRON;
 export const ONCALL_TICKETS_STATS_CRON = process.env.ONCALL_TICKETS_STATS_CRON;
