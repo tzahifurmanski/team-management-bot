@@ -16,10 +16,6 @@ export const SlackWebClient = new WebClient(slackToken);
 
 export let BOT_ID: string;
 
-// Bot Configurations
-export let BOT_TESTS_CHANNEL_ID: string = process.env.BOT_TESTS_CHANNEL_ID || "";
-const BOT_TESTS_CHANNEL_NAME: string = process.env.BOT_TESTS_CHANNEL_NAME || "";
-
 // Channels Configurations
 export let TEAM_ASK_CHANNEL_ID: string = process.env.TEAM_ASK_CHANNEL_ID || "";
 const TEAM_ASK_CHANNEL_NAME: string = process.env.TEAM_ASK_CHANNEL_NAME || "";
@@ -58,8 +54,6 @@ export const loadSlackConfig = async function () {
 
     const teamLeadsChannelId = TEAM_LEADS_CHANNEL_ID || await getConversationId(TEAM_LEADS_CHANNEL_NAME);
 
-    const botTestsChannelId = BOT_TESTS_CHANNEL_ID || await getConversationId(BOT_TESTS_CHANNEL_NAME);
-
     const oncallChannelId = ONCALL_CHANNEL_ID || await getConversationId(ONCALL_CHANNEL_NAME);
 
     // TODO: Allow to add defaults
@@ -83,7 +77,6 @@ export const loadSlackConfig = async function () {
     TEAM_CHATTER_CHANNEL_ID = teamChatterChannelId;
     TEAM_CODE_REVIEW_CHANNEL_ID = teamCodeReviewChannelId;
     TEAM_LEADS_CHANNEL_ID = teamLeadsChannelId;
-    BOT_TESTS_CHANNEL_ID = botTestsChannelId;
     ONCALL_CHANNEL_ID = oncallChannelId;
     GROUP_ASK_CHANNELS_LIST = groupAsksChannelsList;
 
