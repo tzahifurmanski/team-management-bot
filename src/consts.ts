@@ -42,7 +42,7 @@ if (BOT_IMAGE_URL) {
 }
 
 // Scheduling Configurations
-export const ASK_CHANNEL_STATS_CRON = process.env.ASK_CHANNEL_STATS_CRON;
+export const ASK_CHANNEL_STATS_CRON = process.env.ASK_CHANNEL_STATS_CRON || "30 08 * * 0-5";
 export const ONCALL_TICKETS_STATS_CRON = process.env.ONCALL_TICKETS_STATS_CRON;
 
 // Team Configurations
