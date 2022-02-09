@@ -77,6 +77,6 @@ export class AskChannelStatsForYesterday implements BotAction {
     );
 
     // Post the links for the various open stats
-    await reportStatsToSlack(monthStats, event.channel, "", false);
+    await reportStatsToSlack(monthStats, event.channel, event.thread_ts, false);
   }
 }
