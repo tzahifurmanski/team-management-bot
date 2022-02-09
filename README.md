@@ -7,21 +7,22 @@ A slack bot for engineering teams to get various stats and perform team related 
 ## Setup / Deployment:
 
 * Set up a Slack app
-  * Import a Slack App using a [manifest file](slack-manifest.txt), and enter the relevant details instead of the following placeholders:
-    * <BOT_NAME>
-    * <BOT_DESCRIPTION>
-    * <BOT_URL>
-  * Configure the with relevant permissions (TBD, add permissions list)
+  * Initial App Setup
+    * (Easy way) Import a Slack App using a [manifest file](slack-manifest.txt), and enter the relevant details instead of the following placeholders:
+      * <BOT_NAME>
+      * <BOT_DESCRIPTION>
+      * <BOT_URL>
+    * (Manual way) You can also decide to manually setup the Slack app:
+      * Register for event subscriptions
+        * Enable events and set request URL to : BOT_URL/events/slack
+        * Subscribe to bot events
+          * app_mention
+          * message.channels
+          * message.im
+      * Configure the app with relevant permissions (TBD, add permissions list)
   * Install the app to workspace
-    * (Optional) You can also decide to manually setup the Slack app: 
-    * Enable 'App Home > Always Show My Bot as Online' and 'Allow users to send Slash commands and messages from the
-      messages tab'
-    * Register for event subscriptions
-      * Enable events and set request URL to : BOT_URL/events/slack
-      * Subscribe to bot events
-        * app_mention
-        * message.channels
-        * message.im
+  * Enable 'App Home > Always Show My Bot as Online' and 'Allow users to send Slash commands and messages from the
+    messages tab'
 * Setup an Heroku NodeJS app
   * Connect your local git repo to heroku
     * heroku git:remote -a APP_NAME
@@ -55,5 +56,12 @@ In order to enable the feature, you need to:
 * Configure Zendesk Integration
 * Set up the following configurations:
   * MONITORED_ZENDESK_VIEW
-  * ONCALL_CHANNEL_ID
   * ONCALL_CHANNEL_NAME
+  * ONCALL_CHANNEL_ID (Optional, but improves startup time)
+
+## Reaction for Code Review request
+The bot can be reactive, and post a funny gif when someone asks for a code review, in the team's code review channel.
+In order to enable the feature, you need to:
+* Set up the following configurations:
+  * TEAM_CODE_REVIEW_CHANNEL_NAME
+  * TEAM_CODE_REVIEW_CHANNEL_ID (Optional, but improves startup time)

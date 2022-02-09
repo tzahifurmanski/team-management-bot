@@ -57,3 +57,8 @@ ZENDESK_BASE_URL= # Base URL for your Zendesk instance
 MONITORED_ZENDESK_VIEW= # ID of the Zendesk View used by the oncall
 ONCALL_CHANNEL_ID= # ID of the Slack channel used by the oncall team
 ONCALL_CHANNEL_NAME= # Name of the Slack channel used by the oncall team
+
+
+# Code Review
+TEAM_CODE_REVIEW_CHANNEL_ID
+TEAM_CODE_REVIEW_CHANNEL_NAME

@@ -40,6 +40,8 @@ export const handle_direct_event = async function (event: any) {
     );
 
     console.log("Unsupported event", JSON.stringify(event));
+    console.log(`Unsupported text \"${event.text}\"`);
+
     // TODO: Save the unsupported event for later debrief
     // TODO: Reply to unsupported events with a quote
   }

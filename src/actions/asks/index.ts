@@ -27,7 +27,7 @@ export const ASKS_ACTIONS: BotAction[] = [
   new MeaningOfLife()
 ];
 
-// Only if monitored channel vars re defined, Load the monitor channel action
+// Only if monitored channel vars are defined, Load the monitor channel action
 if(MONITORED_CHANNEL_ID && MONITORED_CHANNEL_TRIGGER) {
   ASKS_ACTIONS.push(new MonitoredChannelSummaryStats());
 }
