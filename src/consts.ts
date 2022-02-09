@@ -17,7 +17,7 @@ if (process.env.NODE_ENV !== 'production') {
 export const PORT = process.env.PORT || 3000;
 
 // Bot Configurations
-const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "";
+const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "generic";
 
 // Load the configuration specific to the selected bot personality
 export const botConfig = require(`../assets/personalities/${BOT_PERSONALITY}/bot_config.json`);
