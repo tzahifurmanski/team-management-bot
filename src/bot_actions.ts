@@ -2,7 +2,6 @@ import { BotAction } from "./actions/base_action";
 import { ASKS_ACTIONS } from "./actions/asks";
 import { RESPONSE_ACTIONS } from "./actions/responses";
 import {
-  TEAM_CHATTER_CHANNEL_ID,
   TEAM_CODE_REVIEW_CHANNEL_ID,
 } from "./integrations/slack/consts";
 import { sendSlackMessage } from "./integrations/slack/messages";
@@ -11,7 +10,6 @@ import { sendSlackMessage } from "./integrations/slack/messages";
 export const handle_channel_event = async function (event: any) {
   // Limit this functionality to specific channels (otherwise we'll spam tons of channels)
   if (
-    event.channel != TEAM_CHATTER_CHANNEL_ID &&
     event.channel != TEAM_CODE_REVIEW_CHANNEL_ID
   ) {
     // console.log("We only want to reply in the chatter or code review channels");

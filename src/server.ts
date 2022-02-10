@@ -1,7 +1,7 @@
 // Always load consts first
-import {ASK_CHANNEL_STATS_CRON, ONCALL_TICKETS_STATS_CRON, PORT} from "./consts";
-import {loadSlackConfig} from "./integrations/slack/consts";
-import {getAskChannelStatsForYesterday, getOncallTicketsStatus} from "./logic/cron_jobs";
+import {ASK_CHANNEL_STATS_CRON, LEADS_SUMMARY_CRON, ONCALL_TICKETS_STATS_CRON, PORT} from "./consts";
+import {loadSlackConfig, LEADS_SUMMARY_CHANNEL_ID, LEADS_SUMMARY_CHANNEL_NAME} from "./integrations/slack/consts";
+import {getAskChannelStatsForYesterday, getOncallTicketsStatus, postWeeklyLeadsStats} from "./logic/cron_jobs";
 
 const cron = require("node-cron");
 
@@ -65,10 +65,16 @@ const scheduleCronJobs = async function () {
     });
   }
 
-  // Post in the leads channel every tuesday at 12 PM - DISABLED
-  // cron.schedule("0 12 * * 2", () => {
-  //   postWeeklyLeadsStats();
-  // });
+  if (LEADS_SUMMARY_CHANNEL_ID || LEADS_SUMMARY_CHANNEL_NAME)
+  {
+    console.log(
+        `Setting up a cron to post a leads summary (cron:  ${ONCALL_TICKETS_STATS_CRON}).`
+    );
+
+    cron.schedule(LEADS_SUMMARY_CRON, () => {
+      postWeeklyLeadsStats();
+    });
+  }
 };
 
 init().then(() => console.log("Finished initialisation"));

@@ -8,7 +8,7 @@ import { sendSlackMessage } from "../integrations/slack/messages";
 import {
   ONCALL_CHANNEL_ID,
   TEAM_ASK_CHANNEL_ID,
-  TEAM_LEADS_CHANNEL_ID,
+  LEADS_SUMMARY_CHANNEL_ID,
 } from "../integrations/slack/consts";
 import { AskChannelStatsForYesterday } from "../actions/asks/ask_channel_stats_for_yesterday";
 import {OncallTicketsStatus} from "../actions/asks/oncall_tickets_status";
@@ -55,6 +55,6 @@ export const postWeeklyLeadsStats = async function () {
   );
   await sendSlackMessage(
     `Good morning ${TEAM_NAME} leads :sunny:\nIn the previous ${DAYS_BACK} days, team ${TEAM_NAME} had a *total of ${monthStats.totalMessages} asks*. Out of those, *${monthStats.totalNumProcessed} were answered*, *${monthStats.totalNumInProgress} are in progress*, and *${monthStats.totalNumUnchecked} were not handled*.`,
-    TEAM_LEADS_CHANNEL_ID
+      LEADS_SUMMARY_CHANNEL_ID
   );
 };

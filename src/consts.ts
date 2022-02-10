@@ -43,11 +43,12 @@ if (BOT_IMAGE_URL) {
 
 // Scheduling Configurations
 export const ASK_CHANNEL_STATS_CRON = process.env.ASK_CHANNEL_STATS_CRON || "30 08 * * 0-5";
+export const LEADS_SUMMARY_CRON = process.env.LEADS_SUMMARY_CRON || "0 12 * * 2";
 export const ONCALL_TICKETS_STATS_CRON = process.env.ONCALL_TICKETS_STATS_CRON;
 
 // Team Configurations
 export const TEAM_NAME = process.env.TEAM_NAME || "";
-export const TEAM_FOLKS: string = process.env.TEAM_FOLKS || "";
+export const TEAM_FOLKS: string = process.env.TEAM_FOLKS || "team";
 export const TEAM_SPECIFIC_COMPLIMENTS: string = process.env.TEAM_SPECIFIC_COMPLIMENTS || "";
 
 // Monitored Channel Configurations

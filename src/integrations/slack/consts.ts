@@ -17,12 +17,20 @@ export const SlackWebClient = new WebClient(slackToken);
 export let BOT_ID: string;
 
 // Channels Configurations
+
+// Asks channel stats
 export let TEAM_ASK_CHANNEL_ID: string = process.env.TEAM_ASK_CHANNEL_ID || "";
 const TEAM_ASK_CHANNEL_NAME: string = process.env.TEAM_ASK_CHANNEL_NAME || "";
-export let TEAM_CHATTER_CHANNEL_ID: string = process.env.TEAM_CHATTER_CHANNEL_ID || "";
-const TEAM_CHATTER_CHANNEL_NAME: string = process.env.TEAM_CHATTER_CHANNEL_NAME || "";
-export let TEAM_LEADS_CHANNEL_ID: string = process.env.TEAM_LEADS_CHANNEL_ID || "";
-const TEAM_LEADS_CHANNEL_NAME: string = process.env.TEAM_LEADS_CHANNEL_NAME || "";
+
+// Cron jobs
+// =============
+
+// Leads summary
+export let LEADS_SUMMARY_CHANNEL_ID: string = process.env.LEADS_SUMMARY_CHANNEL_ID || "";
+export const LEADS_SUMMARY_CHANNEL_NAME: string = process.env.LEADS_SUMMARY_CHANNEL_NAME || "";
+
+// Responses
+// ==========
 export let TEAM_CODE_REVIEW_CHANNEL_ID: string = process.env.TEAM_CODE_REVIEW_CHANNEL_ID || "";
 const TEAM_CODE_REVIEW_CHANNEL_NAME: string = process.env.TEAM_CODE_REVIEW_CHANNEL_NAME || "";
 
@@ -48,11 +56,9 @@ export const loadSlackConfig = async function () {
 
     const teamAskChannelId = TEAM_ASK_CHANNEL_ID || await getConversationId(TEAM_ASK_CHANNEL_NAME);
 
-    const teamChatterChannelId = TEAM_CHATTER_CHANNEL_ID || await getConversationId(TEAM_CHATTER_CHANNEL_NAME);
-
     const teamCodeReviewChannelId = TEAM_CODE_REVIEW_CHANNEL_ID || await getConversationId(TEAM_CODE_REVIEW_CHANNEL_NAME);
 
-    const teamLeadsChannelId = TEAM_LEADS_CHANNEL_ID || await getConversationId(TEAM_LEADS_CHANNEL_NAME);
+    const teamLeadsChannelId = LEADS_SUMMARY_CHANNEL_ID || await getConversationId(LEADS_SUMMARY_CHANNEL_NAME);
 
     const oncallChannelId = ONCALL_CHANNEL_ID || await getConversationId(ONCALL_CHANNEL_NAME);
 
@@ -65,18 +71,12 @@ export const loadSlackConfig = async function () {
       groupAsksChannelsList.set(details[0], details[1]);
     });
 
-    groupAsksChannelsList.set(
-        TEAM_ASK_CHANNEL_NAME,
-        teamAskChannelId
-    );
-
     // TODO: Do I need the temp consts, or could I just do the operation directly on the let variables
     // Set the exported configurations
     BOT_ID = botId;
     TEAM_ASK_CHANNEL_ID = teamAskChannelId;
-    TEAM_CHATTER_CHANNEL_ID = teamChatterChannelId;
     TEAM_CODE_REVIEW_CHANNEL_ID = teamCodeReviewChannelId;
-    TEAM_LEADS_CHANNEL_ID = teamLeadsChannelId;
+    LEADS_SUMMARY_CHANNEL_ID = teamLeadsChannelId;
     ONCALL_CHANNEL_ID = oncallChannelId;
     GROUP_ASK_CHANNELS_LIST = groupAsksChannelsList;
 

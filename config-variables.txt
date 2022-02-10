@@ -11,13 +11,12 @@ BOT_IMAGE_URL= # The URL for the image the bot will use, when posting messages. 
 BOT_PERSONALITY= # Default is generic.
 
 // Scheduling Configurations
-ASK_CHANNEL_STATS_CRON= # Default is 30 08 * * 0-5, every day at 8:30 UTC, on Sunday to Friday
+
 ONCALL_TICKETS_STATS_CRON=
 
 // Team Configurations
 TEAM_NAME=
-TEAM_FOLKS=
-TEAM_LEADS=
+TEAM_FOLKS= # How the team members should be referred to by the bot. Default is 'team'.
 TEAM_SPECIFIC_COMPLIMENTS=
 
 // Monitored Channel Configurations
@@ -36,18 +35,22 @@ MONITORED_CHANNEL_TRIGGER=
 SLACK_SIGNING_SECRET=
 BOT_USER_OAUTH_ACCESS_TOKEN=
 
-# Channels Configurations
-TEAM_ASK_CHANNEL_ID=
-TEAM_ASK_CHANNEL_NAME=
-TEAM_CHATTER_CHANNEL_ID=
-TEAM_CHATTER_CHANNEL_NAME=
-TEAM_LEADS_CHANNEL_ID=
-TEAM_LEADS_CHANNEL_NAME=
-TEAM_CODE_REVIEW_CHANNEL_ID=
-TEAM_CODE_REVIEW_CHANNEL_NAME=
 
+# Features
+# =================
+
+# Ask Channel Stats
+ASK_CHANNEL_STATS_CRON= # Default is 30 08 * * 0-5, every day at 8:30 UTC, on Sunday to Friday
+TEAM_ASK_CHANNEL_ID= # The Slack ID for the team ask channel. Supply either a name, or an ID.
+TEAM_ASK_CHANNEL_NAME= # The name of the Slack ask channel. Supply either a name, or an ID.
+
+# Leads summary
+LEADS_SUMMARY_CRON= // Default is every tuesday at 12 PM
+LEADS_SUMMARY_CHANNEL_ID=
+LEADS_SUMMARY_CHANNEL_NAME=
+
+# Ask Channel Stats - For multiple channels (stats only)
 GROUP_ASK_CHANNELS=
-
 
 # Zendesk Integration Configurations
 ZENDESK_TOKEN= # The Basic auth token used to connect to Zendesk
@@ -57,7 +60,6 @@ ZENDESK_BASE_URL= # Base URL for your Zendesk instance
 MONITORED_ZENDESK_VIEW= # ID of the Zendesk View used by the oncall
 ONCALL_CHANNEL_ID= # ID of the Slack channel used by the oncall team
 ONCALL_CHANNEL_NAME= # Name of the Slack channel used by the oncall team
-
 
 # Code Review
 TEAM_CODE_REVIEW_CHANNEL_ID
