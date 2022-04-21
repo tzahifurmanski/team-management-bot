@@ -43,6 +43,9 @@ BOT_USER_OAUTH_ACCESS_TOKEN=
 ASK_CHANNEL_STATS_CRON= # Default is 30 08 * * 0-5, every day at 8:30 UTC, on Sunday to Friday
 TEAM_ASK_CHANNEL_ID= # The Slack ID for the team ask channel. Supply either a name, or an ID.
 TEAM_ASK_CHANNEL_NAME= # The name of the Slack ask channel. Supply either a name, or an ID.
+USER_PROFILE_FIELD_ID_TEAM= # The Slack field ID to get the user's team name, for providing additional stats.
+    USER_PROFILE_FIELD_ID_DIVISION= # The Slack field ID to get the user's division name, for providing additional stats.
+USER_PROFILE_FIELD_ID_DEPARTMENT= # The Slack field ID to get the user's department name, for providing additional stats.
 
 # Leads summary
 LEADS_SUMMARY_CRON= // Default is every tuesday at 12 PM
