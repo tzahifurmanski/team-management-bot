@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
     }
 }
 
-export const PORT = process.env.PORT || 3000;
+export const PORT  = process.env.PORT || 3000;
 
 // Bot Configurations
 const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "generic";

@@ -5,42 +5,56 @@ import {getAskChannelStatsForYesterday, getOncallTicketsStatus, postWeeklyLeadsS
 
 const cron = require("node-cron");
 
-const { createServer } = require("http");
-const express_app = require("./server_init");
+// const { createServer } = require("http");
+const app = require("./server_init");
 
 
 
 async function init() {
-  const loadResult = await loadSlackConfig();
-  if (!loadResult) {
-    console.log("Loading failed!");
-    process.exit(0);
-  }
+  // const loadResult = await loadSlackConfig();
+  // if (!loadResult) {
+  //   console.log("Loading failed!");
+  //   process.exit(1);
+  // }
 
-  await scheduleCronJobs();
+  // await scheduleCronJobs();
 
-  const server = createServer(express_app);
-  server.listen(PORT, () => {
+  // Start the app
+  // await BOLT_APP.start(PORT);
+
+  // Must call init() before start() within an async function
+
+  console.log("HI");
+  await app.init();
+  await app.start(PORT, () => {
+    console.log(`Listening for events on ${PORT}`);
+
+    console.log('⚡️ Bolt app is running!');
+  })
+
+
+  // const server = createServer(express_app);
+  // server.listen(PORT, () => {
     // Log a message when the server is ready
-    console.log(`Listening for events on ${server.address().port}`);
-  });
-
-  server.on("close", async () => {
-    try {
-      console.log("Server is now closing");
-    } finally {
-      process.exit(0);
-    }
-  });
-
-  // TODO: This does not fire when I abort the server with CTRL+C
-  process.on("SIGTERM", () => {
-    // When SIGTERM is received, do a graceful shutdown
-
-    server.close(() => {
-      console.log("Process terminated");
-    });
-  });
+  //   console.log(`Listening for events on ${server.address().port}`);
+  // });
+  //
+  // server.on("close", async () => {
+  //   try {
+  //     console.log("Server is now closing");
+  //   } finally {
+  //     process.exit(0);
+  //   }
+  // });
+  //
+  // // TODO: This does not fire when I abort the server with CTRL+C
+  // process.on("SIGTERM", () => {
+  //   // When SIGTERM is received, do a graceful shutdown
+  //
+  //   server.close(() => {
+  //     console.log("Process terminated");
+  //   });
+  // });
 }
 
 // Cool website for scheduling

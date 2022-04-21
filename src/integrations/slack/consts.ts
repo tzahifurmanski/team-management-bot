@@ -2,14 +2,20 @@
 
 import {getBotId, getConversationId} from "./conversations";
 
-const { WebClient } = require("@slack/web-api");
+
+
 
 export const SLACK_USER_FORMAT: RegExp = /<@.*>/;
 
 // User-Specific Tokens Configurations
+
+// TODO: TEMPORARY THING
+const { WebClient } = require("@slack/web-api");
 export const SLACK_SIGNING_SECRET: string = process.env.SLACK_SIGNING_SECRET || "";
 const slackToken: string = process.env.BOT_USER_OAUTH_ACCESS_TOKEN || "";
 export const SlackWebClient = new WebClient(slackToken);
+
+// export const SlackWebClient = BOLT_APP.client;
 
 
 // These will be resolved by the loadSlackConfig process
