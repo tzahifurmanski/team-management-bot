@@ -22,6 +22,13 @@ export let BOT_ID: string;
 export let TEAM_ASK_CHANNEL_ID: string = process.env.TEAM_ASK_CHANNEL_ID || "";
 const TEAM_ASK_CHANNEL_NAME: string = process.env.TEAM_ASK_CHANNEL_NAME || "";
 
+// User profile field ids
+export const USER_PROFILE_FIELD_ID_TEAM = process.env.USER_PROFILE_FIELD_ID_TEAM || "";
+
+// TODO: Placeholders. Implement use for the department and division field IDs
+export const USER_PROFILE_FIELD_ID_DEPARTMENT = process.env.USER_PROFILE_FIELD_ID_DEPARTMENT || "";
+export const USER_PROFILE_FIELD_ID_DIVISION = process.env.USER_PROFILE_FIELD_ID_DIVISION || "";
+
 // Cron jobs
 // =============
 

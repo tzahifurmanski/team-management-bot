@@ -1,9 +1,10 @@
 import { getConversationHistory } from '../integrations/slack/conversations';
-import { TEAM_ASK_CHANNEL_ID } from '../integrations/slack/consts';
+import {TEAM_ASK_CHANNEL_ID} from '../integrations/slack/consts';
 import { createSectionBlock, getMessagePermalink, sendSlackMessage } from '../integrations/slack/messages';
 import { removeTimeInfoFromDate, setDateToSunday, toDateTime } from '../actions/utils';
 import { SectionBlock } from '@slack/web-api';
-import { getUserDisplayName } from '../integrations/slack/users';
+import {getUserProfile} from '../integrations/slack/users';
+import {getTeamNameFromProfile} from "../integrations/slack/utils";
 
 export interface AsksChannelStatsResult {
   startDateInUTC: string;
@@ -255,21 +256,17 @@ const getPermalinkBlocks = async function (
         const daysDifference = Math.round(
           (dateToday.getTime() - messageDate.getTime()) / (1000 * 3600 * 24)
         );
-        const daysMessage =
-          daysDifference == 0
-            ? " (earlier today)"
-            : daysDifference == 1
-            ? " (1 day ago)"
-            : ` (${daysDifference} days ago)`;
-        block.push(
-          createSectionBlock(
-            `<${permalink}|Link to message> from ${
-              message.user
-                ? await getUserDisplayName(message.user)
-                : message.username
-            } at ${messageDate.toLocaleDateString()}${daysMessage}`
-          )
-        );
+        const daysMessage = daysDifference === 0 ? " (earlier today)" : daysDifference === 1 ? " (1 day ago)" : ` (${daysDifference} days ago)`;
+        const userProfile = await getUserProfile(message.user) || {};
+
+        // TODO: Maybe only display the team name, when doing 'ask channel stats', and not when showing the stats for yesterday. Requires refactor.
+        let teamName = getTeamNameFromProfile(userProfile);
+        teamName = teamName ? ` (Team ${teamName})`: ""
+        const fromClause = `${message.user ? userProfile?.display_name: message.username}${teamName}`;
+
+        const blockText = `<${permalink}|Link to message> from ${fromClause} at ${messageDate.toLocaleDateString()}${daysMessage}`;
+
+        block.push(createSectionBlock(blockText));
       }
     })
   );
