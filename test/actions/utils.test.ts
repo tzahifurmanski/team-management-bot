@@ -1,4 +1,9 @@
-import {AskChannelStatsParams, getAskChannelStatsParameters, getStartingDate} from "../../src/actions/utils";
+import {
+    AskChannelStatsParams,
+    getAskChannelStatsParameters,
+    getStartingDate,
+    setDateToSunday
+} from "../../src/actions/utils";
 import * as MockDate from "mockdate";
 
 describe("getAskChannelStatsParameters", () => {
@@ -143,7 +148,7 @@ describe("getAskChannelStatsParameters", () => {
         expect(result.error).toEqual("Invalid count provided");
     });
 });
-// the month is 0-indexed
+
 describe("getStartingDate", () => {
     test("one day", async () => {
         MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
@@ -262,3 +267,33 @@ describe("getStartingDate", () => {
         MockDate.reset();
     });
 });
+
+
+describe("setDateToSunday", () => {
+    test("Sunday is same day", async () => {
+        const inputDate : Date = new Date(1651438799000); // 01/05/2022 20:16:40 UTC
+
+        const result : Date = setDateToSunday(inputDate);
+
+        const expected : Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
+        expect(result.getTime()).toEqual(expected.getTime());
+    });
+
+    test("Middle of the week", async () => {
+        const inputDate : Date = new Date(1651611599000); // 03/05/2022 20:59:59 UTC
+
+        const result : Date = setDateToSunday(inputDate);
+
+        const expected : Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
+        expect(result.getTime()).toEqual(expected.getTime());
+    });
+
+    test("Saturday night", async () => {
+        const inputDate : Date = new Date(1651957199000); // 07/05/2022 20:59:59 UTC
+
+        const result : Date = setDateToSunday(inputDate);
+
+        const expected : Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
+        expect(result.getTime()).toEqual(expected.getTime());
+    });
+})
