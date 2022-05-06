@@ -6,6 +6,11 @@ import {botConfig} from "../../consts";
 const GIFS: string[] = botConfig.RESPONSE_FOLKS_POOL;
 
 export class FolksResponse implements BotAction {
+  isEnabled(): boolean {
+    // This action should always be available
+    return true;
+  }
+
   doesMatch(event: any): boolean {
     return event.text.toLowerCase().startsWith("folks");
   }

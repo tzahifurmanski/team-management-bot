@@ -1,6 +1,7 @@
 import { getRandomFromArray } from "../utils";
 import { BotAction } from "../base_action";
 import {botConfig} from "../../consts";
+import {TEAM_CODE_REVIEW_CHANNEL_ID} from "../../integrations/slack/consts";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
@@ -9,6 +10,11 @@ const GIFS = botConfig.RESPONSE_REVIEW_REQUEST_POOL;
 // TODO: Add a chaos element (only show gif at X % of the cases)
 
 export class ReviewRequestResponse implements BotAction {
+  isEnabled(): boolean {
+    // Only if code reviews channel vars are defined, Load the code review actions
+    return !!(TEAM_CODE_REVIEW_CHANNEL_ID);
+  }
+
   doesMatch(event: any): boolean {
     return (
       event.text.toLowerCase().includes("https://github.com/snyk") &&

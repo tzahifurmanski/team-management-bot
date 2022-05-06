@@ -3,6 +3,11 @@ import { BotAction } from "../base_action";
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
 export class MeaningOfLife implements BotAction {
+  isEnabled(): boolean {
+    // This action should always be available
+    return true;
+  }
+
   doesMatch(event: any): boolean {
     return event.text.includes("meaning of life");
   }

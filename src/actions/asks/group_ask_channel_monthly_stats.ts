@@ -11,6 +11,11 @@ import {
 } from "../../logic/asks_channel";
 
 export class GroupAskChannelMonthlyStats implements BotAction {
+  isEnabled(): boolean {
+    // This action should always be available
+    return true;
+  }
+
   doesMatch(event: any): boolean {
     // TODO: group ask channel monthly?
     return event.text.includes("group ask channel monthly stats");

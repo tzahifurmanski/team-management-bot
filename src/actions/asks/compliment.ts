@@ -14,6 +14,11 @@ const COMPLIMENTS = botConfig.ACTION_COMPLIMENT_POOL.concat((TEAM_SPECIFIC_COMPL
 );
 
 export class Compliment implements BotAction {
+  isEnabled(): boolean {
+    // This action should always be available
+    return true;
+  }
+
   doesMatch(event: any): boolean {
     return (
       event.text.includes("compliment") ||

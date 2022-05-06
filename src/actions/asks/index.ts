@@ -7,26 +7,31 @@ import { MeaningOfLife } from "./meaning_of_life";
 import { GroupAskChannelMonthlyStats } from "./group_ask_channel_monthly_stats";
 import { MonitoredChannelSummaryStats } from "./monitored_channel_stats";
 import { AskChannelStatsForYesterday } from "./ask_channel_stats_for_yesterday";
-import {OncallTicketsStatus} from "./oncall_tickets_status";
-import {MONITORED_ZENDESK_VIEW, ZENDESK_BASE_URL, ZENDESK_TOKEN} from "../../integrations/slack/consts";
-import {MONITORED_CHANNEL_ID, MONITORED_CHANNEL_TRIGGER} from "../../consts";
+import { OncallTicketsStatus } from "./oncall_tickets_status";
 
-export const ASKS_ACTIONS: BotAction[] = [
+const ACTIONS_LIST : BotAction[] = [
   new Compliment(),
   new IntroduceYourself(),
   new WhatCanYouDo(),
   new GroupAskChannelMonthlyStats(),
   new AskChannelStatsForYesterday(),
   new AskChannelStats(),
-  new MeaningOfLife()
-];
+  new MeaningOfLife(),
+  new MonitoredChannelSummaryStats(),
+  new OncallTicketsStatus()];
 
-// Only if monitored channel vars are defined, Load the monitor channel action
-if(MONITORED_CHANNEL_ID && MONITORED_CHANNEL_TRIGGER) {
-  ASKS_ACTIONS.push(new MonitoredChannelSummaryStats());
-}
+export let ASKS_ACTIONS: BotAction[] = [];
 
-// Only if Zendesk vars are defined, load the oncall tickets status action
-if(ZENDESK_BASE_URL && ZENDESK_TOKEN && MONITORED_ZENDESK_VIEW) {
-  ASKS_ACTIONS.push(new OncallTicketsStatus());
-}
+console.log("Loading actions list...");
+ACTIONS_LIST.forEach( (action) => {
+  if(action.isEnabled())
+  {
+    ASKS_ACTIONS.push(action);
+    console.log(`'${action.constructor.name}' enabled.`)
+  }
+  else
+  {
+    console.log(`'${action.constructor.name}' skipped.`)
+  }
+})
+console.log("Actions list loading is complete.");
