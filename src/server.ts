@@ -11,6 +11,9 @@ const express_app = require("./server_init");
 
 
 async function init() {
+  // Print server time
+  console.log(`Server starting at ${new Date().toUTCString()}`);
+
   const loadResult = await loadSlackConfig();
   if (!loadResult) {
     console.log("Loading failed!");

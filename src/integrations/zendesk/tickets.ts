@@ -23,5 +23,4 @@ export const listTicketComments = async (ticketId : string): Promise<any[]> => {
     const url = `${ZENDESK_BASE_URL}api/v2/tickets/${ticketId}/comments.json?sort_order=desc`;
     const zendeskResponse = await httpGet(url, ZENDESK_TOKEN);
     return zendeskResponse.data.comments;
-
 }
