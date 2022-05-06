@@ -5,7 +5,7 @@ export const getRandomFromArray = (array: any[]) => {
 
 // TODO Make this prettier and add tests for this
 export const toDateTime = (secs: any): Date => {
-  const time = new Date(1970, 0, 1); // Epoch
+  const time = new Date(1970, 0, 1); // Set to Epoch
   time.setSeconds(secs);
   return time;
 };
@@ -23,6 +23,7 @@ export const removeTimeInfoFromDate = (date: Date): Date => {
 export const setDateToSunday = (date: Date): Date => {
   const day = date.getDay();
   if (day !== 0) date.setHours(-24 * (day - 1));
+  date = removeTimeInfoFromDate(date);
   return date;
 };
 
@@ -99,10 +100,7 @@ export const getStartingDate = (params: AskChannelStatsParams) : Date => {
   else {
     // Get the timeframe for the beginning of the month
     const date = new Date();
-    startingDate = new Date(
-        Date.UTC(date.getFullYear(), date.getMonth() - adjustedCount, 1, 0)
-    );
-
+    startingDate = new Date(Date.UTC(date.getFullYear(), date.getMonth() - adjustedCount, 1, 0));
   }
 
   return startingDate;
