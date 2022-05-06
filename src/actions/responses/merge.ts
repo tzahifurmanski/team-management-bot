@@ -9,6 +9,11 @@ const GIFS = botConfig.RESPONSE_MERGE_POOL;
 // TODO: Add a chaos element (only show gif at X % of the cases)
 
 export class MergeResponse implements BotAction {
+  isEnabled(): boolean {
+    // This action should always be available
+    return true;
+  }
+
   doesMatch(event: any): boolean {
     return (
       event.bot_profile?.name === "GitHub" &&

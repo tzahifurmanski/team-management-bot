@@ -7,10 +7,14 @@ import {
 import {getUserByID} from "../../integrations/zendesk/users";
 import {getAllTickets} from "../../integrations/zendesk/tickets";
 import {getOrganizationByID} from "../../integrations/zendesk/organizations";
-import {ZENDESK_BASE_URL} from "../../integrations/slack/consts";
+import {MONITORED_ZENDESK_VIEW, ZENDESK_BASE_URL, ZENDESK_TOKEN} from "../../integrations/slack/consts";
 import {sanitizeCommandInput} from "../../integrations/slack/utils";
 
 export class OncallTicketsStatus implements BotAction {
+    isEnabled(): boolean {
+        return !!(ZENDESK_BASE_URL && ZENDESK_TOKEN && MONITORED_ZENDESK_VIEW);
+    }
+
     doesMatch(event: any): boolean {
         return sanitizeCommandInput(event.text).startsWith("oncall tickets status");
     }

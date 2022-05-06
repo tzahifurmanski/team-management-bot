@@ -1,22 +1,39 @@
 import { BotAction } from "../base_action";
-import {TEAM_CODE_REVIEW_CHANNEL_ID} from "../../integrations/slack/consts";
-import {ReviewRequestResponse} from "./review_request";
-// import { BugResponse } from "./bug";
-// import { FolksResponse } from "./folks";
-// import { MergeResponse } from "./merge";
-// import { HelpResponse } from "./help";
-// import { IThinkResponse } from "./i_think";
+import { ReviewRequestResponse } from "./review_request";
+import { BugResponse } from "./bug";
+import { FolksResponse } from "./folks";
+import { MergeResponse } from "./merge";
+import { HelpResponse } from "./help";
+import { IThinkResponse } from "./i_think";
+import {ENABLE_BOT_RESPONSES} from "../../consts";
 
-// For now disable responses, we'll have to see if that's useful
-export const RESPONSE_ACTIONS: BotAction[] = [
-  // new BugResponse(),
-  // new FolksResponse(),
-  // new MergeResponse(),
-  // new HelpResponse(),
-  // new IThinkResponse(),
+const ACTIONS_LIST: BotAction[] = [
+    new BugResponse(),
+    new FolksResponse(),
+    new MergeResponse(),
+    new HelpResponse(),
+    new IThinkResponse(),
+    new ReviewRequestResponse()
 ];
 
-// Only if code reviews channel vars are defined, Load the code review actions
-if(TEAM_CODE_REVIEW_CHANNEL_ID) {
-    new ReviewRequestResponse()
+// For now most responses are disabled, not sure it's useful ATM
+export let RESPONSE_ACTIONS: BotAction[] = [];
+
+if(!ENABLE_BOT_RESPONSES) {
+    console.log("Bot responses are disabled.");
+}
+else {
+    console.log("Bot responses are enabled. Loading responses list...");
+    ACTIONS_LIST.forEach( (action) => {
+        if(action.isEnabled())
+        {
+            RESPONSE_ACTIONS.push(action);
+            console.log(`'${action.constructor.name}' enabled.`)
+        }
+        else
+        {
+            console.log(`'${action.constructor.name}' skipped.`)
+        }
+    })
+    console.log("Responses list loading is complete.");
 }

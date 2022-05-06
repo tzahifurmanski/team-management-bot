@@ -12,6 +12,11 @@ import {sanitizeCommandInput} from "../../integrations/slack/utils";
 import {TEAM_FOLKS} from "../../consts";
 
 export class AskChannelStatsForYesterday implements BotAction {
+  isEnabled(): boolean {
+    // This action should always be available
+    return true;
+  }
+
   doesMatch(event: any): boolean {
     return sanitizeCommandInput(event.text).startsWith("ask channel stats for yesterday");
   }

@@ -10,6 +10,11 @@ import { BOT_ID, TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
 import {sanitizeCommandInput} from "../../integrations/slack/utils";
 
 export class AskChannelStats implements BotAction {
+  isEnabled(): boolean {
+    // This action should always be available
+    return true;
+  }
+
   doesMatch(event: any): boolean {
     return sanitizeCommandInput(event.text).startsWith("ask channel stats");
   }
@@ -20,6 +25,8 @@ export class AskChannelStats implements BotAction {
     const startingDate = getStartingDate(params);
 
     const endingDate = new Date();
+
+    console.log(`"Date between ${startingDate.toUTCString()} and ${endingDate.toUTCString()}`);
 
     const messages: any[any] = await getChannelMessages(startingDate, endingDate);
 

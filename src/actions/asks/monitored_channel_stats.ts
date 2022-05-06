@@ -15,8 +15,13 @@ import {
   MONITORED_CHANNEL_ID,
   MONITORED_CHANNEL_TRIGGER
 } from "../../consts";
+import {ASKS_ACTIONS} from "./index";
 
 export class MonitoredChannelSummaryStats implements BotAction {
+  isEnabled(): boolean {
+    return !!(MONITORED_CHANNEL_ID && MONITORED_CHANNEL_TRIGGER);
+  }
+
   doesMatch(event: any): boolean {
     // TODO: ask channel summary?
     return event.text.includes(MONITORED_CHANNEL_TRIGGER);

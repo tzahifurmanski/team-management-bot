@@ -64,6 +64,11 @@ MONITORED_ZENDESK_VIEW= # ID of the Zendesk View used by the oncall
 ONCALL_CHANNEL_ID= # ID of the Slack channel used by the oncall team
 ONCALL_CHANNEL_NAME= # Name of the Slack channel used by the oncall team
 
+
+# BOT Responses
+# =============
+ENABLE_BOT_RESPONSES= # Should the bot respond to keywords. Values are True/False, default value is False. Example keywords are 'help', 'bug', 'review', etc
+
 # Code Review
-TEAM_CODE_REVIEW_CHANNEL_ID
-TEAM_CODE_REVIEW_CHANNEL_NAME
+TEAM_CODE_REVIEW_CHANNEL_ID=
+TEAM_CODE_REVIEW_CHANNEL_NAME=

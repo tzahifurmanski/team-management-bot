@@ -8,6 +8,11 @@ const GIFS = botConfig.RESPONSE_I_THINK_POOL || [];
 // TODO: Add a chaos element (only show gif at X % of the cases)
 
 export class IThinkResponse implements BotAction {
+  isEnabled(): boolean {
+    // This action should always be available
+    return true;
+  }
+
   doesMatch(event: any): boolean {
     return (
       event.text.toLowerCase().includes("I think") ||

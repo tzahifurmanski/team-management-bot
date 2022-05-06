@@ -4,6 +4,11 @@ import {botConfig} from "../../consts";
 const { sendSlackMessage } = require('../../integrations/slack/messages');
 
 export class WhatCanYouDo implements BotAction {
+  isEnabled(): boolean {
+    // This action should always be available
+    return true;
+  }
+
   doesMatch(event: any): boolean {
     return (
       event.text.includes('what can you do') || event.text.includes('help')

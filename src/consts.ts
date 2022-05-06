@@ -41,6 +41,9 @@ if (BOT_IMAGE_URL) {
     botConfig.BOT_IMAGE_URL = BOT_IMAGE_URL
 }
 
+// Bot responses
+export const ENABLE_BOT_RESPONSES = process.env.ENABLE_BOT_RESPONSES && process.env.ENABLE_BOT_RESPONSES.toLowerCase() === 'true' || false;
+
 // Scheduling Configurations
 export const ASK_CHANNEL_STATS_CRON = process.env.ASK_CHANNEL_STATS_CRON || "30 08 * * 0-5";
 export const LEADS_SUMMARY_CRON = process.env.LEADS_SUMMARY_CRON || "0 12 * * 2";

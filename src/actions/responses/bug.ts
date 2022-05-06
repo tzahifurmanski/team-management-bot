@@ -9,6 +9,11 @@ const GIFS: string[] = botConfig.RESPONSE_BUG_POOL;
 // TODO: Add a chaos element (only show gif at X % of the cases)
 
 export class BugResponse implements BotAction {
+  isEnabled(): boolean {
+    // This action should always be available
+    return true;
+  }
+
   doesMatch(event: any): boolean {
     return (
       event.text.toLowerCase().includes('found a bug') ||
