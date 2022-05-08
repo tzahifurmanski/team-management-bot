@@ -10,15 +10,16 @@ import { OncallTicketsStatus } from "./oncall_tickets_status";
 import {Help} from "./help";
 
 const ACTIONS_LIST : BotAction[] = [
-  new Help(),
-  new Compliment(),
-  new IntroduceYourself(),
   new AskChannelStats(),
   new GroupAskChannelMonthlyStats(),
   new AskChannelStatsForYesterday(),
-  new MeaningOfLife(),
+  new OncallTicketsStatus(),
   new MonitoredChannelSummaryStats(),
-  new OncallTicketsStatus()];
+  new IntroduceYourself(),
+  new Compliment(),
+  new MeaningOfLife(),
+  new Help(),
+  ];
 
 export let ASKS_ACTIONS: BotAction[] = [];
 
