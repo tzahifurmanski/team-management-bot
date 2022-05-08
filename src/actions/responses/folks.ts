@@ -6,6 +6,10 @@ import {botConfig} from "../../consts";
 const GIFS: string[] = botConfig.RESPONSE_FOLKS_POOL;
 
 export class FolksResponse implements BotAction {
+  getHelpText(): string {
+    return "Post a funny gif when someone says 'folks'";
+  }
+
   isEnabled(): boolean {
     // This action should always be available
     return true;

@@ -4,6 +4,10 @@ import {botConfig, TEAM_NAME} from "../../consts";
 const { sendSlackMessage } = require('../../integrations/slack/messages');
 
 export class IntroduceYourself implements BotAction {
+  getHelpText(): string {
+    return "Introduce myself (`introduce yourself`)";
+  }
+
   isEnabled(): boolean {
     // This action should always be available
     return true;

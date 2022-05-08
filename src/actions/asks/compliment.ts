@@ -14,6 +14,10 @@ const COMPLIMENTS = botConfig.ACTION_COMPLIMENT_POOL.concat((TEAM_SPECIFIC_COMPL
 );
 
 export class Compliment implements BotAction {
+  getHelpText(): string {
+    return "Compliment someone (`compliment @Tzahi`)";
+  }
+
   isEnabled(): boolean {
     // This action should always be available
     return true;

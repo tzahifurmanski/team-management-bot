@@ -7,8 +7,11 @@ const { sendSlackMessage } = require("../../integrations/slack/messages");
 const GIFS = botConfig.RESPONSE_HELP_POOL;
 
 // TODO: Add a chaos element (only show gif at X % of the cases)
-
 export class HelpResponse implements BotAction {
+  getHelpText(): string {
+    return "Post a funny gif when someone asks for help";
+  }
+
   isEnabled(): boolean {
     // This action should always be available
     return true;

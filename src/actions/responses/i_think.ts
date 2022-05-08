@@ -8,6 +8,10 @@ const GIFS = botConfig.RESPONSE_I_THINK_POOL || [];
 // TODO: Add a chaos element (only show gif at X % of the cases)
 
 export class IThinkResponse implements BotAction {
+  getHelpText(): string {
+    return "Post a funny gif when someone says 'I think' or 'I don't think'";
+  }
+
   isEnabled(): boolean {
     // This action should always be available
     return true;

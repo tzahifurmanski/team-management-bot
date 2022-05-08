@@ -12,9 +12,13 @@ import {sanitizeCommandInput} from "../../integrations/slack/utils";
 import {TEAM_FOLKS} from "../../consts";
 
 export class AskChannelStatsForYesterday implements BotAction {
+  getHelpText(): string {
+    return "Get you the ask channel stats from yesterday and a current status for the last 60 days (`ask channel stats for yesterday`)";
+  }
+
   isEnabled(): boolean {
-    // This action should always be available
-    return true;
+    // This action should be available if there is an asks channel to process
+    return !!(TEAM_ASK_CHANNEL_ID);
   }
 
   doesMatch(event: any): boolean {

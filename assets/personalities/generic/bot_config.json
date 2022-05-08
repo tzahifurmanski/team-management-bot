@@ -96,7 +96,7 @@
     "I always learn so much when I’m around you.",
     "Is there anything you can’t do!?"
   ],
-  "ACTION_WHAT_CAN_YOU_DO_TEXT": "Well, at the moment you can ask me to:\n• Introduce myself (`introduce yourself`)\n• Compliment someone (`compliment @Tzahi`)\n• Get you some stats about what goes on in your team channel (`ask channel stats`)\nBut I'm learning new stuff as I grow old :smiley:",
+  "ACTION_WHAT_CAN_YOU_DO_TEXT": "Well, at the moment you can ask me to:\n",
   "RESPONSE_BUG_POOL": [
     "https://media.giphy.com/media/xTiTnGuHmcaQeWSryE/giphy.gif",
     "https://media.giphy.com/media/A1SNSC8s40O64/giphy.gif",

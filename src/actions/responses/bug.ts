@@ -9,6 +9,10 @@ const GIFS: string[] = botConfig.RESPONSE_BUG_POOL;
 // TODO: Add a chaos element (only show gif at X % of the cases)
 
 export class BugResponse implements BotAction {
+  getHelpText(): string {
+    return "Post a funny gif when someone finds a bug";
+  }
+
   isEnabled(): boolean {
     // This action should always be available
     return true;

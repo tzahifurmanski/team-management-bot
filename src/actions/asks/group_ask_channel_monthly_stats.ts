@@ -11,18 +11,23 @@ import {
 } from "../../logic/asks_channel";
 
 export class GroupAskChannelMonthlyStats implements BotAction {
+  getHelpText(): string {
+    return "Get you some stats about what goes on in your department (`group ask channel stats`, default for 7 days). You can provide number of days / weeks / months (`group ask channel stats 15 days`, `group ask channel stats 2 weeks`)";
+  }
+
   isEnabled(): boolean {
-    // This action should always be available
-    return true;
+    // Available only if there are multiple group ask channels defined
+    return !!(GROUP_ASK_CHANNELS_LIST) && GROUP_ASK_CHANNELS_LIST.size > 0;
   }
 
   doesMatch(event: any): boolean {
-    // TODO: group ask channel monthly?
-    return event.text.includes("group ask channel monthly stats");
+    return event.text.includes("group ask channel stats");
   }
 
   async performAction(event: any): Promise<void> {
-    // Get the number of weeks back from event.text. Default is 0 (Beginning of this month).
+    // TODO: Start using getStartingDate here. Need to first refactor getStartingDate to dynamically get indexes for where the days / metric are in the word
+
+    // Get the number of months back from event.text. Default is 0 (Beginning of this month).
     // Added 1 as default so I can reduce the user input by 1 (because week 0 is the first month)
     // TODO: Make this prettier - This is needed because we need to count for a scenario where the text starts with @unibot so we needs to exclude it
     const numOfMonths =

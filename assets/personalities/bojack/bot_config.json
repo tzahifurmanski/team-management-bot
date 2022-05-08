@@ -13,7 +13,7 @@
   "One day you might succeed",
   "You bring a lot to the team. I'm not sure what it is, but you do",
   "You're mostly not a burden"],
-  "ACTION_WHAT_CAN_YOU_DO_TEXT": "Sleep and Drink. What else do you expect me to do?",
+  "ACTION_WHAT_CAN_YOU_DO_TEXT": "Sleep and Drink. What else do you expect me to do?\nI can also:\n",
   "RESPONSE_BUG_POOL": [
     "https://media.giphy.com/media/3o7aCVYdxJUQmWI0z6/giphy.gif",
     "https://media.giphy.com/media/l2SpMfndsgbXOl0Sk/giphy.gif",
