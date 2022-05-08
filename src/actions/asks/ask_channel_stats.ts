@@ -10,9 +10,13 @@ import { BOT_ID, TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
 import {sanitizeCommandInput} from "../../integrations/slack/utils";
 
 export class AskChannelStats implements BotAction {
+  getHelpText(): string {
+    return "Get you some stats about what goes on in your team channel (`ask channel stats`, default for 7 days). You can provide number of days / weeks / months (`ask channel stats 15 days`, `ask channel stats 2 weeks`)\n";
+  }
+
   isEnabled(): boolean {
-    // This action should always be available
-    return true;
+    // This action should be available if there is an asks channel to process
+    return !!(TEAM_ASK_CHANNEL_ID);
   }
 
   doesMatch(event: any): boolean {

@@ -7,12 +7,21 @@ import {
 import {getUserByID} from "../../integrations/zendesk/users";
 import {getAllTickets} from "../../integrations/zendesk/tickets";
 import {getOrganizationByID} from "../../integrations/zendesk/organizations";
-import {MONITORED_ZENDESK_VIEW, ZENDESK_BASE_URL, ZENDESK_TOKEN} from "../../integrations/slack/consts";
+import {
+    MONITORED_ZENDESK_VIEW,
+    ONCALL_CHANNEL_ID,
+    ZENDESK_BASE_URL,
+    ZENDESK_TOKEN
+} from "../../integrations/slack/consts";
 import {sanitizeCommandInput} from "../../integrations/slack/utils";
 
 export class OncallTicketsStatus implements BotAction {
+    getHelpText(): string {
+        return "Provide a daily summary of the current tickets currently active for your oncall team (`oncall tickets status`)";
+    }
+
     isEnabled(): boolean {
-        return !!(ZENDESK_BASE_URL && ZENDESK_TOKEN && MONITORED_ZENDESK_VIEW);
+        return !!(ZENDESK_BASE_URL && ZENDESK_TOKEN && MONITORED_ZENDESK_VIEW && ONCALL_CHANNEL_ID);
     }
 
     doesMatch(event: any): boolean {

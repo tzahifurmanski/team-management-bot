@@ -9,6 +9,10 @@ const GIFS = botConfig.RESPONSE_MERGE_POOL;
 // TODO: Add a chaos element (only show gif at X % of the cases)
 
 export class MergeResponse implements BotAction {
+  getHelpText(): string {
+    return "Post a funny gif when a PR is being merged";
+  }
+
   isEnabled(): boolean {
     // This action should always be available
     return true;

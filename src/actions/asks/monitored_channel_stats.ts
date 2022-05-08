@@ -18,6 +18,10 @@ import {
 import {ASKS_ACTIONS} from "./index";
 
 export class MonitoredChannelSummaryStats implements BotAction {
+  getHelpText(): string {
+    return "Monitor a certain channel for success/failure messages. For example, can be used to track successful deployments";
+  }
+
   isEnabled(): boolean {
     return !!(MONITORED_CHANNEL_ID && MONITORED_CHANNEL_TRIGGER);
   }
