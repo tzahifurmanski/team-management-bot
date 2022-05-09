@@ -8,7 +8,7 @@ import {
 import {
   Block,
   DividerBlock,
-  KnownBlock,
+  KnownBlock, MrkdwnElement,
 } from "@slack/types";
 import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from "./consts";
 import {botConfig} from "../../consts";
@@ -18,13 +18,13 @@ import {botConfig} from "../../consts";
 export const sendSlackMessage = async (
     text: string,
     channel: string,
-    thread_ts: string = "",
+    threadTS: string = "",
     blocks: (KnownBlock | Block)[] = [],
     disableUnfurl = false
 ) => {
   const options: ChatPostMessageArguments = {
-    text: text,
-    channel: channel,
+    text,
+    channel,
     username: botConfig.BOT_NAME,
     icon_url: botConfig.BOT_IMAGE_URL,
   };
@@ -36,8 +36,8 @@ export const sendSlackMessage = async (
   }
 
   // If we're in a thread, reply in the thread
-  if (thread_ts) {
-    options["thread_ts"] = thread_ts;
+  if (threadTS) {
+    options.thread_ts = threadTS;
   }
 
   // If there are blocks, send only 50 at each message
@@ -61,22 +61,25 @@ export const sendSlackMessage = async (
       `Successfully send message ${result.ts} in conversation ${channel}`
     );
   }
-  // console.log(result);
-  // The result contains an identifier for the message, `ts`.
 };
 
 export const createSectionBlock = (
-    text: string,
+    text?: string,
+    fields?: any[],
     accessory?: Button
 ): SectionBlock => {
   // TODO: This currently only supports SectionBlock. Make it more dynamic?
   const section : SectionBlock = {
     type: "section",
-    text: {
-      type: "mrkdwn",
-      text,
-    },
   };
+
+  if (text) {
+    section.text = createText(text);
+  }
+
+  if (fields) {
+    section.fields = fields;
+  }
 
   if (accessory) {
     section.accessory = accessory;
@@ -84,6 +87,12 @@ export const createSectionBlock = (
 
   return section;
 };
+
+
+export const createText = (text : string): MrkdwnElement => ({
+  type: "mrkdwn",
+  text
+})
 
 export const createDivider = (): DividerBlock => ({
   "type": "divider"
@@ -117,26 +126,18 @@ export const getUserIDInText = function (text: string) {
   // Remove the bot id and look for other slack users
   // TODO: This currently has a 'bug' where we can grab multiple users and compliment multiple users in one go
   //       it can create a corrupted output for 'compliment @Yossi and also say hi to @Zigi
-  const slack_users = text.replace(`<@${BOT_ID}>`, "").match(SLACK_USER_FORMAT);
+  const slackUsers = text.replace(`<@${BOT_ID}>`, "").match(SLACK_USER_FORMAT);
 
   // TODO: This will return the first user_id that is not the bot. If there's more than 1 user, we'll return the first one
   // TODO: Verify that this is an actual user
 
-  // TODO: Make this pretty
-  if (!slack_users) {
-    return "";
-  }
-
-  return slack_users[0];
+  return slackUsers ? slackUsers[0] : "";
 };
 
-export const getMessagePermalink = async function (
-  channel_id: string,
-  message_ts: string
-): Promise<string> {
+export const getMessagePermalink = async (channelId: string, messageTS: string): Promise<string> => {
   const options: ChatGetPermalinkArguments = {
-    channel: channel_id,
-    message_ts: message_ts,
+    channel: channelId,
+    message_ts: messageTS,
   };
   try {
     const response = await SlackWebClient.chat.getPermalink(options);
@@ -147,7 +148,7 @@ export const getMessagePermalink = async function (
       return "";
     }
   } catch (error) {
-    console.log("Error in message", message_ts, error);
+    console.log("Error in message", messageTS, error);
     return "";
   }
 };

@@ -1,6 +1,9 @@
 // Remove the name of the bot, in case it was mentioned
 import {botConfig} from "../../consts";
-import {BOT_ID, USER_PROFILE_FIELD_ID_TEAM} from "./consts";
+import {
+    BOT_ID,
+} from "./consts";
+import {sendSlackMessage} from "./messages";
 
 export const sanitizeCommandInput = (text: string): string => {
     return text
@@ -8,7 +11,7 @@ export const sanitizeCommandInput = (text: string): string => {
         .trim();
 }
 
-export const isBotMessage = function (event: any): boolean {
+export const isBotMessage = (event: any): boolean => {
     return (
         event.user === BOT_ID ||
         event.username === botConfig.BOT_NAME ||
@@ -16,12 +19,19 @@ export const isBotMessage = function (event: any): boolean {
     );
 };
 
-// Limit team name to 3 words
-const TEAM_NAME_WORDS_LIMIT = 3;
+// Limit values from the profile to 3 words
+const WORDS_LIMIT = 3;
 
-export const getTeamNameFromProfile = function (
-    profile: any
-): string {
-    const teamName = USER_PROFILE_FIELD_ID_TEAM && profile.fields && profile.fields[USER_PROFILE_FIELD_ID_TEAM]?.value ? profile.fields[USER_PROFILE_FIELD_ID_TEAM].value : "";
-    return teamName ? teamName.split(" ").splice(0,TEAM_NAME_WORDS_LIMIT).join(" ") : "";
+
+export const getValueFromProfile = (profile: any, fieldId: string) : string => {
+    const value = profile?.fields?.[fieldId]?.value ? profile.fields[fieldId].value : "";
+    return value ? value.split(" ").splice(0,WORDS_LIMIT).join(" ") : "Unknown";
+}
+
+export const sendGenericError = async (event : any ) => {
+    await sendSlackMessage(
+        `Sorry, didn't quite catch that.. :(`,
+        event.channel,
+        event.thread_ts ? event.thread_ts : event.ts
+    );
 }

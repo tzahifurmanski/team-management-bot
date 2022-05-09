@@ -5,6 +5,7 @@ import {
   TEAM_CODE_REVIEW_CHANNEL_ID,
 } from "./integrations/slack/consts";
 import { sendSlackMessage } from "./integrations/slack/messages";
+import {sendGenericError} from "./integrations/slack/utils";
 
 // This method handles events that are posted directly inside a channel
 export const handle_channel_event = async function (event: any) {
@@ -31,11 +32,7 @@ export const handle_direct_event = async function (event: any) {
   // console.log("Got new direct event", event.type, event);
 
   if (!(await runActions(event, ASKS_ACTIONS))) {
-    await sendSlackMessage(
-      `Sorry, didn't quite catch that.. :(`,
-      event.channel,
-      event.thread_ts ? event.thread_ts : event.ts
-    );
+    await sendGenericError(event);
 
     console.log("Unsupported event", JSON.stringify(event));
     console.log(`Unsupported text \"${event.text}\"`);

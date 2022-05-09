@@ -1,10 +1,18 @@
 import { getConversationHistory } from '../integrations/slack/conversations';
-import {TEAM_ASK_CHANNEL_ID} from '../integrations/slack/consts';
-import { createSectionBlock, getMessagePermalink, sendSlackMessage } from '../integrations/slack/messages';
+import {TEAM_ASK_CHANNEL_ID, USER_PROFILE_FIELD_ID_TEAM} from '../integrations/slack/consts';
+import {
+  createDivider,
+  createSectionBlock,
+  getMessagePermalink,
+  sendSlackMessage
+} from '../integrations/slack/messages';
 import { removeTimeInfoFromDate, setDateToSunday, toDateTime } from '../actions/utils';
 import { SectionBlock } from '@slack/web-api';
 import {getUserProfile} from '../integrations/slack/users';
-import {getTeamNameFromProfile} from "../integrations/slack/utils";
+import {getValueFromProfile} from "../integrations/slack/utils";
+import {Block} from "@slack/types";
+import {AsksChannelReportResult, createReport, createReportSection} from "./ask_channel_reporting";
+
 
 export interface AsksChannelStatsResult {
   startDateInUTC: string;
@@ -20,11 +28,8 @@ export interface AsksChannelStatsResult {
 }
 
 // This method gets two dates and returns all the messages that were received in the asks channel during this timeframe
-export const getChannelMessages = async function (
-  startingDate: Date,
-  endDate?: Date,
-  askChannelId: string = TEAM_ASK_CHANNEL_ID
-): Promise<any[any]> {
+export const getChannelMessages = async (startingDate: Date, endDate?: Date, askChannelId: string = TEAM_ASK_CHANNEL_ID
+): Promise<any[any]> => {
   // console.log(
   //   `Getting ask channels messages between '${startingDate.toUTCString()}' and '${endDate?.toUTCString()}'`
   // );
@@ -41,16 +46,13 @@ export const getChannelMessages = async function (
 };
 
 // This method gets a list of messages and a timeframe and returns stats on these messages
-export const getStatsForMessages = function (
-  channelId: string,
-  messages: any,
-  startingDateInUTC: string,
-  endDateInUTC?: string
-): AsksChannelStatsResult {
-  const unchecked_messages = messages.filter(function (el: any) {
+export const getStatsForMessages = (channelId: string, messages: any, startDateInUTC: string, endDateInUTC?: string
+): AsksChannelStatsResult => {
+  const messagesUnchecked = messages.filter((el: any) => {
     return (
       !el.reactions ||
-      el.reactions.filter(function (reaction: any) {
+      el.reactions.filter((reaction: any) => {
+        // TODO: Extract this to a config
         return (
           reaction.name === "white_check_mark" ||
           reaction.name === "heavy_check_mark" ||
@@ -58,48 +60,43 @@ export const getStatsForMessages = function (
           reaction.name === "in-progress" ||
           reaction.name === "spinner"
         );
-      }).length == 0
+      }).length === 0
     );
   });
 
   // Go over all unchecked messages and get the permalinks
-  const in_progress_messages = messages.filter(function (el: any) {
+  const messagesInProgress = messages.filter((el: any) => {
     return (
-      el?.reactions?.filter(function (reaction: any) {
+      el?.reactions?.filter((reaction: any) => {
         return reaction.name === "in-progress" || reaction.name === "spinner";
       }).length > 0 &&
-      el?.reactions.filter(function (reaction: any) {
+      el?.reactions.filter((reaction: any) => {
         return (
           reaction.name === "white_check_mark" ||
           reaction.name === "heavy_check_mark" ||
           reaction.name === "green_tick"
         );
-      }).length == 0
+      }).length === 0
     );
   });
 
   return {
-    startDateInUTC: startingDateInUTC,
-    endDateInUTC: endDateInUTC,
-    messages: messages,
-    messagesInProgress: in_progress_messages,
-    messagesUnchecked: unchecked_messages,
+    startDateInUTC,
+    endDateInUTC,
+    messages,
+    messagesInProgress,
+    messagesUnchecked,
     totalMessages: messages.length,
     totalNumProcessed:
-      messages.length - unchecked_messages.length - in_progress_messages.length,
-    totalNumInProgress: in_progress_messages.length,
-    totalNumUnchecked: unchecked_messages.length,
-    channelId: channelId,
+      messages.length - messagesUnchecked.length - messagesInProgress.length,
+    totalNumInProgress: messagesInProgress.length,
+    totalNumUnchecked: messagesUnchecked.length,
+    channelId,
   };
 };
 
-export interface AsksChannelWeeklyStatsResult extends AsksChannelStatsResult {}
-
 // TODO: Add a check that if the end date is after now, return now as the end date (as it's irrelevant)
-export const getBucketRange = function (
-  messageDate: Date,
-  type: string
-): Date[] {
+export const getBucketRange = (messageDate: Date, type: string): Date[] => {
   if (type === "week") {
     // Build the starting and end dates for the bucket
     const weekStartDate = new Date(messageDate.getTime());
@@ -141,9 +138,9 @@ export const getStatsBuckets = async (
     messages: any[],
     type: string,
     channelId: string = TEAM_ASK_CHANNEL_ID // This can either bet 'week' or 'day'. This is the variable by which we're going to 'group by' the buckets
-): Promise<AsksChannelWeeklyStatsResult[]> => {
-  let buckets = new Map<string, any[]>();
-  let bucketsRanges: any = {};
+): Promise<AsksChannelStatsResult[]> => {
+  const buckets = new Map<string, any[]>();
+  const bucketsRanges: any = {};
 
   messages.map(async (message: any) => {
     // Check the date on the message
@@ -168,7 +165,7 @@ export const getStatsBuckets = async (
     }
   });
 
-  let results: AsksChannelWeeklyStatsResult[] = [];
+  const results: AsksChannelStatsResult[] = [];
 
   // Convert the buckets to a list of stats
   for (const [key, currBucketMessages] of buckets.entries()) {
@@ -192,27 +189,25 @@ export const reportStatsToSlack = async (
     destinationChannel: any,
     destinationThreadTS: any,
     includeSummary: boolean = true,
-    includeDetails: boolean = true
+    includeAsks: boolean = true,
+    includeReport: boolean = false
 ) => {
   // console.log("Time in utc - start", stats.startDateInUTC);
   // console.log("Time in utc - end", stats.endDateInUTC);
 
-  // TODO: Send only one message, send all the text in blocks
-  const messageBlocks: SectionBlock[] = [];
+  const messageBlocks: Block[] = [];
 
   if (includeSummary) {
     const text = `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`;
     messageBlocks.push(createSectionBlock(text));
   }
 
-  if (includeDetails) {
+  if (includeAsks && stats.totalMessages > 0) {
     if (stats.totalNumInProgress > 0) {
       messageBlocks.push(
         createSectionBlock("These are the in progress asks we currently have:")
       );
-      // const in_progress_blocks: SectionBlock[] = [
-      //   ,
-      // ];
+
       messageBlocks.push(
         ...(await getPermalinkBlocks(stats.channelId, stats.messagesInProgress))
       );
@@ -228,23 +223,41 @@ export const reportStatsToSlack = async (
     }
   }
 
+  // Post the messages info
   if (messageBlocks.length > 0) {
-    // TODO: Maybe text should be empty here?
     await sendSlackMessage(
-      `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`,
+        `<#${stats.channelId}> had a *total of ${stats.totalMessages} messages* between ${stats.startDateInUTC} and ${stats.endDateInUTC}.\nOut of those, *${stats.totalNumProcessed} were handled*, *${stats.totalNumInProgress} are in progress* and *${stats.totalNumUnchecked} were not handled*.`,
+        destinationChannel,
+        destinationThreadTS,
+        messageBlocks,
+        true,
+    );
+  }
+
+  const reportMessageBlocks: Block[] = [];
+
+  if (includeReport && stats.totalMessages > 0) {
+    const results : AsksChannelReportResult = await createReport(stats.messages);
+
+    reportMessageBlocks.push(...createReportSection(results.statsByTeam, 'Team'));
+    reportMessageBlocks.push(createDivider());
+    reportMessageBlocks.push(...createReportSection(results.statsByDivision, 'Division'));
+    reportMessageBlocks.push(createDivider());
+    reportMessageBlocks.push(...createReportSection(results.statsByDepartment, 'Department'));
+  }
+
+  if (reportMessageBlocks.length > 0) {
+    await sendSlackMessage(
+      `Asks origin report`,
       destinationChannel,
       destinationThreadTS,
-      messageBlocks,
-      true,
+      reportMessageBlocks,
     );
   }
 };
 
 // This method gets a list of messages and creates a permalink string for displaying the message.
-const getPermalinkBlocks = async function (
-  channelId: string,
-  messages: any[]
-): Promise<SectionBlock[]> {
+const getPermalinkBlocks = async (channelId: string, messages: any[]): Promise<SectionBlock[]> => {
   const block: SectionBlock[] = [];
   const dateToday = new Date();
 
@@ -257,10 +270,10 @@ const getPermalinkBlocks = async function (
           (dateToday.getTime() - messageDate.getTime()) / (1000 * 3600 * 24)
         );
         const daysMessage = daysDifference === 0 ? " (earlier today)" : daysDifference === 1 ? " (1 day ago)" : ` (${daysDifference} days ago)`;
-        const userProfile = await getUserProfile(message.user) || {};
 
         // TODO: Maybe only display the team name, when doing 'ask channel stats', and not when showing the stats for yesterday. Requires refactor.
-        let teamName = getTeamNameFromProfile(userProfile);
+        const userProfile = await getUserProfile(message.user) || {};
+        let teamName = getValueFromProfile(userProfile, USER_PROFILE_FIELD_ID_TEAM);
         teamName = teamName ? ` (Team ${teamName})`: ""
         const fromClause = `${message.user ? userProfile?.display_name: message.username}${teamName}`;
 

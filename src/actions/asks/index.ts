@@ -1,18 +1,20 @@
 import { BotAction } from "../base_action";
 import { Compliment } from "./compliment";
 import { IntroduceYourself } from "./introduce_yourself";
+import { AskChannelStatus } from "./ask_channel_status";
 import { AskChannelStats } from "./ask_channel_stats";
 import { MeaningOfLife } from "./meaning_of_life";
 import { GroupAskChannelMonthlyStats } from "./group_ask_channel_monthly_stats";
 import { MonitoredChannelSummaryStats } from "./monitored_channel_stats";
-import { AskChannelStatsForYesterday } from "./ask_channel_stats_for_yesterday";
+import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday";
 import { OncallTicketsStatus } from "./oncall_tickets_status";
-import {Help} from "./help";
+import { Help } from "./help";
 
 const ACTIONS_LIST : BotAction[] = [
+  new AskChannelStatus(),
   new AskChannelStats(),
   new GroupAskChannelMonthlyStats(),
-  new AskChannelStatsForYesterday(),
+  new AskChannelStatusForYesterday(),
   new OncallTicketsStatus(),
   new MonitoredChannelSummaryStats(),
   new IntroduceYourself(),

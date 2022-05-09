@@ -9,10 +9,10 @@ import {
 import { BOT_ID, TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
 import {sanitizeCommandInput, sendGenericError} from "../../integrations/slack/utils";
 
-export class AskChannelStats implements BotAction {
+export class AskChannelStatus implements BotAction {
   getHelpText(): string {
-    return "Get you some stats about what goes on in your team channel (`ask channel stats`, default for 7 days)." +
-        "You can provide number of days / weeks / months (`ask channel stats 15 days`, `ask channel stats 2 weeks`)\n";
+    return "Get you the status of requests in your team ask channel, for a specific timeframe (`ask channel status`, defaults for 7 days). You can provide number of days / weeks / months (`ask channel status 15 days`, `ask channel status 2 weeks`)\n";
+
   }
 
   isEnabled(): boolean {
@@ -21,7 +21,7 @@ export class AskChannelStats implements BotAction {
   }
 
   doesMatch(event: any): boolean {
-    return sanitizeCommandInput(event.text).startsWith("ask channel stats");
+    return sanitizeCommandInput(event.text).startsWith("ask channel status");
   }
 
   async performAction(event: any): Promise<void> {
@@ -47,6 +47,6 @@ export class AskChannelStats implements BotAction {
     );
 
     // Report them to Slack
-    await reportStatsToSlack(stats, event.channel, event.thread_ts, true,false, true);
+    await reportStatsToSlack(stats, event.channel, event.thread_ts);
   }
 }
