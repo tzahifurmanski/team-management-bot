@@ -20,13 +20,7 @@ export class Help implements BotAction {
     }
 
     async performAction(event: any): Promise<void> {
-        await sendSlackMessage(
-            botConfig.ACTION_WHAT_CAN_YOU_DO_TEXT,
-            event.channel,
-            event.thread_ts
-        );
-
-        let message = ''
+        let message = `${botConfig.ACTION_WHAT_CAN_YOU_DO_TEXT}\n`
         // TODO: This currently says what is enabled. Maybe also say what actions are disabled (and what they can do).
         ASKS_ACTIONS.forEach((action) => {
             message += `• ${action.getHelpText()}\n`;
