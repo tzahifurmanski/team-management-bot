@@ -274,7 +274,7 @@ const getPermalinkBlocks = async (channelId: string, messages: any[]): Promise<S
         // TODO: Maybe only display the team name, when doing 'ask channel stats', and not when showing the stats for yesterday. Requires refactor.
         const userProfile = await getUserProfile(message.user) || {};
         let teamName = getValueFromProfile(userProfile, USER_PROFILE_FIELD_ID_TEAM);
-        teamName = teamName ? ` (Team ${teamName})`: ""
+        teamName = teamName !== "Unknown" ? ` (Team ${teamName})`: ""
         const fromClause = `${message.user ? userProfile?.display_name: message.username}${teamName}`;
 
         const blockText = `<${permalink}|Link to message> from ${fromClause} at ${messageDate.toLocaleDateString()}${daysMessage}`;
