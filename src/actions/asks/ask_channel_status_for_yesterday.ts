@@ -22,7 +22,7 @@ export class AskChannelStatusForYesterday implements BotAction {
   }
 
   doesMatch(event: any): boolean {
-    return sanitizeCommandInput(event.text).startsWith("ask channel stats for yesterday");
+    return sanitizeCommandInput(event.text).startsWith("ask channel status for yesterday");
   }
 
   async performAction(event: any): Promise<void> {

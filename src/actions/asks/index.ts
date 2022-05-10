@@ -11,10 +11,10 @@ import { OncallTicketsStatus } from "./oncall_tickets_status";
 import { Help } from "./help";
 
 const ACTIONS_LIST : BotAction[] = [
+  new AskChannelStatusForYesterday(),
   new AskChannelStatus(),
   new AskChannelStats(),
   new GroupAskChannelMonthlyStats(),
-  new AskChannelStatusForYesterday(),
   new OncallTicketsStatus(),
   new MonitoredChannelSummaryStats(),
   new IntroduceYourself(),
