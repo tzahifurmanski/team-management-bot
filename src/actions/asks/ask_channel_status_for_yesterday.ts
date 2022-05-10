@@ -11,9 +11,9 @@ import { sendSlackMessage } from "../../integrations/slack/messages";
 import {sanitizeCommandInput} from "../../integrations/slack/utils";
 import {TEAM_FOLKS} from "../../consts";
 
-export class AskChannelStatsForYesterday implements BotAction {
+export class AskChannelStatusForYesterday implements BotAction {
   getHelpText(): string {
-    return "Get you the ask channel stats from yesterday and a current status for the last 60 days (`ask channel stats for yesterday`)";
+    return "Get you the status of requests in your team ask channel from yesterday and a current status going back for the last 60 days (`ask channel status for yesterday`). This is the same as what the recurring ask channel post contains.";
   }
 
   isEnabled(): boolean {

@@ -10,7 +10,7 @@ import {
   TEAM_ASK_CHANNEL_ID,
   LEADS_SUMMARY_CHANNEL_ID,
 } from "../integrations/slack/consts";
-import { AskChannelStatsForYesterday } from "../actions/asks/ask_channel_stats_for_yesterday";
+import { AskChannelStatusForYesterday } from "../actions/asks/ask_channel_status_for_yesterday";
 import {OncallTicketsStatus} from "../actions/asks/oncall_tickets_status";
 import {TEAM_NAME} from "../consts";
 
@@ -20,7 +20,7 @@ export const getAskChannelStatsForYesterday = async function () {
     channel: TEAM_ASK_CHANNEL_ID,
     thread_ts: "",
   };
-  await new AskChannelStatsForYesterday().performAction(event);
+  await new AskChannelStatusForYesterday().performAction(event);
 };
 
 export const getOncallTicketsStatus = async function () {
