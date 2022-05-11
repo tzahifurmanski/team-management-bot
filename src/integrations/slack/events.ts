@@ -39,7 +39,7 @@ slackEventsSetup.on("message", async (event: any) => {
 // All errors in listeners are caught here. If this weren't caught, the program would terminate.
 slackEventsSetup.on("error", (error: any) => {
   // TODO: Add better error handling
-  console.log("Had an error!", error.name); // TypeError
+  console.log("Had an error!", error.name, error.message); // TypeError
 });
 
 export const slackEvents = slackEventsSetup;

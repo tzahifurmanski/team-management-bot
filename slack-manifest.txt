@@ -1,13 +1,15 @@
 display_information:
-  name: <BOT_NAME>
-  description: <BOT_DESCRIPTION>
+  name: BOT_NAME
+  description: BOT_DESCRIPTION
   background_color: "#757575"
 features:
   bot_user:
-    display_name: <BOT_NAME>
+    display_name: BOT_NAME
     always_online: true
 oauth_config:
   scopes:
+    user:
+      - users.profile:read
     bot:
       - app_mentions:read
       - channels:history
@@ -31,7 +33,7 @@ oauth_config:
       - users:read.email
 settings:
   event_subscriptions:
-    request_url: <BOT_URL>
+    request_url: BOT_URL
     bot_events:
       - app_mention
       - message.channels
