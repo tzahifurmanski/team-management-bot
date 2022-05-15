@@ -1,7 +1,7 @@
 {
   "name": "team-slack-bot",
   "author": "Tzahi Furmanski <tzahi.fur@gmail.com> (https://github.com/tzahifurmanski/)",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "repository": "https://github.com/tzahifurmanski/team-slack-bot",
   "description": "A slack bot for engineering teams",
   "main": "dist/app.js",

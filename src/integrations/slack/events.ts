@@ -5,12 +5,6 @@ import {SLACK_SIGNING_SECRET} from "./consts";
 const { createEventAdapter } = require("@slack/events-api");
 const slackEventsSetup = createEventAdapter(SLACK_SIGNING_SECRET);
 
-
-slackEventsSetup.on("app_mention", async (event: any) => {
-  // console.log("GOT AN APP MENTION!");
-  await handle_direct_event(event);
-});
-
 slackEventsSetup.on("message", async (event: any) => {
   // Ignore messages that the bot post in the conversation
   if (isBotMessage(event)) {
@@ -27,14 +21,25 @@ slackEventsSetup.on("message", async (event: any) => {
     return;
   }
 
-  if (event.channel_type == "channel") {
+  if (event.channel_type === "channel") {
     // console.log("GOT A channel event!");
     await handle_channel_event(event);
-  } else if (event.channel_type == "im") {
+  } else if (event.channel_type === "im") {
     // console.log("GOT A MESSAGE!");
     await handle_direct_event(event);
   }
 });
+
+slackEventsSetup.on("app_mention", async (event: any) => {
+  // If this is an edit to an existing mention, don't reply anything
+  if (event.reply_count) {
+    return;
+  }
+  // console.log("GOT AN APP MENTION!");
+  // console.log(JSON.stringify(event));
+  await handle_direct_event(event);
+});
+
 
 // All errors in listeners are caught here. If this weren't caught, the program would terminate.
 slackEventsSetup.on("error", (error: any) => {
