@@ -8,10 +8,10 @@ import { sendSlackMessage } from "./integrations/slack/messages";
 import {sendGenericError} from "./integrations/slack/utils";
 
 // This method handles events that are posted directly inside a channel
-export const handle_channel_event = async function (event: any) {
+export const handle_channel_event = async (event: any) => {
   // Limit this functionality to specific channels (otherwise we'll spam tons of channels)
   if (
-    event.channel != TEAM_CODE_REVIEW_CHANNEL_ID
+    event.channel !== TEAM_CODE_REVIEW_CHANNEL_ID
   ) {
     // console.log("We only want to reply in the chatter or code review channels");
     return;
@@ -28,7 +28,7 @@ export const handle_channel_event = async function (event: any) {
 };
 
 // This method handles events that are with direct interaction with the bot (like a DM or when the bot is mentioned)
-export const handle_direct_event = async function (event: any) {
+export const handle_direct_event = async (event: any) => {
   // console.log("Got new direct event", event.type, event);
 
   if (!(await runActions(event, ASKS_ACTIONS))) {
@@ -43,7 +43,7 @@ export const handle_direct_event = async function (event: any) {
 };
 
 async function runActions(event: any, actions: BotAction[]) {
-  const result = actions.find((action) => action.doesMatch(event));
+  const result = actions.find((action : BotAction) => action.doesMatch(event));
   if (result) {
     try {
       console.log(

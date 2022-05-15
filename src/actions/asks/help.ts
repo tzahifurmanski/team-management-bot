@@ -2,6 +2,7 @@ import {BotAction} from "../base_action";
 import {sendSlackMessage} from "../../integrations/slack/messages";
 import {botConfig} from "../../consts";
 import {ASKS_ACTIONS} from "./index";
+import {sanitizeCommandInput} from "../../integrations/slack/utils";
 
 export class Help implements BotAction {
     getHelpText(): string {
@@ -14,9 +15,8 @@ export class Help implements BotAction {
     }
 
     doesMatch(event: any): boolean {
-        return (
-            event.text.includes('help') || event.text.includes('what can you do')
-        );
+        return (sanitizeCommandInput(event.text).startsWith("help") ||
+            sanitizeCommandInput(event.text).startsWith("what can you do"));
     }
 
     async performAction(event: any): Promise<void> {
