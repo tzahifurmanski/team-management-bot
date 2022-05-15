@@ -33,7 +33,7 @@ oauth_config:
       - users:read.email
 settings:
   event_subscriptions:
-    request_url: BOT_URL
+    request_url: https://BOT_URL
     bot_events:
       - app_mention
       - message.channels
