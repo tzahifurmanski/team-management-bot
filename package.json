@@ -41,6 +41,6 @@
     "test": "cross-env NODE_ENV=test ENV_FILE=.tests_env jest --testTimeout=10000"
   },
   "engines": {
-    "node": ">=14.x"
+    "node": "14.x"
   }
 }
