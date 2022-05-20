@@ -24,10 +24,14 @@ const TEAM_ASK_CHANNEL_NAME: string = process.env.TEAM_ASK_CHANNEL_NAME || "";
 
 // User profile field ids
 export const USER_PROFILE_FIELD_ID_TEAM = process.env.USER_PROFILE_FIELD_ID_TEAM || "";
-
-// TODO: Placeholders. Implement use for the department and division field IDs
 export const USER_PROFILE_FIELD_ID_DEPARTMENT = process.env.USER_PROFILE_FIELD_ID_DEPARTMENT || "";
 export const USER_PROFILE_FIELD_ID_DIVISION = process.env.USER_PROFILE_FIELD_ID_DIVISION || "";
+
+// Reactions parameters
+const reactionsInProgressParam = (process.env.REACTIONS_IN_PROGRESS || "in-progress,spinner");
+const reactionsHandledParam = (process.env.REACTIONS_HANDLED || "white_check_mark,heavy_check_mark,green_tick");
+export const REACTIONS_IN_PROGRESS : string[] = reactionsInProgressParam.split(",");
+export const REACTIONS_HANDLED : string[] = reactionsHandledParam.split(",");
 
 // Cron jobs
 // =============
@@ -54,9 +58,8 @@ export let ONCALL_CHANNEL_ID: string = process.env.ONCALL_CHANNEL_ID || "";
 const ONCALL_CHANNEL_NAME: string = process.env.ONCALL_CHANNEL_NAME || "";
 
 
-
 // Resolve the slack dynamic variables
-export const loadSlackConfig = async function () {
+export const loadSlackConfig = async () => {
   console.log("Starting Slack config load...");
   try {
     const botId = await getBotId();

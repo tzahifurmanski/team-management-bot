@@ -1,5 +1,10 @@
 import { getConversationHistory } from '../integrations/slack/conversations';
-import {TEAM_ASK_CHANNEL_ID, USER_PROFILE_FIELD_ID_TEAM} from '../integrations/slack/consts';
+import {
+  REACTIONS_HANDLED,
+  REACTIONS_IN_PROGRESS,
+  TEAM_ASK_CHANNEL_ID,
+  USER_PROFILE_FIELD_ID_TEAM
+} from '../integrations/slack/consts';
 import {
   createDivider,
   createSectionBlock,
@@ -52,14 +57,7 @@ export const getStatsForMessages = (channelId: string, messages: any, startDateI
     return (
       !el.reactions ||
       el.reactions.filter((reaction: any) => {
-        // TODO: Extract this to a config
-        return (
-          reaction.name === "white_check_mark" ||
-          reaction.name === "heavy_check_mark" ||
-          reaction.name === "green_tick" ||
-          reaction.name === "in-progress" ||
-          reaction.name === "spinner"
-        );
+        return [...REACTIONS_IN_PROGRESS, ...REACTIONS_HANDLED].includes(reaction.name);
       }).length === 0
     );
   });
@@ -68,14 +66,10 @@ export const getStatsForMessages = (channelId: string, messages: any, startDateI
   const messagesInProgress = messages.filter((el: any) => {
     return (
       el?.reactions?.filter((reaction: any) => {
-        return reaction.name === "in-progress" || reaction.name === "spinner";
+        return REACTIONS_IN_PROGRESS.includes(reaction.name);
       }).length > 0 &&
       el?.reactions.filter((reaction: any) => {
-        return (
-          reaction.name === "white_check_mark" ||
-          reaction.name === "heavy_check_mark" ||
-          reaction.name === "green_tick"
-        );
+        return REACTIONS_HANDLED.includes(reaction.name);
       }).length === 0
     );
   });
