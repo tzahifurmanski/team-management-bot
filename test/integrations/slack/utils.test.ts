@@ -1,6 +1,6 @@
-import {getTeamNameFromProfile} from "../../../src/integrations/slack/utils";
+import {getValueFromProfile} from "../../../src/integrations/slack/utils";
 
-describe("getTeamNameFromProfile", () => {
+describe("getValueFromProfile", () => {
     test("Profile with a short team name", async () => {
         const profile : any = {
             fields: {
@@ -10,7 +10,7 @@ describe("getTeamNameFromProfile", () => {
             }
         };
 
-        expect(getTeamNameFromProfile(profile)).toEqual("Zigi");
+        expect(getValueFromProfile(profile, 'TEAM_FIELD_ID_FOR_TESTS')).toEqual("Zigi");
     });
 
     test("Profile with a long team name", async () => {
@@ -23,7 +23,7 @@ describe("getTeamNameFromProfile", () => {
         };
 
         // Expect only 3 words
-        expect(getTeamNameFromProfile(profile)).toEqual("Zigi one two");
+        expect(getValueFromProfile(profile, 'TEAM_FIELD_ID_FOR_TESTS')).toEqual("Zigi one two");
     });
 
     test("Bad input", async () => {
@@ -35,6 +35,6 @@ describe("getTeamNameFromProfile", () => {
             }
         };
 
-        expect(getTeamNameFromProfile(profile)).toEqual("");
+        expect(getValueFromProfile(profile, 'TEAM_FIELD_ID_FOR_TESTS')).toEqual("Unknown");
     });
 });

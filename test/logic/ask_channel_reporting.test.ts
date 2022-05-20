@@ -2,7 +2,11 @@ import {AsksChannelReportResult, createReport, createReportSection} from "../../
 import { getUserProfile } from "../../src/integrations/slack/users";
 import {PlainTextElement, SectionBlock} from "@slack/web-api";
 import {MrkdwnElement} from "@slack/types";
-import {createText} from "../../src/integrations/slack/messages";
+import {
+    USER_PROFILE_FIELD_ID_DEPARTMENT,
+    USER_PROFILE_FIELD_ID_DIVISION,
+    USER_PROFILE_FIELD_ID_TEAM
+} from "../../src/integrations/slack/consts";
 
 jest.mock('../../src/integrations/slack/users')
 
@@ -81,6 +85,7 @@ describe("createReport", () => {
         // Generate the report
         const results : AsksChannelReportResult = await createReport(messages);
 
+
         // Verify calls to the userProfile method
         expect(mockedUserProfile).toHaveBeenCalledTimes(4)
         expect(mockedUserProfile).toHaveBeenNthCalledWith(1, mockedUserA.id);
@@ -118,25 +123,28 @@ const getMessageForTest = (userId: string) : any => {
 }
 
 const getProfileForTest = (team : string, division : string, department : string) : any => {
-    // TODO: Replace the use of the explicit fields with consts/params
-    return {
-        "first_name":"<NAME>",
-        "last_name":"<LAST_NAME>",
-        "fields":{
-        "Xf01L3FQBAJD":{
-            "value": division,
-                "alt":""
-        },
-        "Xf01KA3W34UX":{
-            "value":department,
-                "alt":""
-        },
-        "Xf01RW57PW6L":{
-            "value":team,
-                "alt":""
-        }
-    },
+    const profile : any = {
+        "first_name": "<NAME>",
+        "last_name": "<LAST_NAME>",
+        "fields": {}
     }
+
+    profile.fields[USER_PROFILE_FIELD_ID_DIVISION] = {
+        "value": division,
+        "alt":""
+    };
+
+    profile.fields[USER_PROFILE_FIELD_ID_DEPARTMENT] = {
+        "value": department,
+        "alt":""
+    };
+
+    profile.fields[USER_PROFILE_FIELD_ID_TEAM] = {
+        "value": team,
+        "alt":""
+    }
+
+    return profile;
 }
 
 describe("createReportSection", () => {
