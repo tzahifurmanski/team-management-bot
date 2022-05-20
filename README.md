@@ -1,4 +1,6 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/tzahifurmanski/team-slack-bot/badge.svg)](https://snyk.io/test/github/tzahifurmanski/team-slack-bot)
+[![CircleCI](https://circleci.com/gh/tzahifurmanski/team-management-bot.svg?style=shield)](https://circleci.com/gh/tzahifurmanski/team-management-bot)
+
 
 # Team Management Bot
 
