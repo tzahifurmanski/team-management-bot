@@ -12,7 +12,7 @@ const express_app = require("./server_init");
 
 async function init() {
   // Print server time
-  console.log(`Server starting at ${new Date().toUTCString()}`);
+  console.log(`Server starting at ${new Date().toUTCString()}, version ${process.env.npm_package_version}`);
 
   const loadResult = await loadSlackConfig();
   if (!loadResult) {
