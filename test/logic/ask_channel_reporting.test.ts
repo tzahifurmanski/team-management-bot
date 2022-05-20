@@ -112,14 +112,21 @@ describe("createReport", () => {
     });
 });
 
-const getMessageForTest = (userId: string) : any => {
-    return {
+const getMessageForTest = (userId: string, reactions?: any) : any => {
+    const message = {
         type:"message",
         text:"<TEXT>",
         user:userId,
         ts:1652116246.760559,
         team:"<TEAM_NAME>",
+        reactions: []
+    };
+
+    if(reactions) {
+        message.reactions = reactions;
     }
+
+    return message;
 }
 
 const getProfileForTest = (team : string, division : string, department : string) : any => {
