@@ -7,4 +7,4 @@
 A [Slack](https://slack.com/) bot for helping engineering teams to get various stats and perform team related actions.
 
 ## Getting Started
-Visit the '[Team Management Bot website](https://team-management-bot.super.site/)'
+Visit the [Team Management Bot](https://team-management-bot.super.site/) website.

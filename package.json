@@ -26,6 +26,7 @@
     "@types/jest": "^27.5.1",
     "cross-env": "7.0.3",
     "jest": "28.1.0",
+    "jest-junit": "^13.2.0",
     "mockdate": "^3.0.5",
     "supertest": "6.2.3",
     "ts-jest": "28.0.2",
@@ -38,7 +39,8 @@
     "postinstall": "tsc",
     "dev-start": "tsc && node dist/server.js",
     "debug": "tsc-watch --project tsconfig.json --onSuccess 'node dist/server.js'",
-    "test": "cross-env NODE_ENV=test ENV_FILE=.tests_env jest --testTimeout=10000"
+    "test": "cross-env NODE_ENV=test ENV_FILE=.tests_env jest --testTimeout=10000",
+    "coverage": "cross-env NODE_ENV=test ENV_FILE=.tests_env jest --testTimeout=10000 --collectCoverage=true"
   },
   "engines": {
     "node": "14.x"
