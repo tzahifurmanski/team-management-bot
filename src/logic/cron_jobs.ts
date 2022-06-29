@@ -14,7 +14,7 @@ import { AskChannelStatusForYesterday } from "../actions/asks/ask_channel_status
 import {OncallTicketsStatus} from "../actions/asks/oncall_tickets_status";
 import {TEAM_NAME} from "../consts";
 
-export const getAskChannelStatsForYesterday = async function () {
+export const getAskChannelStatsForYesterday = async () => {
   // Manually run the Get Channel stats for Yesterday action
   const event: any = {
     channel: TEAM_ASK_CHANNEL_ID,
@@ -23,7 +23,7 @@ export const getAskChannelStatsForYesterday = async function () {
   await new AskChannelStatusForYesterday().performAction(event);
 };
 
-export const getOncallTicketsStatus = async function () {
+export const getOncallTicketsStatus = async () => {
   // Manually run the Get Channel stats for Yesterday action
   const event: any = {
     channel: ONCALL_CHANNEL_ID,
@@ -32,7 +32,7 @@ export const getOncallTicketsStatus = async function () {
   await new OncallTicketsStatus().performAction(event);
 };
 
-export const postWeeklyLeadsStats = async function () {
+export const postWeeklyLeadsStats = async () => {
   console.log("Posting the weekly leads asks channel stats summary");
 
   // Get the timeframe for the last 7 days

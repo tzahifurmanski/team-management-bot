@@ -37,7 +37,7 @@ export class OncallTicketsStatus implements BotAction {
         const filteredTickets = tickets.filter((ticket: any) =>
             (!ticket.custom_fields || ticket.custom_fields.filter((field: any) =>
                     // TODO: Make this filter dynamic, instead of hard coded
-                    (field.id === 360010151217 && ['platform_governance', 'group_sdlc'].includes(field.value))).length > 0
+                    (field.id === 360010151217 && ['group_platform_governance', 'group_sdlc','group_platform_foundation'].includes(field.value))).length > 0
         ));
 
         const messageBlocks:any = []
