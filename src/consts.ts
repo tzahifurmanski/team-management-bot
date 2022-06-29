@@ -14,6 +14,15 @@ if (process.env.NODE_ENV !== 'production') {
     }
 }
 
+import { initialize } from '@heliosphere/opentelemetry-sdk';
+
+initialize({
+    apiToken: process.env.HS_TOKEN || '',
+    serviceName: process.env.HS_SERVICE_NAME,
+    enable: true,                // Defaults to false if omitted.
+    commitHash: process.env.HEROKU_SLUG_COMMIT || 'UNAVAILABLE',   // Defaults to process.env.COMMIT_HASH if omitted.
+});
+
 export const PORT = process.env.PORT || 3000;
 
 // Bot Configurations
