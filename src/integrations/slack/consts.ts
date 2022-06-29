@@ -63,6 +63,7 @@ export const loadSlackConfig = async () => {
   console.log("Starting Slack config load...");
   try {
     const botId = await getBotId();
+    console.log(`Loaded bot id ${botId}`)
 
     const teamAskChannelId = TEAM_ASK_CHANNEL_ID || await getConversationId(TEAM_ASK_CHANNEL_NAME);
 

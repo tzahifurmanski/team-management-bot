@@ -121,8 +121,8 @@ export const shouldMessageBeSkipped = function (message: any) {
       !(message.username && message.username == "Snyk Support")) // Skip all bot_message except for messages from Snyk Support bot
   );
 };
-export const getBotId = async function () {
-  // This can also return response.user with the bot user name
-  let response = await SlackWebClient.auth.test();
+export const getBotId = async () => {
+  // This can also return response.user with the bot username
+  const response = await SlackWebClient.auth.test();
   return response?.user_id;
 };
