@@ -17,7 +17,7 @@ import {sanitizeCommandInput} from "../../integrations/slack/utils";
 
 export class OncallTicketsStatus implements BotAction {
     getHelpText(): string {
-        return "Provide a daily summary of the current tickets currently active for your oncall team (`oncall tickets status`)";
+        return "Provide a summary of the current tickets currently active for your oncall team (`oncall tickets status`)";
     }
 
     isEnabled(): boolean {
@@ -33,11 +33,10 @@ export class OncallTicketsStatus implements BotAction {
 
         const tickets = await getAllTickets();
 
-        // Filter the tickets
         const filteredTickets = tickets.filter((ticket: any) =>
             (!ticket.custom_fields || ticket.custom_fields.filter((field: any) =>
                     // TODO: Make this filter dynamic, instead of hard coded -  filter to only get the tickets for relevant engineering groups
-                    (field.id === 360010151217 && ['group_platform_governance', 'group_sdlc','group_platform_foundation'].includes(field.value))).length > 0
+                    field.id === 360010151217 && ['group_platform_governance', 'group_sdlc','group_platform_foundation'].includes(field.value)).length > 0
         ));
 
         const messageBlocks:any = []

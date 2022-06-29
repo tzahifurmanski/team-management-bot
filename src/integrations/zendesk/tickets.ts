@@ -6,12 +6,14 @@ export const getAllTickets = async (): Promise<any[]> => {
     let zendeskResponse = await httpGet(url, ZENDESK_TOKEN);
     const all = zendeskResponse.data.tickets;
 
-    // Get all the paginated responses
-    while(zendeskResponse.next_page){
-        url=zendeskResponse.next_page
+    // Get the results from additional pages also
+    while(zendeskResponse.data.next_page){
+        url=zendeskResponse.data.next_page
         zendeskResponse = await httpGet(url, ZENDESK_TOKEN);
-        all.push(zendeskResponse.data.tickets)
+        all.push(...zendeskResponse.data.tickets)
     }
+
+    console.log(`A total of ${all.length} tickets were returned from Zendesk`);
 
     return all;
 }
