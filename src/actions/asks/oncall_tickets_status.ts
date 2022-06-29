@@ -36,7 +36,7 @@ export class OncallTicketsStatus implements BotAction {
         // Filter the tickets
         const filteredTickets = tickets.filter((ticket: any) =>
             (!ticket.custom_fields || ticket.custom_fields.filter((field: any) =>
-                    // TODO: Make this filter dynamic, instead of hard coded
+                    // TODO: Make this filter dynamic, instead of hard coded -  filter to only get the tickets for relevant engineering groups
                     (field.id === 360010151217 && ['group_platform_governance', 'group_sdlc','group_platform_foundation'].includes(field.value))).length > 0
         ));
 
