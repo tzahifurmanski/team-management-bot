@@ -9,11 +9,16 @@ import {
 import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import {sanitizeCommandInput} from "../../integrations/slack/utils";
-import {TEAM_FOLKS} from "../../consts";
+import {ASK_CHANNEL_STATS_CRON, TEAM_FOLKS} from "../../consts";
+import cronstrue from "cronstrue";
 
 export class AskChannelStatusForYesterday implements BotAction {
   getHelpText(): string {
-    return "Get you the status of requests in your team ask channel from yesterday and a current status going back for the last 60 days (`ask channel status for yesterday`). This is the same as what the recurring ask channel post contains.";
+    let helpMessage = "`ask channel status for yesterday` - Get the status of requests in your team ask channel from yesterday and a current status going back for the last 60 days."
+    if (ASK_CHANNEL_STATS_CRON) {
+      helpMessage += `\n*A recurring ask channel post is scheduled to be sent ${cronstrue.toString(ASK_CHANNEL_STATS_CRON)}.*`;
+    }
+    return helpMessage;
   }
 
   isEnabled(): boolean {

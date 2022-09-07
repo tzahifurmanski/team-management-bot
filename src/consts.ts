@@ -27,7 +27,7 @@ export const botConfig = require(`../assets/personalities/${BOT_PERSONALITY}/bot
 
 // If we got a bot name, override the default:
 const BOT_NAME_PLACEHOLDER = "<BOT_NAME>";
-const BOT_NAME = process.env.BOT_NAME || "";
+export const BOT_NAME = process.env.BOT_NAME || "";
 if(BOT_NAME) {
     botConfig.BOT_NAME=BOT_NAME;
     botConfig.ACTION_INTRODUCE_YOURSELF_TEXT = botConfig.ACTION_INTRODUCE_YOURSELF_TEXT.replace(BOT_NAME_PLACEHOLDER, BOT_NAME);

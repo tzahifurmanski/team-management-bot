@@ -9,7 +9,9 @@ import { MonitoredChannelSummaryStats } from "./monitored_channel_stats";
 import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday";
 import { OncallTicketsStatus } from "./oncall_tickets_status";
 import { Help } from "./help";
+import { Status } from "./status";
 
+const helpCommand = new Help();
 const ACTIONS_LIST : BotAction[] = [
   new AskChannelStatusForYesterday(),
   new AskChannelStatus(),
@@ -17,10 +19,11 @@ const ACTIONS_LIST : BotAction[] = [
   new GroupAskChannelMonthlyStats(),
   new OncallTicketsStatus(),
   new MonitoredChannelSummaryStats(),
-  new IntroduceYourself(),
   new Compliment(),
   new MeaningOfLife(),
-  new Help(),
+  new Status(),
+  helpCommand,
+  new IntroduceYourself(),
   ];
 
 export let ASKS_ACTIONS: BotAction[] = [];
@@ -38,3 +41,5 @@ ACTIONS_LIST.forEach( (action) => {
   }
 })
 console.log("Actions list loading is complete.");
+
+helpCommand.setActionsList(ASKS_ACTIONS);

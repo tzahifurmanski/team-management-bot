@@ -17,7 +17,7 @@ import {sanitizeCommandInput} from "../../integrations/slack/utils";
 
 export class OncallTicketsStatus implements BotAction {
     getHelpText(): string {
-        return "Provide a summary of the current tickets currently active for your oncall team (`oncall tickets status`)";
+        return "`oncall tickets status` - Provide a summary of the current tickets currently active for your oncall team.";
     }
 
     isEnabled(): boolean {

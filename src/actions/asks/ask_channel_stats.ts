@@ -1,5 +1,5 @@
 import { BotAction } from "../base_action";
-import {AskChannelStatsParams, getAskChannelStatsParameters, getStartingDate, removeTimeInfoFromDate} from "../utils";
+import {AskChannelStatsParams, getAskChannelStatsParameters, getStartingDate} from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -11,8 +11,8 @@ import {sanitizeCommandInput, sendGenericError} from "../../integrations/slack/u
 
 export class AskChannelStats implements BotAction {
   getHelpText(): string {
-    return "Get you some stats about what goes on in your team channel (`ask channel stats`, default for 7 days)." +
-        "You can provide number of days / weeks / months (`ask channel stats 15 days`, `ask channel stats 2 weeks`)\n";
+    return "`ask channel stats` - Get statistics about what goes on in your team channel (default for 7 days)." +
+        "You can provide number of days / weeks / months (For example: `ask channel stats 15 days`, `ask channel stats 2 weeks`).";
   }
 
   isEnabled(): boolean {

@@ -12,7 +12,7 @@ import {
 
 export class GroupAskChannelMonthlyStats implements BotAction {
   getHelpText(): string {
-    return "Get you some stats about what goes on in your department (`group ask channel stats`, default for 7 days). You can provide number of days / weeks / months (`group ask channel stats 15 days`, `group ask channel stats 2 weeks`)";
+    return "`group ask channel stats` - Get statistics about what goes on in your department (default for 7 days). You can provide number of days / weeks / months (For example: `group ask channel stats 15 days`, `group ask channel stats 2 weeks`)";
   }
 
   isEnabled(): boolean {
