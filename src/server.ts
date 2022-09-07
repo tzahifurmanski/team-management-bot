@@ -4,6 +4,7 @@ import {loadSlackConfig, LEADS_SUMMARY_CHANNEL_ID, LEADS_SUMMARY_CHANNEL_NAME} f
 import {getAskChannelStatsForYesterday, getOncallTicketsStatus, postWeeklyLeadsStats} from "./logic/cron_jobs";
 
 const cron = require("node-cron");
+import cronstrue from 'cronstrue';
 
 const { createServer } = require("http");
 const express_app = require("./server_init");
@@ -48,20 +49,20 @@ async function init() {
 
 // Cool website for scheduling
 // https://crontab.guru/#0_12_*_*_2
-const scheduleCronJobs = async function () {
+// TODO: Move this to be part of a command initialization - AKA if the ASK CHANNEL command is initialized, add the cron
+const scheduleCronJobs = async () => {
   if (ASK_CHANNEL_STATS_CRON) {
     console.log(
-      `Setting up a cron to update on ask channel stats (cron:  ${ASK_CHANNEL_STATS_CRON}).`
+      `Setting up a cron to update on ask channel stats (cron: ${ASK_CHANNEL_STATS_CRON}, ${cronstrue.toString(ASK_CHANNEL_STATS_CRON)}`
     );
     cron.schedule(ASK_CHANNEL_STATS_CRON, () => {
       getAskChannelStatsForYesterday();
     })
   }
 
-
   if (ONCALL_TICKETS_STATS_CRON) {
     console.log(
-        `Setting up a cron to update on oncall tickets stats (cron:  ${ONCALL_TICKETS_STATS_CRON}).`
+        `Setting up a cron to update on oncall tickets stats (cron:  ${ONCALL_TICKETS_STATS_CRON}, ${cronstrue.toString(ONCALL_TICKETS_STATS_CRON)}).`
     );
     cron.schedule(ONCALL_TICKETS_STATS_CRON, () => {
       getOncallTicketsStatus();
