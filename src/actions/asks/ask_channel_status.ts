@@ -1,5 +1,5 @@
 import { BotAction } from "../base_action";
-import {AskChannelStatsParams, getAskChannelStatsParameters, getStartingDate, removeTimeInfoFromDate} from "../utils";
+import {AskChannelStatsParams, getAskChannelStatsParameters, getStartingDate} from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -11,8 +11,7 @@ import {sanitizeCommandInput, sendGenericError} from "../../integrations/slack/u
 
 export class AskChannelStatus implements BotAction {
   getHelpText(): string {
-    return "Get you the status of requests in your team ask channel, for a specific timeframe (`ask channel status`, defaults for 7 days). You can provide number of days / weeks / months (`ask channel status 15 days`, `ask channel status 2 weeks`)\n";
-
+    return "`ask channel status` - Get the status of requests in your team ask channel, for a specific timeframe (defaults for 7 days). You can provide number of days / weeks / months (For example: `ask channel status 15 days`, `ask channel status 2 weeks`).";
   }
 
   isEnabled(): boolean {

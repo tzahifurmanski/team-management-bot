@@ -1,7 +1,7 @@
 import {
   Button,
   ChatGetPermalinkArguments,
-  ChatPostMessageArguments, ContextBlock,
+  ChatPostMessageArguments, ChatPostMessageResponse, ContextBlock,
   SectionBlock,
 } from "@slack/web-api";
 
@@ -21,7 +21,7 @@ export const sendSlackMessage = async (
     threadTS: string = "",
     blocks: (KnownBlock | Block)[] = [],
     disableUnfurl = false
-) => {
+) : Promise<ChatPostMessageResponse> => {
   const options: ChatPostMessageArguments = {
     text,
     channel,
@@ -40,15 +40,15 @@ export const sendSlackMessage = async (
     options.thread_ts = threadTS;
   }
 
+  let result : ChatPostMessageResponse;
+
   // If there are blocks, send only 50 at each message
   if (blocks && blocks.length > 0) {
-    let i,
-      j,
-      chunk = 50; // Max number of blocks Slack allows to send in 1 message
-    for (i = 0, j = blocks.length; i < j; i += chunk) {
+    const chunk = 50; // Max number of blocks Slack allows to send in 1 message
+    for (let i = 0, j = blocks.length; i < j; i += chunk) {
       // Get blocks batch up to the size of a chunk
-      options["blocks"] = blocks.slice(i, i + chunk);
-      const result = await SlackWebClient.chat.postMessage(options);
+      options.blocks = blocks.slice(i, i + chunk);
+      result = await SlackWebClient.chat.postMessage(options);
       console.log(
         `Successfully send message ${result.ts} in conversation ${channel}`
       );
@@ -56,11 +56,13 @@ export const sendSlackMessage = async (
   }
   // If there are no blocks, just send the message
   else {
-    const result = await SlackWebClient.chat.postMessage(options);
+    result = await SlackWebClient.chat.postMessage(options);
     console.log(
       `Successfully send message ${result.ts} in conversation ${channel}`
     );
   }
+  // @ts-ignore
+  return result;
 };
 
 export const createSectionBlock = (

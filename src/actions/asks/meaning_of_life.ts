@@ -4,7 +4,7 @@ const { sendSlackMessage } = require("../../integrations/slack/messages");
 
 export class MeaningOfLife implements BotAction {
   getHelpText(): string {
-    return "Answer what is the meaning of life (`meaning of life`)";
+    return "`meaning of life` - Obviously, explain the meaning of life.";
   }
 
   isEnabled(): boolean {
