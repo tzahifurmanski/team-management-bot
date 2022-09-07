@@ -8,6 +8,8 @@ const slackEventsSetup = createEventAdapter(SLACK_SIGNING_SECRET);
 slackEventsSetup.on("message", async (event: any) => {
   // Ignore messages that the bot post in the conversation
   if (isBotMessage(event)) {
+    // TODO: When there was an invalid BOT_USER_OAUTH_ACCESS_TOKEN, and when you DMing the bot,
+    //  this is what fires. Error should be clearer
     console.log("Got a message from bot, ignoring...");
     return;
   }
