@@ -21,7 +21,7 @@ export class Status implements BotAction {
 
   async performAction(event: any): Promise<void> {
     await sendSlackMessage(
-      `Bot <@${BOT_ID}> (ID ${BOT_ID}), version ${process.env.npm_package_version}/${version}.`,
+      `Bot <@${BOT_ID}> (ID *${BOT_ID}*), version ${version}.`,
       event.channel,
       event.thread_ts
     );
