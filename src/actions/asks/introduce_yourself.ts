@@ -40,7 +40,7 @@ export class IntroduceYourself implements BotAction {
     }
 
     const result = await sendSlackMessage("More things to know about me! :excited: (:thread:)", event.channel, event.thread_ts);
-    await sendSlackMessage(`You can communicate with me everywhere - Either by DMing me with what you'd like me to run (DM <@${BOT_ID}> with \`help\`) or tagging me in a message (\`@${BOT_NAME}> help\`) in a channel I'm in.`, event.channel, result.ts);
+    await sendSlackMessage(`You can communicate with me everywhere - Either by DMing me with what you'd like me to run (DM <@${BOT_ID}> with \`help\`) or tagging me in a message (\`@${BOT_NAME} help\`) in a channel I'm in.`, event.channel, result.ts);
     await new Help().performAction({...event, thread_ts: result.ts});
   }
 }

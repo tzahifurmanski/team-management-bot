@@ -62,34 +62,25 @@ const ONCALL_CHANNEL_NAME: string = process.env.ONCALL_CHANNEL_NAME || "";
 export const loadSlackConfig = async () => {
   console.log("Starting Slack config load...");
   try {
-    const botId = await getBotId();
-    console.log(`Loaded bot id ${botId}`)
+    BOT_ID = await getBotId();
+    console.log(`Loaded bot id ${BOT_ID}`)
 
-    const teamAskChannelId = TEAM_ASK_CHANNEL_ID || await getConversationId(TEAM_ASK_CHANNEL_NAME);
+    TEAM_ASK_CHANNEL_ID = TEAM_ASK_CHANNEL_ID || await getConversationId(TEAM_ASK_CHANNEL_NAME);
 
-    const teamCodeReviewChannelId = TEAM_CODE_REVIEW_CHANNEL_ID || await getConversationId(TEAM_CODE_REVIEW_CHANNEL_NAME);
+    TEAM_CODE_REVIEW_CHANNEL_ID = TEAM_CODE_REVIEW_CHANNEL_ID || await getConversationId(TEAM_CODE_REVIEW_CHANNEL_NAME);
 
-    const teamLeadsChannelId = LEADS_SUMMARY_CHANNEL_ID || await getConversationId(LEADS_SUMMARY_CHANNEL_NAME);
+    LEADS_SUMMARY_CHANNEL_ID = LEADS_SUMMARY_CHANNEL_ID || await getConversationId(LEADS_SUMMARY_CHANNEL_NAME);
 
-    const oncallChannelId = ONCALL_CHANNEL_ID || await getConversationId(ONCALL_CHANNEL_NAME);
+    ONCALL_CHANNEL_ID = ONCALL_CHANNEL_ID || await getConversationId(ONCALL_CHANNEL_NAME);
 
     // TODO: Allow to add defaults
-    const groupAsksChannelsList = new Map<string, string>();
+    GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
 
     const asksChannels = GROUP_ASK_CHANNELS.split(",");
     asksChannels.forEach((channelDetails: string) => {
       const details = channelDetails.split(":");
-      groupAsksChannelsList.set(details[0], details[1]);
+      GROUP_ASK_CHANNELS_LIST.set(details[0], details[1]);
     });
-
-    // TODO: Do I need the temp consts, or could I just do the operation directly on the let variables
-    // Set the exported configurations
-    BOT_ID = botId;
-    TEAM_ASK_CHANNEL_ID = teamAskChannelId;
-    TEAM_CODE_REVIEW_CHANNEL_ID = teamCodeReviewChannelId;
-    LEADS_SUMMARY_CHANNEL_ID = teamLeadsChannelId;
-    ONCALL_CHANNEL_ID = oncallChannelId;
-    GROUP_ASK_CHANNELS_LIST = groupAsksChannelsList;
 
     console.log("Slack config completed successfully.");
   } catch (err) {
