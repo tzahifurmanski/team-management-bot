@@ -33,11 +33,11 @@ ACTIONS_LIST.forEach( (action) => {
   if(action.isEnabled())
   {
     ASKS_ACTIONS.push(action);
-    console.log(`'${action.constructor.name}' enabled.`)
+    console.log(`* '${action.constructor.name}' action is enabled.`)
   }
   else
   {
-    console.log(`'${action.constructor.name}' skipped.`)
+    console.log(`* '${action.constructor.name}' action is skipped.`)
   }
 })
 console.log("Actions list loading is complete.");

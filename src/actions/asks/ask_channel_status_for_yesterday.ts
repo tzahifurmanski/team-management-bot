@@ -6,13 +6,44 @@ import {
   getStatsForMessages,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
-import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
+import {
+  LEADS_SUMMARY_CHANNEL_ID,
+  LEADS_SUMMARY_CHANNEL_NAME,
+  TEAM_ASK_CHANNEL_ID
+} from "../../integrations/slack/consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import {sanitizeCommandInput} from "../../integrations/slack/utils";
-import {ASK_CHANNEL_STATS_CRON, TEAM_FOLKS} from "../../consts";
+import {ASK_CHANNEL_STATS_CRON, LEADS_SUMMARY_CRON, TEAM_FOLKS} from "../../consts";
 import cronstrue from "cronstrue";
+const cron = require("node-cron");
+import {getAskChannelStatsForYesterday, postWeeklyLeadsStats} from "../../logic/cron_jobs";
+
 
 export class AskChannelStatusForYesterday implements BotAction {
+  constructor(){
+    if(this.isEnabled()) {
+      if (ASK_CHANNEL_STATS_CRON) {
+        console.log(
+            `Setting up a cron to update on ask channel stats (cron: ${ASK_CHANNEL_STATS_CRON}, ${cronstrue.toString(ASK_CHANNEL_STATS_CRON)})`
+        );
+        cron.schedule(ASK_CHANNEL_STATS_CRON, () => {
+          // TODO: Replace this and the implementation of this file to use one implementation
+          getAskChannelStatsForYesterday();
+        })
+      }
+
+      if (LEADS_SUMMARY_CRON && (LEADS_SUMMARY_CHANNEL_ID || LEADS_SUMMARY_CHANNEL_NAME)) {
+        console.log(
+            `Setting up a cron to post a leads summary (cron:  ${LEADS_SUMMARY_CRON}).`
+        );
+
+        cron.schedule(LEADS_SUMMARY_CRON, () => {
+          postWeeklyLeadsStats();
+        });
+      }
+    }
+  }
+
   getHelpText(): string {
     let helpMessage = "`ask channel status for yesterday` - Get the status of requests in your team ask channel from yesterday and a current status going back for the last 60 days."
     if (ASK_CHANNEL_STATS_CRON) {

@@ -20,7 +20,7 @@ const ACTIONS_LIST: BotAction[] = [
 export let RESPONSE_ACTIONS: BotAction[] = [];
 
 if(!ENABLE_BOT_RESPONSES) {
-    console.log("Bot responses are disabled.");
+    console.log("** Bot responses are disabled. **");
 }
 else {
     console.log("Bot responses are enabled. Loading responses list...");
@@ -28,11 +28,11 @@ else {
         if(action.isEnabled())
         {
             RESPONSE_ACTIONS.push(action);
-            console.log(`'${action.constructor.name}' enabled.`)
+            console.log(`* '${action.constructor.name}' response is enabled.`)
         }
         else
         {
-            console.log(`'${action.constructor.name}' skipped.`)
+            console.log(`* '${action.constructor.name}' response is skipped.`)
         }
     })
     console.log("Responses list loading is complete.");

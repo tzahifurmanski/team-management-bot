@@ -8,7 +8,7 @@ import { sendSlackMessage } from "./integrations/slack/messages";
 import {sendGenericError} from "./integrations/slack/utils";
 
 // This method handles events that are posted directly inside a channel
-export const handle_channel_event = async (event: any) => {
+export const handleChannelEvent = async (event: any, client : any) => {
   // Limit this functionality to specific channels (otherwise we'll spam tons of channels)
   if (
     event.channel !== TEAM_CODE_REVIEW_CHANNEL_ID
@@ -28,7 +28,7 @@ export const handle_channel_event = async (event: any) => {
 };
 
 // This method handles events that are with direct interaction with the bot (like a DM or when the bot is mentioned)
-export const handle_direct_event = async (event: any) => {
+export const handleDirectEvent = async (event: any, client : any) => {
   // console.log("Got new direct event", event.type, event);
 
   if (!(await runActions(event, ASKS_ACTIONS))) {

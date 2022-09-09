@@ -14,10 +14,30 @@ import {
     ZENDESK_TOKEN
 } from "../../integrations/slack/consts";
 import {sanitizeCommandInput} from "../../integrations/slack/utils";
+import {ONCALL_TICKETS_STATS_CRON} from "../../consts";
+import {getOncallTicketsStatus} from "../../logic/cron_jobs";
+
+import cronstrue from "cronstrue";
+const cron = require("node-cron");
 
 export class OncallTicketsStatus implements BotAction {
+    constructor() {
+        if (this.isEnabled() && ONCALL_TICKETS_STATS_CRON) {
+            console.log(
+                `Setting up a cron to update on oncall tickets stats (cron:  ${ONCALL_TICKETS_STATS_CRON}, ${cronstrue.toString(ONCALL_TICKETS_STATS_CRON)}).`
+            );
+            cron.schedule(ONCALL_TICKETS_STATS_CRON, () => {
+                getOncallTicketsStatus();
+            });
+        }
+    }
+
     getHelpText(): string {
-        return "`oncall tickets status` - Provide a summary of the current tickets currently active for your oncall team.";
+        let helpMessage = "`oncall tickets status` - Provide a summary of the current tickets currently active for your oncall team.";
+        if (ONCALL_TICKETS_STATS_CRON) {
+            helpMessage += `\n*A recurring ask channel post is scheduled to be sent ${cronstrue.toString(ONCALL_TICKETS_STATS_CRON)}.*`;
+        }
+        return helpMessage;
     }
 
     isEnabled(): boolean {
