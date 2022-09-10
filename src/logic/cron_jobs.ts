@@ -6,13 +6,14 @@ import {
 } from "./asks_channel";
 import { sendSlackMessage } from "../integrations/slack/messages";
 import {
-  ONCALL_CHANNEL_ID,
-  TEAM_ASK_CHANNEL_ID,
   LEADS_SUMMARY_CHANNEL_ID,
+  ONCALL_CHANNEL_ID,
+  SlackWebClient,
+  TEAM_ASK_CHANNEL_ID,
 } from "../integrations/slack/consts";
 import { AskChannelStatusForYesterday } from "../actions/asks/ask_channel_status_for_yesterday";
-import {OncallTicketsStatus} from "../actions/asks/oncall_tickets_status";
-import {TEAM_NAME} from "../consts";
+import { OncallTicketsStatus } from "../actions/asks/oncall_tickets_status";
+import { TEAM_NAME } from "../consts";
 
 export const getAskChannelStatsForYesterday = async () => {
   // Manually run the Get Channel stats for Yesterday action
@@ -20,7 +21,7 @@ export const getAskChannelStatsForYesterday = async () => {
     channel: TEAM_ASK_CHANNEL_ID,
     thread_ts: "",
   };
-  await new AskChannelStatusForYesterday().performAction(event);
+  await new AskChannelStatusForYesterday().performAction(event, SlackWebClient);
 };
 
 export const getOncallTicketsStatus = async () => {
@@ -29,7 +30,7 @@ export const getOncallTicketsStatus = async () => {
     channel: ONCALL_CHANNEL_ID,
     thread_ts: "",
   };
-  await new OncallTicketsStatus().performAction(event);
+  await new OncallTicketsStatus().performAction(event, SlackWebClient);
 };
 
 export const postWeeklyLeadsStats = async () => {
@@ -54,7 +55,8 @@ export const postWeeklyLeadsStats = async () => {
     endingDate.toUTCString()
   );
   await sendSlackMessage(
+    SlackWebClient,
     `Good morning ${TEAM_NAME} leads :sunny:\nIn the previous ${DAYS_BACK} days, team ${TEAM_NAME} had a *total of ${monthStats.totalMessages} asks*. Out of those, *${monthStats.totalNumProcessed} were answered*, *${monthStats.totalNumInProgress} are in progress*, and *${monthStats.totalNumUnchecked} were not handled*.`,
-      LEADS_SUMMARY_CHANNEL_ID
+    LEADS_SUMMARY_CHANNEL_ID
   );
 };

@@ -1,7 +1,7 @@
 {
   "name": "team-management-bot",
   "author": "Tzahi Furmanski <tzahi.fur@gmail.com> (https://github.com/tzahifurmanski/)",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "repository": "https://github.com/tzahifurmanski/team-management-bot",
   "description": "A slack bot for engineering teams",
   "main": "dist/app.js",
@@ -36,8 +36,8 @@
     "supertest": "6.2.4",
     "ts-jest": "28.0.8",
     "tsc-watch": "5.0.3",
-    "tslint": "6.1.3",
-    "typescript": "4.8.2"
+    "tslint": "^6.1.3",
+    "typescript": "^4.8.2"
   },
   "scripts": {
     "start": "node dist/server.js",

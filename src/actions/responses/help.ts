@@ -1,6 +1,6 @@
 import { getRandomFromArray } from "../utils";
 import { BotAction } from "../base_action";
-import {botConfig} from "../../consts";
+import { botConfig } from "../../consts";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
@@ -21,7 +21,7 @@ export class HelpResponse implements BotAction {
     return event.text.toLowerCase().includes("help");
   }
 
-  async performAction(event: any): Promise<void> {
+  async performAction(event: any, slackClient: any): Promise<void> {
     if (event.thread_ts) {
       // This is a thread, do nothing. Not sure if I need it
       return;
@@ -29,6 +29,6 @@ export class HelpResponse implements BotAction {
     const gif = getRandomFromArray(GIFS);
 
     // Reply in a thread
-    await sendSlackMessage(gif, event.channel, event.ts);
+    await sendSlackMessage(slackClient, gif, event.channel, event.ts);
   }
 }

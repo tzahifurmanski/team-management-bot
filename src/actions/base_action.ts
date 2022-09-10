@@ -1,5 +1,5 @@
 export interface BotAction {
-  performAction(event: any): Promise<void>;
+  performAction(event: any, slackClient: any): Promise<void>;
   doesMatch(event: any): boolean;
   isEnabled(): boolean;
   getHelpText(): string;

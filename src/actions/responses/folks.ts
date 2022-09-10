@@ -1,7 +1,7 @@
 import { BotAction } from "../base_action";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import { getRandomFromArray } from "../utils";
-import {botConfig} from "../../consts";
+import { botConfig } from "../../consts";
 
 const GIFS: string[] = botConfig.RESPONSE_FOLKS_POOL;
 
@@ -19,10 +19,11 @@ export class FolksResponse implements BotAction {
     return event.text.toLowerCase().startsWith("folks");
   }
 
-  async performAction(event: any): Promise<void> {
+  async performAction(event: any, slackClient: any): Promise<void> {
     const gif = getRandomFromArray(GIFS);
 
     await sendSlackMessage(
+      slackClient,
       gif,
       event.channel,
       event.thread_ts ? event.thread_ts : event.ts
