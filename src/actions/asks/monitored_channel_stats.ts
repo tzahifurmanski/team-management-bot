@@ -46,6 +46,7 @@ export class MonitoredChannelSummaryStats implements BotAction {
     const endingDate = new Date();
 
     const messages: any[any] = await getChannelMessages(
+      slackClient,
       startingDate,
       endingDate,
       MONITORED_CHANNEL_ID

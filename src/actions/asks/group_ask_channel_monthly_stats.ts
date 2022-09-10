@@ -42,8 +42,8 @@ export class GroupAskChannelMonthlyStats implements BotAction {
     for (const [channelName, channelId] of GROUP_ASK_CHANNELS_LIST.entries()) {
       console.log(`Processing channel '${channelName}' and id '${channelId}'`);
 
-      // TODO: Pass the channel ID so we can easily show it later
       const messages: any[any] = await getChannelMessages(
+        slackClient,
         startingDate,
         undefined,
         channelId

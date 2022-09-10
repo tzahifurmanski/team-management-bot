@@ -1,18 +1,19 @@
 // This is a util function that is able to look for the ID of a conversation / channel by name
-import { BOT_ID, SlackWebClient } from "./consts";
+import { BOT_ID } from "./consts";
 import {
   ConversationsHistoryArguments,
   ConversationsHistoryResponse,
   ConversationsListArguments,
 } from "@slack/web-api";
 import { Message } from "@slack/web-api/dist/response/ConversationsHistoryResponse";
-import {isBotMessage} from "./utils";
+import { isBotMessage } from "./utils";
 
 // If something is not found, we'll have to go over everything
 export const getConversationId = async (
+  slackClient: any,
   name: string,
-  typesList: string = "public_channel,private_channel",
-  cursor: string = ""
+  typesList = "public_channel,private_channel",
+  cursor = ""
 ): Promise<string> => {
   // Return fast if there's no name
   if (!name) {
@@ -29,7 +30,7 @@ export const getConversationId = async (
   if (cursor) {
     options.cursor = cursor;
   }
-  const channelsList = await SlackWebClient.conversations.list(options);
+  const channelsList = await slackClient.conversations.list(options);
 
   // Look for the channel details in the results
   const filtered = channelsList.channels.filter((el: any) => {
@@ -57,6 +58,7 @@ export const getConversationId = async (
       return "";
     } else {
       return getConversationId(
+        slackClient,
         name,
         typesList,
         channelsList.response_metadata.next_cursor
@@ -66,8 +68,9 @@ export const getConversationId = async (
 };
 
 export const getConversationHistory = async (
+  slackClient: any,
   channelId: string,
-  oldest: string = "", // Start of time range of messages to include in results (in seconds).
+  oldest = "", // Start of time range of messages to include in results (in seconds).
   latest?: string
 ): Promise<any[]> => {
   // TODO: Handle a 'channel not found' error / 'not_in_channel' error
@@ -85,9 +88,8 @@ export const getConversationHistory = async (
 
   const results: any[] = [];
 
-  let response: ConversationsHistoryResponse = await SlackWebClient.conversations.history(
-    options
-  );
+  let response: ConversationsHistoryResponse =
+    await slackClient.conversations.history(options);
 
   do {
     if (response.messages) {
@@ -103,7 +105,7 @@ export const getConversationHistory = async (
       });
 
       options.cursor = response.response_metadata?.next_cursor;
-      response = await SlackWebClient.conversations.history(options);
+      response = await slackClient.conversations.history(options);
     }
   } while (response.has_more);
 
@@ -121,8 +123,8 @@ export const shouldMessageBeSkipped = (message: any) => {
       !(message.username && message.username === "Snyk Support")) // Skip all bot_message except for messages from Snyk Support bot
   );
 };
-export const getBotId = async () => {
+export const getBotId = async (slackClient: any) => {
   // This can also return response.user with the bot username
-  const response = await SlackWebClient.auth.test();
+  const response = await slackClient.auth.test();
   return response?.user_id;
 };

@@ -8,7 +8,7 @@ import {
 } from "@slack/web-api";
 
 import { Block, DividerBlock, KnownBlock, MrkdwnElement } from "@slack/types";
-import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from "./consts";
+import { BOT_ID, SLACK_USER_FORMAT } from "./consts";
 import { botConfig } from "../../consts";
 
 // Post a message to the channel, and await the result.
@@ -63,6 +63,8 @@ export const sendSlackMessage = async (
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   return result;
 };
 
@@ -140,6 +142,7 @@ export const getUserIDInText = (text: string) => {
 };
 
 export const getMessagePermalink = async (
+  slackClient: any,
   channelId: string,
   messageTS: string
 ): Promise<string> => {
@@ -148,7 +151,7 @@ export const getMessagePermalink = async (
     message_ts: messageTS,
   };
   try {
-    const response = await SlackWebClient.chat.getPermalink(options);
+    const response = await slackClient.chat.getPermalink(options);
     if (response.ok) {
       return response.permalink;
     } else {

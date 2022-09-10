@@ -94,6 +94,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     );
 
     const messages: any[any] = await getChannelMessages(
+      slackClient,
       startingDate,
       endingDate
     );
@@ -123,6 +124,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     );
 
     const monthMessages: any[any] = await getChannelMessages(
+      slackClient,
       beginningOfMonthDate,
       now
     );

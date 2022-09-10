@@ -15,6 +15,8 @@ import { AskChannelStatusForYesterday } from "../actions/asks/ask_channel_status
 import { OncallTicketsStatus } from "../actions/asks/oncall_tickets_status";
 import { TEAM_NAME } from "../consts";
 
+// TODO: Find a better place for the cron jobs code - maybe as part of the relevant action
+
 export const getAskChannelStatsForYesterday = async () => {
   // Manually run the Get Channel stats for Yesterday action
   const event: any = {
@@ -47,7 +49,10 @@ export const postWeeklyLeadsStats = async () => {
   removeTimeInfoFromDate(tempDate);
   const endingDate = new Date(tempDate.getTime() - 1);
 
-  const monthMessages: any[any] = await getChannelMessages(startTimeframe);
+  const monthMessages: any[any] = await getChannelMessages(
+    SlackWebClient,
+    startTimeframe
+  );
   const monthStats: AsksChannelStatsResult = await getStatsForMessages(
     TEAM_ASK_CHANNEL_ID,
     monthMessages,

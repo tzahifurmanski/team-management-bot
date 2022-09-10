@@ -54,6 +54,7 @@ export class AskChannelStats implements BotAction {
 
     // Get the stats
     const messages: any[any] = await getChannelMessages(
+      slackClient,
       startingDate,
       endingDate
     );

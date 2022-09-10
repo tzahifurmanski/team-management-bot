@@ -41,6 +41,7 @@ export interface AsksChannelStatsResult {
 
 // This method gets two dates and returns all the messages that were received in the asks channel during this timeframe
 export const getChannelMessages = async (
+  slackClient: any,
   startingDate: Date,
   endDate?: Date,
   askChannelId: string = TEAM_ASK_CHANNEL_ID
@@ -54,6 +55,7 @@ export const getChannelMessages = async (
   // console.log(`Timeframe between '${oldestMessage}' and '${latestMessage}'`);
 
   return await getConversationHistory(
+    slackClient,
     askChannelId,
     oldestMessage,
     latestMessage
@@ -221,7 +223,11 @@ export const reportStatsToSlack = async (
       );
 
       messageBlocks.push(
-        ...(await getPermalinkBlocks(stats.channelId, stats.messagesInProgress))
+        ...(await getPermalinkBlocks(
+          slackClient,
+          stats.channelId,
+          stats.messagesInProgress
+        ))
       );
     }
 
@@ -230,7 +236,11 @@ export const reportStatsToSlack = async (
         createSectionBlock("These are the open asks we currently have:")
       );
       messageBlocks.push(
-        ...(await getPermalinkBlocks(stats.channelId, stats.messagesUnchecked))
+        ...(await getPermalinkBlocks(
+          slackClient,
+          stats.channelId,
+          stats.messagesUnchecked
+        ))
       );
     }
   }
@@ -250,7 +260,10 @@ export const reportStatsToSlack = async (
   const reportMessageBlocks: Block[] = [];
 
   if (includeReport && stats.totalMessages > 0) {
-    const results: AsksChannelReportResult = await createReport(stats.messages);
+    const results: AsksChannelReportResult = await createReport(
+      slackClient,
+      stats.messages
+    );
 
     reportMessageBlocks.push(
       ...createReportSection(results.statsByTeam, "Team")
@@ -278,6 +291,7 @@ export const reportStatsToSlack = async (
 
 // This method gets a list of messages and creates a permalink string for displaying the message.
 const getPermalinkBlocks = async (
+  slackClient: any,
   channelId: string,
   messages: any[]
 ): Promise<SectionBlock[]> => {
@@ -286,7 +300,11 @@ const getPermalinkBlocks = async (
 
   await Promise.all(
     messages.map(async (message: any) => {
-      const permalink = await getMessagePermalink(channelId, message.ts);
+      const permalink = await getMessagePermalink(
+        slackClient,
+        channelId,
+        message.ts
+      );
       if (permalink) {
         const messageDate = toDateTime(message.ts);
         const daysDifference = Math.round(
@@ -300,7 +318,8 @@ const getPermalinkBlocks = async (
             : ` (${daysDifference} days ago)`;
 
         // TODO: Maybe only display the team name, when doing 'ask channel stats', and not when showing the stats for yesterday. Requires refactor.
-        const userProfile = (await getUserProfile(message.user)) || {};
+        const userProfile =
+          (await getUserProfile(slackClient, message.user)) || {};
         let teamName = getValueFromProfile(
           userProfile,
           USER_PROFILE_FIELD_ID_TEAM
