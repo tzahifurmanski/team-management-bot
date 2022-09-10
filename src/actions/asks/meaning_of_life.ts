@@ -16,8 +16,9 @@ export class MeaningOfLife implements BotAction {
     return event.text.includes("meaning of life");
   }
 
-  async performAction(event: any): Promise<void> {
+  async performAction(event: any, slackClient: any): Promise<void> {
     await sendSlackMessage(
+      slackClient,
       `42`,
       event.channel,
       event.thread_ts ? event.thread_ts : event.ts

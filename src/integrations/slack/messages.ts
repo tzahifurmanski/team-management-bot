@@ -1,27 +1,26 @@
 import {
   Button,
   ChatGetPermalinkArguments,
-  ChatPostMessageArguments, ChatPostMessageResponse, ContextBlock,
+  ChatPostMessageArguments,
+  ChatPostMessageResponse,
+  ContextBlock,
   SectionBlock,
 } from "@slack/web-api";
 
-import {
-  Block,
-  DividerBlock,
-  KnownBlock, MrkdwnElement,
-} from "@slack/types";
-import { BOT_ID, SLACK_USER_FORMAT, SlackWebClient } from "./consts";
-import {botConfig} from "../../consts";
+import { Block, DividerBlock, KnownBlock, MrkdwnElement } from "@slack/types";
+import { BOT_ID, SLACK_USER_FORMAT } from "./consts";
+import { botConfig } from "../../consts";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
 export const sendSlackMessage = async (
-    text: string,
-    channel: string,
-    threadTS: string = "",
-    blocks: (KnownBlock | Block)[] = [],
-    disableUnfurl = false
-) : Promise<ChatPostMessageResponse> => {
+  slackClient: any,
+  text: string,
+  channel: string,
+  threadTS = "",
+  blocks: (KnownBlock | Block)[] = [],
+  disableUnfurl = false
+): Promise<ChatPostMessageResponse> => {
   const options: ChatPostMessageArguments = {
     text,
     channel,
@@ -40,7 +39,9 @@ export const sendSlackMessage = async (
     options.thread_ts = threadTS;
   }
 
-  let result : ChatPostMessageResponse;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  let result: ChatPostMessageResponse;
 
   // If there are blocks, send only 50 at each message
   if (blocks && blocks.length > 0) {
@@ -48,7 +49,7 @@ export const sendSlackMessage = async (
     for (let i = 0, j = blocks.length; i < j; i += chunk) {
       // Get blocks batch up to the size of a chunk
       options.blocks = blocks.slice(i, i + chunk);
-      result = await SlackWebClient.chat.postMessage(options);
+      result = await slackClient.chat.postMessage(options);
       console.log(
         `Successfully send message ${result.ts} in conversation ${channel}`
       );
@@ -56,22 +57,24 @@ export const sendSlackMessage = async (
   }
   // If there are no blocks, just send the message
   else {
-    result = await SlackWebClient.chat.postMessage(options);
+    result = await slackClient.chat.postMessage(options);
     console.log(
       `Successfully send message ${result.ts} in conversation ${channel}`
     );
   }
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return result;
 };
 
 export const createSectionBlock = (
-    text?: string,
-    fields?: any[],
-    accessory?: Button
+  text?: string,
+  fields?: any[],
+  accessory?: Button
 ): SectionBlock => {
   // TODO: This currently only supports SectionBlock. Make it more dynamic?
-  const section : SectionBlock = {
+  const section: SectionBlock = {
     type: "section",
   };
 
@@ -90,41 +93,43 @@ export const createSectionBlock = (
   return section;
 };
 
-
-export const createText = (text : string): MrkdwnElement => ({
+export const createText = (text: string): MrkdwnElement => ({
   type: "mrkdwn",
-  text
-})
+  text,
+});
 
 export const createDivider = (): DividerBlock => ({
-  "type": "divider"
-})
+  type: "divider",
+});
 
-export const createButton = (text: string, url: string, value?: string): Button => ({
-    "type": "button",
-    "text": {
-      "type": "plain_text",
-      "text": text,
-      "emoji": true
-    },
-    "value": value,
-    "url": url,
-    "action_id": "button-action"
+export const createButton = (
+  text: string,
+  url: string,
+  value?: string
+): Button => ({
+  type: "button",
+  text: {
+    type: "plain_text",
+    text,
+    emoji: true,
+  },
+  value,
+  url,
+  action_id: "button-action",
   // }
-})
+});
 
 export const createContext = (text: string): ContextBlock => ({
-  "type": "context",
-  "elements": [
+  type: "context",
+  elements: [
     {
-      "type": "plain_text",
-      "text": text
-    }
-  ]
-})
+      type: "plain_text",
+      text,
+    },
+  ],
+});
 
-
-export const getUserIDInText = function (text: string) {
+export const getUserIDInText = (text: string) => {
   // Remove the bot id and look for other slack users
   // TODO: This currently has a 'bug' where we can grab multiple users and compliment multiple users in one go
   //       it can create a corrupted output for 'compliment @Yossi and also say hi to @Zigi
@@ -136,13 +141,17 @@ export const getUserIDInText = function (text: string) {
   return slackUsers ? slackUsers[0] : "";
 };
 
-export const getMessagePermalink = async (channelId: string, messageTS: string): Promise<string> => {
+export const getMessagePermalink = async (
+  slackClient: any,
+  channelId: string,
+  messageTS: string
+): Promise<string> => {
   const options: ChatGetPermalinkArguments = {
     channel: channelId,
     message_ts: messageTS,
   };
   try {
-    const response = await SlackWebClient.chat.getPermalink(options);
+    const response = await slackClient.chat.getPermalink(options);
     if (response.ok) {
       return response.permalink;
     } else {

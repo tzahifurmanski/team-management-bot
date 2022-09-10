@@ -17,14 +17,14 @@ export class GroupAskChannelMonthlyStats implements BotAction {
 
   isEnabled(): boolean {
     // Available only if there are multiple group ask channels defined
-    return !!(GROUP_ASK_CHANNELS_LIST) && GROUP_ASK_CHANNELS_LIST.size > 0;
+    return !!GROUP_ASK_CHANNELS_LIST && GROUP_ASK_CHANNELS_LIST.size > 0;
   }
 
   doesMatch(event: any): boolean {
     return event.text.includes("group ask channel stats");
   }
 
-  async performAction(event: any): Promise<void> {
+  async performAction(event: any, slackClient: any): Promise<void> {
     // TODO: Start using getStartingDate here. Need to first refactor getStartingDate to dynamically get indexes for where the days / metric are in the word
 
     // Get the number of months back from event.text. Default is 0 (Beginning of this month).
@@ -42,8 +42,8 @@ export class GroupAskChannelMonthlyStats implements BotAction {
     for (const [channelName, channelId] of GROUP_ASK_CHANNELS_LIST.entries()) {
       console.log(`Processing channel '${channelName}' and id '${channelId}'`);
 
-      // TODO: Pass the channel ID so we can easily show it later
       const messages: any[any] = await getChannelMessages(
+        slackClient,
         startingDate,
         undefined,
         channelId
@@ -60,7 +60,13 @@ export class GroupAskChannelMonthlyStats implements BotAction {
         console.log(
           `Currently processing block for ${stats.startDateInUTC} to ${stats.endDateInUTC}...`
         );
-        await reportStatsToSlack(stats, event.channel, event.thread_ts, false);
+        await reportStatsToSlack(
+          slackClient,
+          stats,
+          event.channel,
+          event.thread_ts,
+          false
+        );
       }
     }
   }

@@ -1,5 +1,9 @@
 import { BotAction } from "../base_action";
-import {AskChannelStatsParams, getAskChannelStatsParameters, getStartingDate} from "../utils";
+import {
+  AskChannelStatsParams,
+  getAskChannelStatsParameters,
+  getStartingDate,
+} from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -7,38 +11,53 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import { BOT_ID, TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
-import {sanitizeCommandInput, sendGenericError} from "../../integrations/slack/utils";
+import {
+  sanitizeCommandInput,
+  sendGenericError,
+} from "../../integrations/slack/utils";
 
 export class AskChannelStats implements BotAction {
   getHelpText(): string {
-    return "`ask channel stats` - Get statistics about what goes on in your team channel (default for 7 days)." +
-        "You can provide number of days / weeks / months (For example: `ask channel stats 15 days`, `ask channel stats 2 weeks`).";
+    return (
+      "`ask channel stats` - Get statistics about what goes on in your team channel (default for 7 days)." +
+      "You can provide number of days / weeks / months (For example: `ask channel stats 15 days`, `ask channel stats 2 weeks`)."
+    );
   }
 
   isEnabled(): boolean {
     // This action should be available if there is an asks channel to process
-    return !!(TEAM_ASK_CHANNEL_ID);
+    return !!TEAM_ASK_CHANNEL_ID;
   }
 
   doesMatch(event: any): boolean {
     return sanitizeCommandInput(event.text).startsWith("ask channel stats");
   }
 
-  async performAction(event: any): Promise<void> {
+  async performAction(event: any, slackClient: any): Promise<void> {
     // Get the timeframe to operate on
-    const params: AskChannelStatsParams = getAskChannelStatsParameters(event.text.replace(`<@${BOT_ID}> `, ""));
-    if(params.error) {
-      console.log(`There was an error processing the stats params for ${event.text} command: ${params.timeMetric}`);
-      await sendGenericError(event);
+    const params: AskChannelStatsParams = getAskChannelStatsParameters(
+      event.text.replace(`<@${BOT_ID}> `, "")
+    );
+    if (params.error) {
+      console.log(
+        `There was an error processing the stats params for ${event.text} command: ${params.timeMetric}`
+      );
+      await sendGenericError(event, slackClient);
       return;
     }
 
     const startingDate = getStartingDate(params);
     const endingDate = new Date();
-    console.log(`"Date between ${startingDate.toUTCString()} and ${endingDate.toUTCString()}`);
+    console.log(
+      `"Date between ${startingDate.toUTCString()} and ${endingDate.toUTCString()}`
+    );
 
     // Get the stats
-    const messages: any[any] = await getChannelMessages(startingDate, endingDate);
+    const messages: any[any] = await getChannelMessages(
+      slackClient,
+      startingDate,
+      endingDate
+    );
     const stats: AsksChannelStatsResult = await getStatsForMessages(
       TEAM_ASK_CHANNEL_ID,
       messages,
@@ -47,6 +66,14 @@ export class AskChannelStats implements BotAction {
     );
 
     // Report them to Slack
-    await reportStatsToSlack(stats, event.channel, event.thread_ts, true,false, true);
+    await reportStatsToSlack(
+      slackClient,
+      stats,
+      event.channel,
+      event.thread_ts,
+      true,
+      false,
+      true
+    );
   }
 }

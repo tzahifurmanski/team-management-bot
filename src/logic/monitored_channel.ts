@@ -14,16 +14,16 @@ export interface MonitoredChannelStatsResult {
 }
 
 // This method gets a list of messages and a timeframe and returns stats on these messages
-export const getMonitoredChannelStatsForMessages = function (
+export const getMonitoredChannelStatsForMessages = (
   channelId: string,
   messages: any,
-  startingDateInUTC: string,
+  startDateInUTC: string,
   endDateInUTC?: string,
   conditionUsername?: string,
   conditionSuccessMessage?: string,
   conditionFailureMessage?: string,
   eventEntity?: string
-): MonitoredChannelStatsResult {
+): MonitoredChannelStatsResult => {
   // Check if no filter conditions were given. If so, skip filtering and return everything.
   if (
     !conditionUsername &&
@@ -35,28 +35,28 @@ export const getMonitoredChannelStatsForMessages = function (
     );
 
     return {
-      eventEntity: eventEntity,
-      startDateInUTC: startingDateInUTC,
-      endDateInUTC: endDateInUTC,
-      messages: messages,
+      eventEntity,
+      startDateInUTC,
+      endDateInUTC,
+      messages,
       totalMessages: messages.length,
-      channelId: channelId,
+      channelId,
     };
   }
 
-  const success_messages = messages.filter(function (el: any) {
+  const successMessages = messages.filter((el: any) => {
     return (
       (!conditionUsername || el.username === conditionUsername) &&
-      el.attachments?.filter(function (attachment: any) {
+      el.attachments?.filter((attachment: any) => {
         return attachment.title?.includes(conditionSuccessMessage);
       }).length > 0
     );
   });
 
-  const failure_messages = messages.filter(function (el: any) {
+  const failureMessages = messages.filter((el: any) => {
     return (
       el.username === conditionUsername &&
-      el.attachments?.filter(function (attachment: any) {
+      el.attachments?.filter((attachment: any) => {
         return attachment.title?.includes(conditionFailureMessage);
       }).length > 0
     );
@@ -64,31 +64,33 @@ export const getMonitoredChannelStatsForMessages = function (
 
   // Filtering twice as there might be 'noise' messages as well so I'm ignoring those
   // TODO: Do this for the other stats function places as well?
-  const totalMessages = success_messages.concat(failure_messages);
+  const totalMessages = successMessages.concat(failureMessages);
 
   return {
-    eventEntity: eventEntity,
-    startDateInUTC: startingDateInUTC,
-    endDateInUTC: endDateInUTC,
+    eventEntity,
+    startDateInUTC,
+    endDateInUTC,
     messages: totalMessages,
-    messagesSuccess: success_messages,
-    messagesFailure: failure_messages,
+    messagesSuccess: successMessages,
+    messagesFailure: failureMessages,
     totalMessages: totalMessages.length,
-    totalNumSuccess: success_messages.length,
-    totalNumFailure: failure_messages.length,
-    channelId: channelId,
+    totalNumSuccess: successMessages.length,
+    totalNumFailure: failureMessages.length,
+    channelId,
   };
 };
 
-export const reportMonitoredChannelStatsToSlack = async function (
+export const reportMonitoredChannelStatsToSlack = async (
+  slackClient: any,
   stats: MonitoredChannelStatsResult,
   destinationChannel: any,
   destinationThreadTS: any
-) {
+) => {
   // console.log("Time in utc - start", stats.startDateInUTC);
   // console.log("Time in utc - end", stats.endDateInUTC);
 
   await sendSlackMessage(
+    slackClient,
     // TODO: Skip the second line if there are no stats.totalNumSuccess and  stats.totalNumFailure
     `<#${stats.channelId}> had a *total of ${stats.totalMessages} ${
       stats.eventEntity ? stats.eventEntity : "events"

@@ -1,7 +1,7 @@
 import { BotAction } from "../base_action";
 import { getRandomFromArray } from "../utils";
 import { sendSlackMessage } from "../../integrations/slack/messages";
-import {botConfig} from "../../consts";
+import { botConfig } from "../../consts";
 
 const GIFS = botConfig.RESPONSE_I_THINK_POOL || [];
 
@@ -24,10 +24,10 @@ export class IThinkResponse implements BotAction {
     );
   }
 
-  async performAction(event: any): Promise<void> {
+  async performAction(event: any, slackClient: any): Promise<void> {
     const gif = getRandomFromArray(GIFS);
 
     // Reply in a thread
-    if (gif) await sendSlackMessage(gif, event.channel, event.ts);
+    if (gif) await sendSlackMessage(slackClient, gif, event.channel, event.ts);
   }
 }

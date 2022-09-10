@@ -1,7 +1,7 @@
 import { getRandomFromArray } from "../utils";
 import { BotAction } from "../base_action";
-import {botConfig} from "../../consts";
-import {TEAM_CODE_REVIEW_CHANNEL_ID} from "../../integrations/slack/consts";
+import { botConfig } from "../../consts";
+import { TEAM_CODE_REVIEW_CHANNEL_ID } from "../../integrations/slack/consts";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
@@ -16,12 +16,12 @@ export class ReviewRequestResponse implements BotAction {
 
   isEnabled(): boolean {
     // Only if code reviews channel vars are defined, Load the code review actions
-    return !!(TEAM_CODE_REVIEW_CHANNEL_ID);
+    return !!TEAM_CODE_REVIEW_CHANNEL_ID;
   }
 
   doesMatch(event: any): boolean {
     return (
-        // TODO: Improve these conditions
+      // TODO: Improve these conditions
       event.text.toLowerCase().includes("https://github.com/snyk") &&
       //   event.text.toLowerCase().includes("/pull/") &&
       //   !event.text.toLowerCase().includes("revert")) ||
@@ -29,7 +29,7 @@ export class ReviewRequestResponse implements BotAction {
     );
   }
 
-  async performAction(event: any): Promise<void> {
+  async performAction(event: any, slackClient: any): Promise<void> {
     if (event.thread_ts) {
       // This is a thread, do nothing
       return;
@@ -38,6 +38,6 @@ export class ReviewRequestResponse implements BotAction {
     const gif = getRandomFromArray(GIFS);
 
     // Reply in a thread
-    await sendSlackMessage(gif, event.channel, event.ts);
+    await sendSlackMessage(slackClient, gif, event.channel, event.ts);
   }
 }
