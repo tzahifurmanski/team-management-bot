@@ -37,7 +37,7 @@ BOT_USER_OAUTH_ACCESS_TOKEN=
 # =================
 
 # Ask Channel Status
-ASK_CHANNEL_STATS_CRON= # Default is 30 08 * * 0-5, every day at 8:30 UTC, on Sunday to Friday
+ASK_CHANNEL_STATS_CRON= # Optional, a cron expression for the bot to post in the team ask channel with a current status. For example, '30 08 * * 0-5', which is every day at 8:30 UTC, on Sunday to Friday.
 TEAM_ASK_CHANNEL_ID= # The Slack ID for the team ask channel. Supply either a name, or an ID.
 TEAM_ASK_CHANNEL_NAME= # The name of the Slack ask channel. Supply either a name, or an ID.
 
