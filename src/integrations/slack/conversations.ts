@@ -96,12 +96,11 @@ export const getConversationHistory = async (
       response.messages.forEach((message: Message) => {
         // Filter out messages from the bot, and all message events with subtypes that are not bot messages
         if (!shouldMessageBeSkipped(message)) {
-          // console.log(`Saving ${JSON.stringify(message)} message`);
+          console.log(`Saving ${JSON.stringify(message)} message`);
           results.push(message);
+        } else {
+          console.log(`Skipped ${JSON.stringify(message)} message`);
         }
-        // else {
-        // console.log(`Skipped ${JSON.stringify(message)} message`);
-        // }
       });
 
       options.cursor = response.response_metadata?.next_cursor;
@@ -118,8 +117,8 @@ export const shouldMessageBeSkipped = (message: any) => {
     // TODO: Put this in a env var
     message.text.includes(`<@${BOT_ID}>`) || // Skip any messages that refer the bot
     (message.subtype && message.subtype !== "bot_message") || // Skip any message that has a subtype, that is not a bot (We filter the bot later)
-    // TODO: Extract the 'Snyk Support' to an env var
-    !isBotAllowed(message, ALLOWED_BOTS)
+    ((message.bot_id || message.subtype) &&
+      !isBotAllowed(message, ALLOWED_BOTS))
   );
 };
 export const getBotId = async (slackClient: any) => {
@@ -133,9 +132,5 @@ export const isBotAllowed = (
   message: any,
   allowedBotsList: string[]
 ): boolean => {
-  return (
-    (message.bot_id || message.subtype) &&
-    message.username &&
-    allowedBotsList.includes(message.username)
-  );
+  return message.username && allowedBotsList.includes(message.username);
 };
