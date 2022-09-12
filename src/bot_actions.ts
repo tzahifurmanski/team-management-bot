@@ -8,19 +8,19 @@ import { BOT_RESPONSES_CHANNELS } from "./consts";
 // This method handles events that are posted directly inside a channel
 export const handleChannelEvent = async (event: any, client: any) => {
   // Limit this functionality to specific channels (otherwise we'll spam tons of channels)
-  if (!(event.channel in BOT_RESPONSES_CHANNELS)) {
-    // console.log("Message identified in a none supported channel. We only want to monitor specific channels for reactions.");
+  if (!BOT_RESPONSES_CHANNELS.includes(event.channel)) {
+    // console.log(
+    //   `Message identified in a none supported channel ${event.channel}.` +
+    //     `We only want to monitor specific channels for reactions.`
+    // );
     return;
   }
 
   // console.log("Got new channel event", event);
 
   if (!(await runActions(event, client, RESPONSE_ACTIONS))) {
-    // console.log("Unsupported event", event);
-    // TODO: Save the unsupported event for later debrief
+    // console.log("Unsupported event", JSON.stringify(event));
   }
-
-  // TODO: Reply to good morning / great day / good weekend things
 };
 
 // This method handles events that are with direct interaction with the bot (like a DM or when the bot is mentioned)

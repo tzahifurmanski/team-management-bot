@@ -16,7 +16,6 @@ const ACTIONS_LIST: BotAction[] = [
   new ReviewRequestResponse(),
 ];
 
-// For now most responses are disabled, not sure it's useful ATM
 export const RESPONSE_ACTIONS: BotAction[] = [];
 
 if (!ENABLE_BOT_RESPONSES) {
