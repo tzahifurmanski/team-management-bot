@@ -1,304 +1,422 @@
 import {
-    AskChannelStatsParams,
-    getAskChannelStatsParameters,
-    getStartingDate,
-    setDateToSunday
+  AskChannelParams,
+  getAskChannelParameters,
+  getStartingDate,
+  setDateToSunday,
 } from "../../src/actions/utils";
-console.log(new Date().toUTCString());
 import * as MockDate from "mockdate";
 
-describe("getAskChannelStatsParameters", () => {
-    test("default ask", async () => {
-        const ask = "ask channel stats"
+console.log(new Date().toUTCString());
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+const verifyAskChannelParamsResult = (
+  result: AskChannelParams,
+  actionType: string,
+  timeMetric: string,
+  count: number,
+  groupBy: string,
+  error: string
+) => {
+  expect(result.actionType).toEqual(actionType);
+  expect(result.timeMetric).toEqual(timeMetric);
+  expect(result.count).toEqual(count);
+  expect(result.groupBy).toEqual(groupBy);
+  expect(result.error).toEqual(error);
+};
 
-        // Check that we got the default - 7 days
-        expect(result.timeMetric).toEqual("days");
-        expect(result.count).toEqual(7);
-        expect(result.error).toEqual("");
-    });
+describe("getAskChannelStatsParameters - Valid, Default", () => {
+  test("default stats ask", async () => {
+    const ask = "ask channel stats";
 
-    test("one day", async () => {
-        const ask = "ask channel stats 1 day"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    // Check that we got the default - 7 days
+    verifyAskChannelParamsResult(result, "stats", "days", 7, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("days");
-        expect(result.count).toEqual(1);
-        expect(result.error).toEqual("");
-    });
+  test("default status ask", async () => {
+    const ask = "ask channel status";
 
-    test("one days", async () => {
-        const ask = "ask channel stats 1 days"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    // Check that we got the default - 7 days
+    verifyAskChannelParamsResult(result, "status", "days", 7, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("days");
-        expect(result.count).toEqual(1);
-        expect(result.error).toEqual("");
-    });
+  test("default summary ask", async () => {
+    const ask = "ask channel summary";
 
-    test("multiple days", async () => {
-        const ask = "ask channel stats 5 days"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    // Check that we got the default - 7 days
+    verifyAskChannelParamsResult(result, "summary", "days", 7, "", "");
+  });
+});
 
-        expect(result.timeMetric).toEqual("days");
-        expect(result.count).toEqual(5);
-        expect(result.error).toEqual("");
-    });
+describe("getAskChannelStatsParameters - Valid, dates", () => {
+  test("one days stats", async () => {
+    const ask = "ask channel stats 1 days";
 
-    test("multiple days, more than a month", async () => {
-        const ask = "ask channel stats 45 days"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    verifyAskChannelParamsResult(result, "stats", "days", 1, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("days");
-        expect(result.count).toEqual(45);
-        expect(result.error).toEqual("");
-    });
+  test("one day status", async () => {
+    const ask = "ask channel status 1 day";
 
-    test("one week", async () => {
-        const ask = "ask channel stats 1 week"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    verifyAskChannelParamsResult(result, "status", "days", 1, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("weeks");
-        expect(result.count).toEqual(1);
-        expect(result.error).toEqual("");
-    });
+  test("one day summary", async () => {
+    const ask = "ask channel summary 1 day";
 
-    test("one weeks", async () => {
-        const ask = "ask channel stats 1 weeks"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    verifyAskChannelParamsResult(result, "summary", "days", 1, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("weeks");
-        expect(result.count).toEqual(1);
-        expect(result.error).toEqual("");
-    });
+  test("multiple days stats", async () => {
+    const ask = "ask channel stats 5 days";
 
-    test("multiple weeks", async () => {
-        const ask = "ask channel stats 5 weeks"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    verifyAskChannelParamsResult(result, "stats", "days", 5, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("weeks");
-        expect(result.count).toEqual(5);
-        expect(result.error).toEqual("");
-    });
+  test("multiple days stats - group by", async () => {
+    const ask = "ask channel stats 5 days by days";
 
-    test("one month", async () => {
-        const ask = "ask channel stats 1 month"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    verifyAskChannelParamsResult(result, "stats", "days", 5, "days", "");
+  });
 
-        expect(result.timeMetric).toEqual("months");
-        expect(result.count).toEqual(1);
-        expect(result.error).toEqual("");
-    });
+  test("multiple days, more than a month stats", async () => {
+    const ask = "ask channel stats 45 days";
 
-    test("one months", async () => {
-        const ask = "ask channel stats 1 months"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    verifyAskChannelParamsResult(result, "stats", "days", 45, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("months");
-        expect(result.count).toEqual(1);
-        expect(result.error).toEqual("");
-    });
+  test("one weeks stats", async () => {
+    const ask = "ask channel stats 1 weeks";
 
-    test("multiple months", async () => {
-        const ask = "ask channel stats 2 months"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    verifyAskChannelParamsResult(result, "stats", "weeks", 1, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("months");
-        expect(result.count).toEqual(2);
-        expect(result.error).toEqual("");
-    });
+  test("one week status", async () => {
+    const ask = "ask channel status 1 week";
 
-    test("invalid time metric", async () => {
-        const ask = "ask channel stats 5 zigis"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    verifyAskChannelParamsResult(result, "status", "weeks", 1, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("");
-        expect(result.count).toEqual(-1);
-        expect(result.error).toEqual("Invalid type provided");
-    });
+  test("one week summary", async () => {
+    const ask = "ask channel summary 1 week";
 
-    test("missing time metric", async () => {
-        const ask = "ask channel stats 8"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    verifyAskChannelParamsResult(result, "summary", "weeks", 1, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("");
-        expect(result.count).toEqual(-1);
-        expect(result.error).toEqual("Not all params provided");
-    });
+  test("multiple weeks stats", async () => {
+    const ask = "ask channel stats 5 weeks";
 
-    test("invalid days", async () => {
-        const ask = "ask channel stats -5 days"
+    const result: AskChannelParams = getAskChannelParameters(ask);
 
-        const result : AskChannelStatsParams = getAskChannelStatsParameters(ask);
+    verifyAskChannelParamsResult(result, "stats", "weeks", 5, "", "");
+  });
 
-        expect(result.timeMetric).toEqual("");
-        expect(result.count).toEqual(-1);
-        expect(result.error).toEqual("Invalid count provided");
-    });
+  test("one month status", async () => {
+    const ask = "ask channel status 1 month";
+
+    const result: AskChannelParams = getAskChannelParameters(ask);
+
+    verifyAskChannelParamsResult(result, "status", "months", 1, "", "");
+  });
+
+  test("one month summary", async () => {
+    const ask = "ask channel summary 1 month";
+
+    const result: AskChannelParams = getAskChannelParameters(ask);
+
+    verifyAskChannelParamsResult(result, "summary", "months", 1, "", "");
+  });
+
+  test("multiple weeks stats - by weeks", async () => {
+    const ask = "ask channel stats 5 weeks by weeks";
+
+    const result: AskChannelParams = getAskChannelParameters(ask);
+
+    verifyAskChannelParamsResult(result, "stats", "weeks", 5, "weeks", "");
+  });
+
+  test("one months stats", async () => {
+    const ask = "ask channel stats 1 months";
+
+    const result: AskChannelParams = getAskChannelParameters(ask);
+
+    verifyAskChannelParamsResult(result, "stats", "months", 1, "", "");
+  });
+
+  test("multiple months stats", async () => {
+    const ask = "ask channel stats 2 months";
+
+    const result: AskChannelParams = getAskChannelParameters(ask);
+
+    verifyAskChannelParamsResult(result, "stats", "months", 2, "", "");
+  });
+
+  test("multiple months stats - group by", async () => {
+    const ask = "ask channel stats 2 months by months";
+
+    const result: AskChannelParams = getAskChannelParameters(ask);
+
+    verifyAskChannelParamsResult(result, "stats", "months", 2, "months", "");
+  });
+});
+
+describe("getAskChannelStatsParameters - Invalid", () => {
+  test("invalid action type metric", async () => {
+    const ask = "ask channel statszig 5 days";
+
+    const result: AskChannelParams = getAskChannelParameters(ask);
+    expect(result.actionType).toEqual("");
+    expect(result.timeMetric).toEqual("");
+    expect(result.count).toEqual(-1);
+    expect(result.error).toEqual("Invalid action type provided");
+  });
+
+  test("invalid time metric", async () => {
+    const ask = "ask channel stats 5 zigis";
+
+    const result: AskChannelParams = getAskChannelParameters(ask);
+    expect(result.actionType).toEqual("");
+    expect(result.timeMetric).toEqual("");
+    expect(result.count).toEqual(-1);
+    expect(result.error).toEqual("Invalid time metric provided");
+  });
+
+  test("missing time metric", async () => {
+    const ask = "ask channel stats 8";
+
+    const result: AskChannelParams = getAskChannelParameters(ask);
+    expect(result.actionType).toEqual("");
+    expect(result.timeMetric).toEqual("");
+    expect(result.count).toEqual(-1);
+    expect(result.error).toEqual("Not all params provided");
+  });
+
+  test("invalid days", async () => {
+    const ask = "ask channel stats -5 days";
+
+    const result: AskChannelParams = getAskChannelParameters(ask);
+    expect(result.actionType).toEqual("");
+    expect(result.timeMetric).toEqual("");
+    expect(result.count).toEqual(-1);
+    expect(result.error).toEqual("Invalid count provided");
+  });
 });
 
 // TODO: This doesn't work in CI, or in the bot, but tests are passing locally.
 //  (Date should be reset to Sunday but it actaully being reset to Monday, both in CI and in Heroku)
 describe("getStartingDate", () => {
-    test("one day", async () => {
-        MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
+  test("one day", async () => {
+    MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
-        const params : AskChannelStatsParams = new AskChannelStatsParams(1, 'days');
-        const result : Date = getStartingDate(params);
+    const params: AskChannelParams = new AskChannelParams(
+      "stats",
+      1,
+      "days",
+      ""
+    );
+    const result: Date = getStartingDate(params);
 
-        // Check that the start date is the beginning of this day
-        const expected : Date = new Date(1651708800000); // 05/05/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
+    // Check that the start date is the beginning of this day
+    const expected: Date = new Date(1651708800000); // 05/05/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
 
-        MockDate.reset();
-    });
+    MockDate.reset();
+  });
 
-    test("multiple days", async () => {
-        MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
+  test("multiple days", async () => {
+    MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
-        const params : AskChannelStatsParams = new AskChannelStatsParams(3, 'days');
-        const result : Date = getStartingDate(params);
+    const params: AskChannelParams = new AskChannelParams(
+      "stats",
+      3,
+      "days",
+      ""
+    );
+    const result: Date = getStartingDate(params);
 
-        // Check that the start date is the wanted date
-        const expected : Date = new Date(1651536000000); // 03/05/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
+    // Check that the start date is the wanted date
+    const expected: Date = new Date(1651536000000); // 03/05/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
 
-        MockDate.reset();
-    });
+    MockDate.reset();
+  });
 
-    test("multiple days - more than a week", async () => {
-        MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
+  test("multiple days - more than a week", async () => {
+    MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
-        const params : AskChannelStatsParams = new AskChannelStatsParams(8, 'days');
-        const result : Date = getStartingDate(params);
+    const params: AskChannelParams = new AskChannelParams(
+      "stats",
+      8,
+      "days",
+      ""
+    );
+    const result: Date = getStartingDate(params);
 
-        // Check that the start date is the wanted date
-        const expected : Date = new Date(1651104000000); // 28/04/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
+    // Check that the start date is the wanted date
+    const expected: Date = new Date(1651104000000); // 28/04/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
 
-        MockDate.reset();
-    });
+    MockDate.reset();
+  });
 
-    test.skip("one week", async () => {
-        MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
+  test.skip("one week", async () => {
+    MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
-        const params : AskChannelStatsParams = new AskChannelStatsParams(1, 'weeks');
-        const result : Date = getStartingDate(params);
+    const params: AskChannelParams = new AskChannelParams(
+      "stats",
+      1,
+      "weeks",
+      ""
+    );
+    const result: Date = getStartingDate(params);
 
-        // Check that the start date is the beginning of this week
-        const expected : Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
+    // Check that the start date is the beginning of this week
+    const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
 
-        MockDate.reset();
-    });
+    MockDate.reset();
+  });
 
-    test.skip("multiple weeks", async () => {
-        MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
+  test.skip("multiple weeks", async () => {
+    MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
-        const params : AskChannelStatsParams = new AskChannelStatsParams(2, 'weeks');
-        const result : Date = getStartingDate(params);
+    const params: AskChannelParams = new AskChannelParams(
+      "stats",
+      2,
+      "weeks",
+      ""
+    );
+    const result: Date = getStartingDate(params);
 
-        // Check that the start date is the beginning of the previous week
-        const expected : Date = new Date(1650758400000); // 24/04/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
+    // Check that the start date is the beginning of the previous week
+    const expected: Date = new Date(1650758400000); // 24/04/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
 
-        MockDate.reset();
-    });
+    MockDate.reset();
+  });
 
-    test.skip("multiple weeks - more than a month", async () => {
-        MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
+  test.skip("multiple weeks - more than a month", async () => {
+    MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
-        const params : AskChannelStatsParams = new AskChannelStatsParams(6, 'weeks');
-        const result : Date = getStartingDate(params);
+    const params: AskChannelParams = new AskChannelParams(
+      "stats",
+      6,
+      "weeks",
+      ""
+    );
+    const result: Date = getStartingDate(params);
 
-        // Check that the start date is the wanted date
-        const expected : Date = new Date(1648339200000); // 27/03/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
+    // Check that the start date is the wanted date
+    const expected: Date = new Date(1648339200000); // 27/03/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
 
-        MockDate.reset();
-    });
+    MockDate.reset();
+  });
 
-    test("one month", async () => {
-        MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
+  test("one month", async () => {
+    MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
-        const params : AskChannelStatsParams = new AskChannelStatsParams(1, 'month');
-        const result : Date = getStartingDate(params);
+    const params: AskChannelParams = new AskChannelParams(
+      "stats",
+      1,
+      "month",
+      ""
+    );
+    const result: Date = getStartingDate(params);
 
-        // Check that the start date is the beginning of this month
-        const expected : Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
+    // Check that the start date is the beginning of this month
+    const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
 
-        MockDate.reset();
-    });
+    MockDate.reset();
+  });
 
-    test("multiple months", async () => {
-        MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
+  test("multiple months", async () => {
+    MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
-        const params : AskChannelStatsParams = new AskChannelStatsParams(3, 'month');
-        const result : Date = getStartingDate(params);
+    const params: AskChannelParams = new AskChannelParams(
+      "stats",
+      3,
+      "month",
+      ""
+    );
+    const result: Date = getStartingDate(params);
 
-        // Check that the start date is the beginning of the wanted month
-        const expected : Date = new Date(1646092800000); // 01/03/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
+    // Check that the start date is the beginning of the wanted month
+    const expected: Date = new Date(1646092800000); // 01/03/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
 
-        MockDate.reset();
-    });
+    MockDate.reset();
+  });
 
-    test("multiple months - more than a year", async () => {
-        MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
+  test("multiple months - more than a year", async () => {
+    MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
-        const params : AskChannelStatsParams = new AskChannelStatsParams(14, 'month');
-        const result : Date = getStartingDate(params);
+    const params: AskChannelParams = new AskChannelParams(
+      "stats",
+      14,
+      "month",
+      ""
+    );
+    const result: Date = getStartingDate(params);
 
-        // Check that the start date is the wanted date
-        const expected : Date = new Date(1617235200000); // 01/04/2021 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
+    // Check that the start date is the wanted date
+    const expected: Date = new Date(1617235200000); // 01/04/2021 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
 
-        MockDate.reset();
-    });
+    MockDate.reset();
+  });
 });
 
-
 // TODO: This doesn't work in CI, or in the bot, but tests are passing locally.
-//  (Date should be reset to Sunday but it actaully being reset to Monday, both in CI and in Heroku)
+//  (Date should be reset to Sunday but it actually being reset to Monday, both in CI and in Heroku)
 describe("setDateToSunday", () => {
-    test("Sunday is same day", async () => {
-        const inputDate : Date = new Date(1651438799000); // 01/05/2022 20:16:40 UTC
+  test("Sunday is same day", async () => {
+    const inputDate: Date = new Date(1651438799000); // 01/05/2022 20:16:40 UTC
 
-        const result : Date = setDateToSunday(inputDate);
+    const result: Date = setDateToSunday(inputDate);
 
-        const expected : Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
-    });
+    const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
+  });
 
-    test.skip("Middle of the week", async () => {
-        const inputDate : Date = new Date(1651611599000); // 03/05/2022 20:59:59 UTC
+  test.skip("Middle of the week", async () => {
+    const inputDate: Date = new Date(1651611599000); // 03/05/2022 20:59:59 UTC
 
-        const result : Date = setDateToSunday(inputDate);
+    const result: Date = setDateToSunday(inputDate);
 
-        const expected : Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
-    });
+    const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
+  });
 
-    test.skip("Saturday night", async () => {
-        const inputDate : Date = new Date(1651957199000); // 07/05/2022 20:59:59 UTC
+  test.skip("Saturday night", async () => {
+    const inputDate: Date = new Date(1651957199000); // 07/05/2022 20:59:59 UTC
 
-        const result : Date = setDateToSunday(inputDate);
+    const result: Date = setDateToSunday(inputDate);
 
-        const expected : Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
-        expect(result.getTime()).toEqual(expected.getTime());
-    });
-})
+    const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
+    expect(result.getTime()).toEqual(expected.getTime());
+  });
+});

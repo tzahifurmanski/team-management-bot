@@ -1,8 +1,7 @@
 import { BotAction } from "../base_action";
 import { Compliment } from "./compliment";
 import { IntroduceYourself } from "./introduce_yourself";
-import { AskChannelStatus } from "./ask_channel_status";
-import { AskChannelStats } from "./ask_channel_stats";
+import { AskChannelStatusStatsOrSummary } from "./ask_channel_status_stats_or_summary";
 import { MeaningOfLife } from "./meaning_of_life";
 import { GroupAskChannelMonthlyStats } from "./group_ask_channel_monthly_stats";
 import { MonitoredChannelSummaryStats } from "./monitored_channel_stats";
@@ -12,10 +11,9 @@ import { Help } from "./help";
 import { Status } from "./status";
 
 const helpCommand = new Help();
-const ACTIONS_LIST : BotAction[] = [
+const ACTIONS_LIST: BotAction[] = [
   new AskChannelStatusForYesterday(),
-  new AskChannelStatus(),
-  new AskChannelStats(),
+  new AskChannelStatusStatsOrSummary(),
   new GroupAskChannelMonthlyStats(),
   new OncallTicketsStatus(),
   new MonitoredChannelSummaryStats(),
@@ -24,22 +22,19 @@ const ACTIONS_LIST : BotAction[] = [
   new Status(),
   helpCommand,
   new IntroduceYourself(),
-  ];
+];
 
-export let ASKS_ACTIONS: BotAction[] = [];
+export const ASKS_ACTIONS: BotAction[] = [];
 
 console.log("Loading actions list...");
-ACTIONS_LIST.forEach( (action) => {
-  if(action.isEnabled())
-  {
+ACTIONS_LIST.forEach((action) => {
+  if (action.isEnabled()) {
     ASKS_ACTIONS.push(action);
-    console.log(`* '${action.constructor.name}' action is enabled.`)
+    console.log(`* '${action.constructor.name}' action is enabled.`);
+  } else {
+    console.log(`* '${action.constructor.name}' action is skipped.`);
   }
-  else
-  {
-    console.log(`* '${action.constructor.name}' action is skipped.`)
-  }
-})
+});
 console.log("Actions list loading is complete.");
 
 helpCommand.setActionsList(ASKS_ACTIONS);
