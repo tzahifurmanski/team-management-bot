@@ -18,20 +18,17 @@ import { ONCALL_TICKETS_STATS_CRON } from "../../consts";
 import { getOncallTicketsStatus } from "../../logic/cron_jobs";
 
 import cronstrue from "cronstrue";
-
-const cron = require("node-cron");
+import { scheduleCron } from "../utils";
 
 export class OncallTicketsStatus implements BotAction {
   constructor() {
-    if (this.isEnabled() && ONCALL_TICKETS_STATS_CRON) {
-      console.log(
-        `Setting up a cron to update on oncall tickets stats (cron:  ${ONCALL_TICKETS_STATS_CRON}, ${cronstrue.toString(
-          ONCALL_TICKETS_STATS_CRON
-        )}).`
+    if (this.isEnabled()) {
+      scheduleCron(
+        !!ONCALL_TICKETS_STATS_CRON,
+        "update on oncall tickets status",
+        ONCALL_TICKETS_STATS_CRON,
+        getOncallTicketsStatus
       );
-      cron.schedule(ONCALL_TICKETS_STATS_CRON, () => {
-        getOncallTicketsStatus();
-      });
     }
   }
 

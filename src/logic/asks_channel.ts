@@ -109,7 +109,8 @@ export const getStatsForMessages = (
 
 // TODO: Add a check that if the end date is after now, return now as the end date (as it's irrelevant)
 export const getBucketRange = (messageDate: Date, type: string): Date[] => {
-  if (type === "week") {
+  console.log(messageDate);
+  if (type === "weeks") {
     // Build the starting and end dates for the bucket
     const weekStartDate = new Date(messageDate.getTime());
     setDateToSunday(weekStartDate);
@@ -119,20 +120,18 @@ export const getBucketRange = (messageDate: Date, type: string): Date[] => {
     weekEndDate.setDate(weekEndDate.getDate() + 7);
 
     return [weekStartDate, weekEndDate];
-  } else if (type === "month") {
+  } else if (type === "months") {
     const dayStartDate = new Date(
       Date.UTC(messageDate.getFullYear(), messageDate.getMonth(), 1)
     );
 
     const tempDate = new Date(
-      messageDate.getFullYear(),
-      messageDate.getMonth() + 1,
-      1
+      Date.UTC(messageDate.getFullYear(), messageDate.getMonth() + 1, 1)
     );
     const dayEndDate = new Date(tempDate.getTime() - 1);
 
     return [dayStartDate, dayEndDate];
-  } else if (type === "day") {
+  } else if (type === "days") {
     // Build the starting and end dates for the bucket
     const dayStartDate = new Date(messageDate.getTime());
     removeTimeInfoFromDate(dayStartDate);
@@ -148,8 +147,8 @@ export const getBucketRange = (messageDate: Date, type: string): Date[] => {
 
 export const getStatsBuckets = async (
   messages: any[],
-  type: string,
-  channelId: string = TEAM_ASK_CHANNEL_ID // This can either bet 'week' or 'day'. This is the variable by which we're going to 'group by' the buckets
+  type: string, // This can either be 'days', 'weeks', or 'months'. This is the variable by which we're going to 'group by' the buckets
+  channelId: string = TEAM_ASK_CHANNEL_ID
 ): Promise<AsksChannelStatsResult[]> => {
   const buckets = new Map<string, any[]>();
   const bucketsRanges: any = {};
@@ -265,6 +264,11 @@ export const reportStatsToSlack = async (
       stats.messages
     );
 
+    reportMessageBlocks.push(
+      createSectionBlock(
+        `Between ${stats.startDateInUTC} and ${stats.endDateInUTC}:`
+      )
+    );
     reportMessageBlocks.push(
       ...createReportSection(results.statsByTeam, "Team")
     );

@@ -1,5 +1,5 @@
 import { BotAction } from "../base_action";
-import { removeTimeInfoFromDate } from "../utils";
+import { removeTimeInfoFromDate, scheduleCron } from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -24,35 +24,26 @@ import {
   postWeeklyLeadsStats,
 } from "../../logic/cron_jobs";
 
-const cron = require("node-cron");
-
 export class AskChannelStatusForYesterday implements BotAction {
   constructor() {
     if (this.isEnabled()) {
-      if (ASK_CHANNEL_STATS_CRON) {
-        console.log(
-          `Setting up a cron to update on ask channel stats (cron: ${ASK_CHANNEL_STATS_CRON}, ${cronstrue.toString(
-            ASK_CHANNEL_STATS_CRON
-          )})`
-        );
-        cron.schedule(ASK_CHANNEL_STATS_CRON, () => {
-          // TODO: Replace this and the implementation of this file to use one implementation
-          getAskChannelStatsForYesterday();
-        });
-      }
+      // TODO: Replace this and the implementation of this file to use one implementation
+      scheduleCron(
+        !!ASK_CHANNEL_STATS_CRON,
+        "update on ask channel stats",
+        ASK_CHANNEL_STATS_CRON,
+        getAskChannelStatsForYesterday
+      );
 
-      if (
-        LEADS_SUMMARY_CRON &&
-        (LEADS_SUMMARY_CHANNEL_ID || LEADS_SUMMARY_CHANNEL_NAME)
-      ) {
-        console.log(
-          `Setting up a cron to post a leads summary (cron:  ${LEADS_SUMMARY_CRON}).`
-        );
-
-        cron.schedule(LEADS_SUMMARY_CRON, () => {
-          postWeeklyLeadsStats();
-        });
-      }
+      scheduleCron(
+        !!(
+          LEADS_SUMMARY_CRON &&
+          (LEADS_SUMMARY_CHANNEL_ID || LEADS_SUMMARY_CHANNEL_NAME)
+        ),
+        "post a leads summary",
+        LEADS_SUMMARY_CRON,
+        postWeeklyLeadsStats
+      );
     }
   }
 
@@ -147,6 +138,8 @@ export class AskChannelStatusForYesterday implements BotAction {
       monthStats,
       event.channel,
       event.thread_ts,
+      false,
+      true,
       false
     );
   }

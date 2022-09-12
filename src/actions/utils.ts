@@ -1,3 +1,7 @@
+import cronstrue from "cronstrue";
+
+const cron = require("node-cron");
+
 export const getRandomFromArray = (array: any[]) => {
   const random = Math.floor(Math.random() * array.length);
   return array[random];
@@ -27,81 +31,137 @@ export const setDateToSunday = (date: Date): Date => {
   return date;
 };
 
-
-export class AskChannelStatsParams {
-  constructor(public count: number, public timeMetric: string, public error?: string) {}
+export class AskChannelParams {
+  constructor(
+    public actionType: string,
+    public count: number,
+    public timeMetric: string,
+    public groupBy: string,
+    public error?: string
+  ) {}
 }
 
-export const getAskChannelStatsParameters = (ask: string): AskChannelStatsParams => {
+export const getAskChannelParameters = (ask: string): AskChannelParams => {
   // Check that we got enough params
   const askArray = ask.split(" ");
+  let actionType;
+  let groupBy;
   let timeMetric;
   let count;
 
-  // Verify we got exactly 5 params - 'ask channel stats <COUNT> <TIME_PERIOD>'
-  if(askArray.length === 5) {
+  // Verify we got exactly 7 params - 'ask channel stats/status <COUNT> <TIME_PERIOD>' by days/weeks/months
+  if (askArray.length === 7) {
     // Get values from params
+    actionType = askArray[2];
     count = askArray[3];
     timeMetric = askArray[4];
+    groupBy = askArray[6];
   }
-  else
-  {
-    // Check if we got the default version of 'ask channel stats'
-    if(askArray.length === 3) {
-      // Use defaults - 7 days
-      timeMetric = 'days';
-      count = 7;
-    }
-    else {
-      return new AskChannelStatsParams(-1, "", "Not all params provided");
-    }
+  // Verify we got exactly 5 params - 'ask channel stats/status <COUNT> <TIME_PERIOD>'
+  else if (askArray.length === 5) {
+    // Get values from params
+    actionType = askArray[2];
+    count = askArray[3];
+    timeMetric = askArray[4];
+    groupBy = "";
+  }
+  // Check if we got the default version of 'ask channel stats'
+  else if (askArray.length === 3) {
+    // Use defaults - 7 days
+    actionType = askArray[2];
+    timeMetric = "days";
+    count = 7;
+    groupBy = "";
+  } else {
+    return new AskChannelParams("", -1, "", "", "Not all params provided");
+  }
+
+  // Validate the action type
+  if (!["stats", "status", "summary"].includes(actionType)) {
+    // Return error
+    return new AskChannelParams("", -1, "", "", "Invalid action type provided");
   }
 
   // Validate the number of days
   if (Number(count) === undefined || Number(count) < 1) {
-    return new AskChannelStatsParams(-1, "", "Invalid count provided");
+    return new AskChannelParams("", -1, "", "", "Invalid count provided");
   }
 
   // If the user has supplied a singular criteria, change it to plural
-  if(Number(count) === 1 && ['day', 'week', 'month'].includes(timeMetric)) {
+  if (Number(count) === 1 && ["day", "week", "month"].includes(timeMetric)) {
     timeMetric += "s";
   }
-  if(!['days', 'weeks', 'months'].includes(timeMetric)) {
+
+  if (!["days", "weeks", "months"].includes(timeMetric)) {
     // Return error
-    return new AskChannelStatsParams(-1, "", "Invalid type provided");
+    return new AskChannelParams("", -1, "", "", "Invalid time metric provided");
   }
 
-  return new AskChannelStatsParams(Number(count), timeMetric, "");
-}
+  if (groupBy && !["days", "weeks", "months"].includes(groupBy)) {
+    // Return error
+    return new AskChannelParams(
+      "",
+      -1,
+      "",
+      "",
+      "Invalid group by clause provided"
+    );
+  }
 
-export const getStartingDate = (params: AskChannelStatsParams) : Date => {
+  return new AskChannelParams(
+    actionType,
+    Number(count),
+    timeMetric,
+    groupBy,
+    ""
+  );
+};
+
+export const getStartingDate = (params: AskChannelParams): Date => {
   // How to calculate:
   // For days - count backwards from today
   // For weeks - count backwards from the beginning of the week
   // For months - count backwards from the beginning of the month
   let startingDate;
 
-  const adjustedCount = params.count - 1 // Remove 1 from the number of requested count,
+  const adjustedCount = params.count - 1; // Remove 1 from the number of requested count,
   // so '1' will be treated as 'this' (AKA '1 day' will be beginning of today, '1 week' will be beginning of this week,
   // and '1 month' will be beginning of this month)
 
   // Get the starting date - Days
-  if(params.timeMetric === 'days') {
+  if (params.timeMetric === "days") {
     startingDate = new Date();
     startingDate.setDate(startingDate.getDate() - adjustedCount);
     removeTimeInfoFromDate(startingDate);
-  }
-  else if(params.timeMetric === 'weeks')
-  {
+  } else if (params.timeMetric === "weeks") {
     startingDate = setDateToSunday(new Date());
     startingDate.setDate(startingDate.getDate() - 7 * adjustedCount);
     removeTimeInfoFromDate(startingDate);
-  }
-  else {
+  } else {
     // Get the timeframe for the beginning of the month
     const date = new Date();
-    startingDate = new Date(Date.UTC(date.getFullYear(), date.getMonth() - adjustedCount, 1, 0));
+    startingDate = new Date(
+      Date.UTC(date.getFullYear(), date.getMonth() - adjustedCount, 1, 0)
+    );
   }
 
   return startingDate;
-}
+};
+
+export const scheduleCron = (
+  condition: boolean,
+  description: string,
+  cronExpression: string,
+  functionToSchedule: any
+) => {
+  if (condition) {
+    console.log(
+      `Setting up a cron to ${description} (cron: ${cronExpression}, ${cronstrue.toString(
+        cronExpression
+      )})`
+    );
+    cron.schedule(cronExpression, () => {
+      functionToSchedule();
+    });
+  }
+};
