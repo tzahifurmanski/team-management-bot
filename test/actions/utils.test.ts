@@ -6,8 +6,6 @@ import {
 } from "../../src/actions/utils";
 import * as MockDate from "mockdate";
 
-console.log(new Date().toUTCString());
-
 const verifyAskChannelParamsResult = (
   result: AskChannelParams,
   actionType: string,

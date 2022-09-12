@@ -1,5 +1,5 @@
 // This is a util function that is able to look for the ID of a conversation / channel by name
-import { BOT_ID } from "./consts";
+import { ALLOWED_BOTS, BOT_ID } from "./consts";
 import {
   ConversationsHistoryArguments,
   ConversationsHistoryResponse,
@@ -119,12 +119,23 @@ export const shouldMessageBeSkipped = (message: any) => {
     message.text.includes(`<@${BOT_ID}>`) || // Skip any messages that refer the bot
     (message.subtype && message.subtype !== "bot_message") || // Skip any message that has a subtype, that is not a bot (We filter the bot later)
     // TODO: Extract the 'Snyk Support' to an env var
-    ((message.bot_id || message.subtype) &&
-      !(message.username && message.username === "Snyk Support")) // Skip all bot_message except for messages from Snyk Support bot
+    !isBotAllowed(message, ALLOWED_BOTS)
   );
 };
 export const getBotId = async (slackClient: any) => {
   // This can also return response.user with the bot username
   const response = await slackClient.auth.test();
   return response?.user_id;
+};
+
+// Skip all bot_message except for messages from allowed bots
+export const isBotAllowed = (
+  message: any,
+  allowedBotsList: string[]
+): boolean => {
+  return (
+    (message.bot_id || message.subtype) &&
+    message.username &&
+    allowedBotsList.includes(message.username)
+  );
 };
