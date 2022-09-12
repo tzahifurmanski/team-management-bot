@@ -21,6 +21,9 @@ export let BOT_ID: string;
 export let TEAM_ASK_CHANNEL_ID: string = process.env.TEAM_ASK_CHANNEL_ID || "";
 const TEAM_ASK_CHANNEL_NAME: string = process.env.TEAM_ASK_CHANNEL_NAME || "";
 
+const allowedBots = process.env.ALLOWED_BOTS || "";
+export const ALLOWED_BOTS: string[] = allowedBots.split(",");
+
 // User profile field ids
 export const USER_PROFILE_FIELD_ID_TEAM =
   process.env.USER_PROFILE_FIELD_ID_TEAM || "";
