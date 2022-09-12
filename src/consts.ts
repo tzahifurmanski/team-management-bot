@@ -55,10 +55,8 @@ const botResponsesChannels = process.env.BOT_RESPONSES_CHANNELS || "";
 export const BOT_RESPONSES_CHANNELS: string[] = botResponsesChannels.split(",");
 
 // Scheduling Configurations
-export const ASK_CHANNEL_STATS_CRON =
-  process.env.ASK_CHANNEL_STATS_CRON || "30 08 * * 0-5";
-export const LEADS_SUMMARY_CRON =
-  process.env.LEADS_SUMMARY_CRON || "0 12 * * 2";
+export const ASK_CHANNEL_STATS_CRON = process.env.ASK_CHANNEL_STATS_CRON || "";
+export const LEADS_SUMMARY_CRON = process.env.LEADS_SUMMARY_CRON || "";
 export const ONCALL_TICKETS_STATS_CRON =
   process.env.ONCALL_TICKETS_STATS_CRON || "";
 
