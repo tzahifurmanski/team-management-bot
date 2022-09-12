@@ -41,6 +41,7 @@ export class AskChannelParams {
   ) {}
 }
 
+// TODO: Refactor this to be cleaner
 export const getAskChannelParameters = (ask: string): AskChannelParams => {
   // Check that we got enough params
   const askArray = ask.split(" ");
@@ -61,9 +62,17 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
   else if (askArray.length === 5) {
     // Get values from params
     actionType = askArray[2];
-    count = askArray[3];
-    timeMetric = askArray[4];
-    groupBy = "";
+
+    // Check if we got 'ask channel stats/status by days/weeks/months' format
+    if (askArray[3] === "by") {
+      timeMetric = "days";
+      count = 7;
+      groupBy = askArray[4];
+    } else {
+      count = askArray[3];
+      timeMetric = askArray[4];
+      groupBy = "";
+    }
   }
   // Check if we got the default version of 'ask channel stats'
   else if (askArray.length === 3) {

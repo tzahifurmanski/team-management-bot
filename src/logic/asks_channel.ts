@@ -7,6 +7,7 @@ import {
 } from "../integrations/slack/consts";
 import {
   createDivider,
+  createImageBlock,
   createSectionBlock,
   getMessagePermalink,
   sendSlackMessage,
@@ -291,6 +292,54 @@ export const reportStatsToSlack = async (
       reportMessageBlocks
     );
   }
+};
+
+export const reportChartToSlack = async (
+  slackClient: any,
+  statsArray: AsksChannelStatsResult[],
+  destinationChannel: any,
+  destinationThreadTS: any
+) => {
+  const chart: any = {
+    type: "bar",
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: "Total",
+          data: [],
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          anchor: "end",
+          align: "top",
+          color: "#fff",
+          backgroundColor: "rgba(34, 139, 34, 0.6)",
+          borderColor: "rgba(34, 139, 34, 1.0)",
+          borderRadius: 10,
+        },
+      },
+    },
+  };
+
+  // Reverse the ordering of this array so it'll be time sorted
+  for (const stats of statsArray.reverse()) {
+    chart.data.labels.push(new Date(stats.startDateInUTC).toDateString());
+    chart.data.datasets[0].data.push(stats.totalMessages);
+  }
+  const encodedChart = encodeURIComponent(JSON.stringify(chart));
+  const chartImageURL = `https://quickchart.io/chart?c=${encodedChart}`;
+
+  await sendSlackMessage(
+    slackClient,
+    `Asks origin report`,
+    destinationChannel,
+    destinationThreadTS,
+    [createImageBlock("Asks Distribution", chartImageURL, "Asks Distribution")]
+  );
 };
 
 // This method gets a list of messages and creates a permalink string for displaying the message.
