@@ -48,6 +48,8 @@ export const ENABLE_BOT_RESPONSES =
   (process.env.ENABLE_BOT_RESPONSES &&
     process.env.ENABLE_BOT_RESPONSES.toLowerCase() === "true") ||
   false;
+const disabledResponsesParam = process.env.DISABLED_RESPONSES || "";
+export const DISABLED_RESPONSES: string[] = disabledResponsesParam.split(",");
 
 // Scheduling Configurations
 export const ASK_CHANNEL_STATS_CRON =
