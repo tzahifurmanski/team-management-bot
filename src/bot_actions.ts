@@ -1,15 +1,15 @@
 import { BotAction } from "./actions/base_action";
 import { ASKS_ACTIONS } from "./actions/asks";
 import { RESPONSE_ACTIONS } from "./actions/responses";
-import { TEAM_CODE_REVIEW_CHANNEL_ID } from "./integrations/slack/consts";
 import { sendSlackMessage } from "./integrations/slack/messages";
 import { sendGenericError } from "./integrations/slack/utils";
+import { BOT_RESPONSES_CHANNELS } from "./consts";
 
 // This method handles events that are posted directly inside a channel
 export const handleChannelEvent = async (event: any, client: any) => {
   // Limit this functionality to specific channels (otherwise we'll spam tons of channels)
-  if (event.channel !== TEAM_CODE_REVIEW_CHANNEL_ID) {
-    // console.log("We only want to reply in the chatter or code review channels");
+  if (!(event.channel in BOT_RESPONSES_CHANNELS)) {
+    // console.log("Message identified in a none supported channel. We only want to monitor specific channels for reactions.");
     return;
   }
 

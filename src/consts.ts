@@ -51,6 +51,9 @@ export const ENABLE_BOT_RESPONSES =
 const disabledResponsesParam = process.env.DISABLED_RESPONSES || "";
 export const DISABLED_RESPONSES: string[] = disabledResponsesParam.split(",");
 
+const botResponsesChannels = process.env.BOT_RESPONSES_CHANNELS || "";
+export const BOT_RESPONSES_CHANNELS: string[] = botResponsesChannels.split(",");
+
 // Scheduling Configurations
 export const ASK_CHANNEL_STATS_CRON =
   process.env.ASK_CHANNEL_STATS_CRON || "30 08 * * 0-5";
