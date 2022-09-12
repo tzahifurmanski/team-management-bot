@@ -3,13 +3,13 @@ import {
   ChatGetPermalinkArguments,
   ChatPostMessageArguments,
   ChatPostMessageResponse,
-  ContextBlock,
   SectionBlock,
 } from "@slack/web-api";
 
 import { Block, DividerBlock, KnownBlock, MrkdwnElement } from "@slack/types";
 import { BOT_ID, SLACK_USER_FORMAT } from "./consts";
 import { botConfig } from "../../consts";
+import { ImageBlock } from "@slack/bolt";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
@@ -102,32 +102,26 @@ export const createDivider = (): DividerBlock => ({
   type: "divider",
 });
 
-export const createButton = (
-  text: string,
-  url: string,
-  value?: string
-): Button => ({
-  type: "button",
-  text: {
-    type: "plain_text",
-    text,
-    emoji: true,
-  },
-  value,
-  url,
-  action_id: "button-action",
-  // }
-});
+export const createImageBlock = (
+  alt_text: string,
+  image_url: string,
+  title?: string
+): ImageBlock => {
+  const section: ImageBlock = {
+    type: "image",
+    image_url,
+    alt_text,
+  };
 
-export const createContext = (text: string): ContextBlock => ({
-  type: "context",
-  elements: [
-    {
+  if (title) {
+    section.title = {
       type: "plain_text",
-      text,
-    },
-  ],
-});
+      text: title,
+    };
+  }
+
+  return section;
+};
 
 export const getUserIDInText = (text: string) => {
   // Remove the bot id and look for other slack users

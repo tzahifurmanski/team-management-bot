@@ -9,6 +9,7 @@ import {
   getChannelMessages,
   getStatsBuckets,
   getStatsForMessages,
+  reportChartToSlack,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
@@ -184,6 +185,17 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
         includeAsks,
         includeReport
       );
+    }
+
+    if (params.actionType === "summary") {
+      await reportChartToSlack(
+        slackClient,
+        statsArray,
+        event.channel,
+        event.thread_ts
+      );
+
+      // TODO: Add a total message
     }
 
     console.log("Done handling a group by request..");
