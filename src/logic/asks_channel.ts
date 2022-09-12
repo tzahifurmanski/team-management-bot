@@ -194,6 +194,13 @@ export const getStatsBuckets = async (
     results.push(stats);
   }
 
+  // Sort the results by start time
+  results.sort(function (a, b) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return new Date(b.startDateInUTC) - new Date(a.startDateInUTC);
+  });
+
   return results;
 };
 
@@ -325,7 +332,6 @@ export const reportChartToSlack = async (
     },
   };
 
-  // Reverse the ordering of this array so it'll be time sorted
   for (const stats of statsArray.reverse()) {
     chart.data.labels.push(new Date(stats.startDateInUTC).toDateString());
     chart.data.datasets[0].data.push(stats.totalMessages);
