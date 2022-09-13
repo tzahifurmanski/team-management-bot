@@ -7,6 +7,11 @@ import { Help } from "./help";
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
 export class IntroduceYourself implements BotAction {
+  private helpCommand: Help;
+
+  constructor(helpCommand: Help) {
+    this.helpCommand = helpCommand;
+  }
   getHelpText(): string {
     return "`introduce yourself` - Introduce the bot and it's capabilities";
   }
@@ -80,7 +85,7 @@ export class IntroduceYourself implements BotAction {
       event.channel,
       result.ts
     );
-    await new Help().performAction(
+    await this.helpCommand.performAction(
       { ...event, thread_ts: result.ts },
       slackClient
     );

@@ -21,7 +21,7 @@ const ACTIONS_LIST: BotAction[] = [
   new MeaningOfLife(),
   new Status(),
   helpCommand,
-  new IntroduceYourself(),
+  new IntroduceYourself(helpCommand),
 ];
 
 export const ASKS_ACTIONS: BotAction[] = [];
