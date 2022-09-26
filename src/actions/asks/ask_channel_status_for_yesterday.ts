@@ -7,42 +7,27 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import {
-  LEADS_SUMMARY_CHANNEL_ID,
-  LEADS_SUMMARY_CHANNEL_NAME,
+  SlackWebClient,
   TEAM_ASK_CHANNEL_ID,
 } from "../../integrations/slack/consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
-import {
-  ASK_CHANNEL_STATS_CRON,
-  LEADS_SUMMARY_CRON,
-  TEAM_FOLKS,
-} from "../../consts";
+import { ASK_CHANNEL_STATS_CRON, TEAM_FOLKS } from "../../consts";
 import cronstrue from "cronstrue";
-import {
-  getAskChannelStatsForYesterday,
-  postWeeklyLeadsStats,
-} from "../../logic/cron_jobs";
 
 export class AskChannelStatusForYesterday implements BotAction {
   constructor() {
     if (this.isEnabled()) {
-      // TODO: Replace this and the implementation of this file to use one implementation
       scheduleCron(
         !!ASK_CHANNEL_STATS_CRON,
         "update on ask channel stats",
         ASK_CHANNEL_STATS_CRON,
-        getAskChannelStatsForYesterday
-      );
-
-      scheduleCron(
-        !!(
-          LEADS_SUMMARY_CRON &&
-          (LEADS_SUMMARY_CHANNEL_ID || LEADS_SUMMARY_CHANNEL_NAME)
-        ),
-        "post a leads summary",
-        LEADS_SUMMARY_CRON,
-        postWeeklyLeadsStats
+        this.getAskChannelStatsForYesterday,
+        {
+          channel: TEAM_ASK_CHANNEL_ID,
+          thread_ts: "",
+        },
+        SlackWebClient
       );
     }
   }
@@ -70,6 +55,13 @@ export class AskChannelStatusForYesterday implements BotAction {
   }
 
   async performAction(event: any, slackClient: any): Promise<void> {
+    await this.getAskChannelStatsForYesterday(event, slackClient);
+  }
+
+  async getAskChannelStatsForYesterday(
+    event: any,
+    slackClient: any
+  ): Promise<void> {
     console.log("Posting the daily asks channel stats summary");
 
     // Set the timeframe range to be yesterday

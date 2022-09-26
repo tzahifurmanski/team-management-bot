@@ -3,6 +3,8 @@ import {
   AskChannelParams,
   getAskChannelParameters,
   getStartingDate,
+  removeTimeInfoFromDate,
+  scheduleCron,
 } from "../utils";
 import {
   AsksChannelStatsResult,
@@ -12,13 +14,40 @@ import {
   reportChartToSlack,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
-import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
+import {
+  LEADS_SUMMARY_CHANNEL_ID,
+  LEADS_SUMMARY_CHANNEL_NAME,
+  SlackWebClient,
+  TEAM_ASK_CHANNEL_ID,
+} from "../../integrations/slack/consts";
 import {
   sanitizeCommandInput,
   sendGenericError,
 } from "../../integrations/slack/utils";
+import { LEADS_SUMMARY_CRON, TEAM_NAME } from "../../consts";
+import { sendSlackMessage } from "../../integrations/slack/messages";
 
 export class AskChannelStatusStatsOrSummary implements BotAction {
+  constructor() {
+    if (this.isEnabled()) {
+      // Manually run the Get Channel stats for Yesterday action
+      scheduleCron(
+        !!(
+          LEADS_SUMMARY_CRON &&
+          (LEADS_SUMMARY_CHANNEL_ID || LEADS_SUMMARY_CHANNEL_NAME)
+        ),
+        "post a leads summary",
+        LEADS_SUMMARY_CRON,
+        this.postWeeklyLeadsStats,
+        {
+          channel: LEADS_SUMMARY_CHANNEL_ID,
+          thread_ts: "",
+        },
+        SlackWebClient
+      );
+    }
+  }
+
   getHelpText(): string {
     return (
       "`ask channel stats` - Get statistics on the requests in your team ask channel.\n" +
@@ -199,5 +228,37 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     }
 
     console.log("Done handling a group by request..");
+  }
+
+  async postWeeklyLeadsStats(event: any, slackClient: any): Promise<void> {
+    console.log("Posting the weekly leads asks channel stats summary");
+
+    // Get the timeframe for the last 7 days
+    const DAYS_BACK = 7;
+    const startTimeframe = new Date(
+      new Date().getTime() - DAYS_BACK * 24 * 60 * 60 * 1000
+    );
+    removeTimeInfoFromDate(startTimeframe);
+
+    const tempDate = new Date();
+    removeTimeInfoFromDate(tempDate);
+    const endingDate = new Date(tempDate.getTime() - 1);
+
+    const monthMessages: any[any] = await getChannelMessages(
+      slackClient,
+      startTimeframe
+    );
+    const monthStats: AsksChannelStatsResult = await getStatsForMessages(
+      TEAM_ASK_CHANNEL_ID,
+      monthMessages,
+      startTimeframe.toUTCString(),
+      endingDate.toUTCString()
+    );
+    await sendSlackMessage(
+      SlackWebClient,
+      `Good morning ${TEAM_NAME} leads :sunny:\nIn the previous ${DAYS_BACK} days, team ${TEAM_NAME} had a *total of ${monthStats.totalMessages} asks*. Out of those, *${monthStats.totalNumProcessed} were answered*, *${monthStats.totalNumInProgress} are in progress*, and *${monthStats.totalNumUnchecked} were not handled*.`,
+      event.channel,
+      event.thread_ts
+    );
   }
 }

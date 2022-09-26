@@ -19,8 +19,8 @@ export class IThinkResponse implements BotAction {
 
   doesMatch(event: any): boolean {
     return (
-      event.text.toLowerCase().includes("I think") ||
-      event.text.toLowerCase().includes("I don't think")
+      event.text.toLowerCase().includes("i think") ||
+      event.text.toLowerCase().includes("i don't think")
     );
   }
 
