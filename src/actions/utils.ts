@@ -169,16 +169,12 @@ export const scheduleCron = (
     console.log(
       `Setting up a cron to ${description} (cron: ${cronExpression}, ${cronstrue.toString(
         cronExpression
-      )})`
+      )}.)`
     );
     cron.schedule(cronExpression, () => {
       functionToSchedule(event, slackClient);
     });
   } else {
-    console.log(
-      `Skipping on setting up a cron to ${description} (cron: ${cronExpression}, ${cronstrue.toString(
-        cronExpression
-      )})`
-    );
+    console.log(`Skipping on setting up a cron to ${description}.`);
   }
 };
