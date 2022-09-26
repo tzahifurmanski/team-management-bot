@@ -231,6 +231,11 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
   }
 
   async postWeeklyLeadsStats(event: any, slackClient: any): Promise<void> {
+    // TODO: Temporary fix. If client is null, get it again from consts.
+    if (!slackClient) {
+      slackClient = SlackWebClient;
+    }
+
     console.log("Posting the weekly leads asks channel stats summary");
 
     // Get the timeframe for the last 7 days

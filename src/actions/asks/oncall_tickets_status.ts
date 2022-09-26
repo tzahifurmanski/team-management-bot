@@ -66,6 +66,11 @@ export class OncallTicketsStatus implements BotAction {
   }
 
   async getOncallTicketsStatus(event: any, slackClient: any): Promise<void> {
+    // TODO: Temporary fix. If client is null, get it again from consts.
+    if (!slackClient) {
+      slackClient = SlackWebClient;
+    }
+
     console.log("Running oncall status ask");
 
     const tickets = await getAllTickets();

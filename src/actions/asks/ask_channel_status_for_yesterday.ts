@@ -62,6 +62,11 @@ export class AskChannelStatusForYesterday implements BotAction {
     event: any,
     slackClient: any
   ): Promise<void> {
+    // TODO: Temporary fix. If client is null, get it again from consts.
+    if (!slackClient) {
+      slackClient = SlackWebClient;
+    }
+
     console.log("Posting the daily asks channel stats summary");
 
     // Set the timeframe range to be yesterday
