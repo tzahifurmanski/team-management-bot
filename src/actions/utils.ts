@@ -161,7 +161,9 @@ export const scheduleCron = (
   condition: boolean,
   description: string,
   cronExpression: string,
-  functionToSchedule: any
+  functionToSchedule: any,
+  event: any,
+  slackClient: any
 ) => {
   if (condition) {
     console.log(
@@ -170,7 +172,13 @@ export const scheduleCron = (
       )})`
     );
     cron.schedule(cronExpression, () => {
-      functionToSchedule();
+      functionToSchedule(event, slackClient);
     });
+  } else {
+    console.log(
+      `Skipping on setting up a cron to ${description} (cron: ${cronExpression}, ${cronstrue.toString(
+        cronExpression
+      )})`
+    );
   }
 };

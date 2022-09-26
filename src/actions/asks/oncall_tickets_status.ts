@@ -10,12 +10,12 @@ import { getOrganizationByID } from "../../integrations/zendesk/organizations";
 import {
   MONITORED_ZENDESK_VIEW,
   ONCALL_CHANNEL_ID,
+  SlackWebClient,
   ZENDESK_BASE_URL,
   ZENDESK_TOKEN,
 } from "../../integrations/slack/consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { ONCALL_TICKETS_STATS_CRON } from "../../consts";
-import { getOncallTicketsStatus } from "../../logic/cron_jobs";
 
 import cronstrue from "cronstrue";
 import { scheduleCron } from "../utils";
@@ -27,7 +27,12 @@ export class OncallTicketsStatus implements BotAction {
         !!ONCALL_TICKETS_STATS_CRON,
         "update on oncall tickets status",
         ONCALL_TICKETS_STATS_CRON,
-        getOncallTicketsStatus
+        this.getOncallTicketsStatus,
+        {
+          channel: ONCALL_CHANNEL_ID,
+          thread_ts: "",
+        },
+        SlackWebClient
       );
     }
   }
@@ -57,6 +62,10 @@ export class OncallTicketsStatus implements BotAction {
   }
 
   async performAction(event: any, slackClient: any): Promise<void> {
+    await this.getOncallTicketsStatus(event, slackClient);
+  }
+
+  async getOncallTicketsStatus(event: any, slackClient: any): Promise<void> {
     console.log("Running oncall status ask");
 
     const tickets = await getAllTickets();
