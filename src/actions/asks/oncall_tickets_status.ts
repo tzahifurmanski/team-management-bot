@@ -5,9 +5,11 @@ import {
   sendSlackMessage,
 } from "../../integrations/slack/messages";
 import { getUserByID } from "../../integrations/zendesk/users";
-import { getAllTickets } from "../../integrations/zendesk/tickets";
+import { getTicketsByView } from "../../integrations/zendesk/tickets";
 import { getOrganizationByID } from "../../integrations/zendesk/organizations";
 import {
+  MONITORED_ZENDESK_FILTER_FIELD_ID,
+  MONITORED_ZENDESK_FILTER_FIELD_VALUES,
   MONITORED_ZENDESK_VIEW,
   ONCALL_CHANNEL_ID,
   SlackWebClient,
@@ -73,30 +75,34 @@ export class OncallTicketsStatus implements BotAction {
 
     console.log("Running oncall status ask");
 
-    const tickets = await getAllTickets();
+    const tickets: any[] = await getTicketsByView(MONITORED_ZENDESK_VIEW);
+    let filteredTickets: any[];
 
-    const filteredTickets = tickets.filter(
-      (ticket: any) =>
-        !ticket.custom_fields ||
-        ticket.custom_fields.filter(
-          (field: any) =>
-            // TODO: Make this filter dynamic, instead of hard coded -  filter to only get the tickets for relevant engineering groups
-            field.id === 360010151217 &&
-            [
-              "group_platform_governance",
-              "group_sdlc",
-              "group_platform_foundation",
-            ].includes(field.value)
-        ).length > 0
-    );
+    // Check if we need to filter the tickets
+    if (
+      MONITORED_ZENDESK_FILTER_FIELD_ID &&
+      MONITORED_ZENDESK_FILTER_FIELD_VALUES.length > 0
+    ) {
+      filteredTickets = tickets.filter(
+        (ticket: any) =>
+          !ticket.custom_fields ||
+          ticket.custom_fields.filter(
+            (field: any) =>
+              field.id.toString() === MONITORED_ZENDESK_FILTER_FIELD_ID &&
+              MONITORED_ZENDESK_FILTER_FIELD_VALUES.includes(field.value)
+          ).length > 0
+      );
+    } else {
+      filteredTickets = tickets;
+    }
 
     const messageBlocks: any = [];
 
     // TODO: Make the header dynamic
-    // messageBlocks.push(createSectionBlock("Good morning platform group oncallers :sunny:\nThere are *total of X tier 3 tickets* assigned to you - *Y open, 3 pending customers and 1 closed*."))
+    // messageBlocks.push(createSectionBlock("Good morning on-callers :sunny:\nThere are *total of X tier 3 tickets* assigned to you - *Y open, 3 pending customers and 1 closed*."))
     messageBlocks.push(
       createSectionBlock(
-        "Good morning platform group oncallers :sunny:\nHere are the tier 3 tickets assigned to you:"
+        `Good morning on-callers :sunny:\nThere are currently ${filteredTickets.length} tier 3 tickets currently assigned to you.`
       )
     );
     messageBlocks.push(createDivider());
