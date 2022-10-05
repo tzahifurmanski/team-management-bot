@@ -2,6 +2,17 @@
 
 import { getBotId, getConversationId } from "./conversations";
 
+const handleListParameter = (
+  param: string | undefined,
+  defaultValue = "",
+  delimiter = ","
+): string[] => {
+  const fieldContent = param || defaultValue;
+
+  // Split by , and remove empty elements
+  return fieldContent.split(delimiter).filter((i) => i);
+};
+
 export const SLACK_USER_FORMAT = /<@.*>/;
 
 // User-Specific Tokens Configurations
@@ -21,8 +32,11 @@ export let BOT_ID: string;
 export let TEAM_ASK_CHANNEL_ID: string = process.env.TEAM_ASK_CHANNEL_ID || "";
 const TEAM_ASK_CHANNEL_NAME: string = process.env.TEAM_ASK_CHANNEL_NAME || "";
 
-const allowedBots = process.env.ALLOWED_BOTS || "";
-export const ALLOWED_BOTS: string[] = allowedBots.split(",");
+export const ALLOWED_BOTS: string[] = handleListParameter(
+  process.env.ALLOWED_BOTS,
+  "",
+  ","
+);
 
 // User profile field ids
 export const USER_PROFILE_FIELD_ID_TEAM =
@@ -33,14 +47,16 @@ export const USER_PROFILE_FIELD_ID_DIVISION =
   process.env.USER_PROFILE_FIELD_ID_DIVISION || "";
 
 // Reactions parameters
-const reactionsInProgressParam =
-  process.env.REACTIONS_IN_PROGRESS || "in-progress,spinner";
-const reactionsHandledParam =
-  process.env.REACTIONS_HANDLED ||
-  "white_check_mark,heavy_check_mark,green_tick";
-export const REACTIONS_IN_PROGRESS: string[] =
-  reactionsInProgressParam.split(",");
-export const REACTIONS_HANDLED: string[] = reactionsHandledParam.split(",");
+export const REACTIONS_IN_PROGRESS: string[] = handleListParameter(
+  process.env.REACTIONS_IN_PROGRESS,
+  "in-progress,spinner",
+  ","
+);
+export const REACTIONS_HANDLED: string[] = handleListParameter(
+  process.env.REACTIONS_HANDLED,
+  "white_check_mark,heavy_check_mark,green_tick",
+  ","
+);
 
 // Cron jobs
 // =============
@@ -67,6 +83,16 @@ export const ZENDESK_BASE_URL = process.env.ZENDESK_BASE_URL || "";
 
 // Oncall Tickets Status Configurations
 export const MONITORED_ZENDESK_VIEW = process.env.MONITORED_ZENDESK_VIEW || "";
+export const MONITORED_ZENDESK_FILTER_FIELD_ID =
+  process.env.MONITORED_ZENDESK_FILTER_FIELD_ID || "";
+
+export const MONITORED_ZENDESK_FILTER_FIELD_VALUES: string[] =
+  handleListParameter(
+    process.env.MONITORED_ZENDESK_FILTER_FIELD_VALUES,
+    "",
+    ","
+  );
+
 export let ONCALL_CHANNEL_ID: string = process.env.ONCALL_CHANNEL_ID || "";
 const ONCALL_CHANNEL_NAME: string = process.env.ONCALL_CHANNEL_NAME || "";
 
