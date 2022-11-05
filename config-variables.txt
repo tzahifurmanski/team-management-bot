@@ -4,6 +4,8 @@
 // General Configurations
 NODE_ENV=
 PORT=
+BOLT_LOG_LEVEL= # Log level to be used for Bolt library logging. Default is 'info', option are 'error', 'warn, 'info', 'debug'.
+
 
 // Bot Configurations
 BOT_NAME= # The name for the bot to use when posting messages. Should be identical to the name of the bot as was set up in the Slack App.

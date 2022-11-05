@@ -1,4 +1,4 @@
-import {handleDirectEvent} from "../../../../bot_actions";
+import { handleDirectEvent } from "../../../bot_actions";
 
 const appMentionCallback = async ({event, client, logger}: any) => {
     try {
