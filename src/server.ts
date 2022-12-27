@@ -1,6 +1,9 @@
 // Always load consts first
 import { getBoltLogLevel, PORT } from "./consts";
-import { loadSlackConfig, SLACK_SIGNING_SECRET } from "./integrations/slack/consts";
+import {
+  loadSlackConfig,
+  SLACK_SIGNING_SECRET,
+} from "./integrations/slack/consts";
 
 import { App, ExpressReceiver } from "@slack/bolt";
 
@@ -8,7 +11,7 @@ const { version } = require("../package.json");
 
 const { registerListeners } = require("./listeners");
 
-const receiver = new ExpressReceiver({ signingSecret: '' });
+const receiver = new ExpressReceiver({ signingSecret: SLACK_SIGNING_SECRET });
 
 const boltApp = new App({
   signingSecret: SLACK_SIGNING_SECRET,
