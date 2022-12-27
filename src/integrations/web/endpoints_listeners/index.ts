@@ -1,5 +1,6 @@
 import healthcheck from "./healthcheck";
 
+// Solution based off of: https://github.com/slackapi/bolt-js/issues/212
 module.exports.register = (receiver : any) => {
   console.log("Setting up routes...")
 

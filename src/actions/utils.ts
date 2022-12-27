@@ -1,4 +1,5 @@
 import cronstrue from "cronstrue";
+import { AsksChannelStatsResult } from "../logic/asks_channel";
 
 const cron = require("node-cron");
 
@@ -177,4 +178,20 @@ export const scheduleCron = (
   } else {
     console.log(`Skipping on setting up a cron to ${description}.`);
   }
+};
+
+export const getStatsMessage = (
+  channelId: string,
+  stats: AsksChannelStatsResult
+): string => {
+  let summary = `<#${channelId}> received *${stats.totalMessages} new asks*:\n`;
+  summary =
+    summary +
+    `• *${stats.totalNumUnchecked}* Not Handled :mailbox_with_mail:\n`;
+  summary =
+    summary + `• *${stats.totalNumInProgress}* In Progress :in-progress:\n`;
+  summary =
+    summary + `• *${stats.totalNumProcessed}* Resolved :white_check_mark:`;
+
+  return summary;
 };

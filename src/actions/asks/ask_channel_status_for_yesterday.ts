@@ -1,5 +1,9 @@
 import { BotAction } from "../base_action";
-import { removeTimeInfoFromDate, scheduleCron } from "../utils";
+import {
+  getStatsMessage,
+  removeTimeInfoFromDate,
+  scheduleCron,
+} from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -94,7 +98,10 @@ export class AskChannelStatusForYesterday implements BotAction {
       endingDate.toUTCString()
     );
 
-    const yesterdaySummary = `Good morning ${TEAM_FOLKS}:sunny:\nYesterday, <#${TEAM_ASK_CHANNEL_ID}> received a *total of ${stats.totalMessages} new asks*. Out of those, *${stats.totalNumProcessed} were answered*, *${stats.totalNumInProgress} are in progress*, and *${stats.totalNumUnchecked} were not handled*.`;
+    const yesterdaySummary = `Good morning ${TEAM_FOLKS}:sunny:\nYesterday, ${getStatsMessage(
+      TEAM_ASK_CHANNEL_ID,
+      stats
+    )}`;
 
     // Say what's the total of open asks we have in the last 60 days
     // =============================================================================
@@ -124,7 +131,10 @@ export class AskChannelStatusForYesterday implements BotAction {
     );
     await sendSlackMessage(
       slackClient,
-      `${yesterdaySummary}\nIn the last ${DAYS_BACK} days, <#${TEAM_ASK_CHANNEL_ID}> had a *total of ${monthStats.totalMessages} asks*. Out of those, *${monthStats.totalNumProcessed} were answered*, *${monthStats.totalNumInProgress} are in progress*, and *${monthStats.totalNumUnchecked} were not handled*.`,
+      `${yesterdaySummary}\nIn the last ${DAYS_BACK} days, ${getStatsMessage(
+        TEAM_ASK_CHANNEL_ID,
+        monthStats
+      )}`,
       event.channel,
       event.thread_ts
     );
