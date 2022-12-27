@@ -226,7 +226,7 @@ export const reportStatsToSlack = async (
   if (includeAsks && stats.totalMessages > 0) {
     if (stats.totalNumInProgress > 0) {
       messageBlocks.push(
-        createSectionBlock("These are the in progress asks we currently have:")
+        createSectionBlock("These are the *In Progress* asks:")
       );
 
       messageBlocks.push(
@@ -240,7 +240,7 @@ export const reportStatsToSlack = async (
 
     if (stats.totalNumUnchecked > 0) {
       messageBlocks.push(
-        createSectionBlock("These are the open asks we currently have:")
+        createSectionBlock("These are the *Not Handled* asks:")
       );
       messageBlocks.push(
         ...(await getPermalinkBlocks(
@@ -388,7 +388,7 @@ const getPermalinkBlocks = async (
           message.user ? userProfile?.display_name : message.username
         }${teamName}`;
 
-        const blockText = `<${permalink}|Link to message> from ${fromClause} at ${messageDate.toLocaleDateString()}${daysMessage}`;
+        const blockText = `<${permalink}|Link to ask> from ${fromClause} at ${messageDate.toLocaleDateString()}${daysMessage}`;
 
         block.push(createSectionBlock(blockText));
       }
