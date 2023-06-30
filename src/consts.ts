@@ -1,5 +1,6 @@
-// General Configurations
-
+// =================================================
+//          General Configurations
+// =================================================
 // Load the .env file config for debug
 import { LogLevel } from "@slack/bolt";
 
@@ -16,14 +17,14 @@ if (process.env.NODE_ENV !== "production") {
 
 export const PORT = process.env.PORT || 3000;
 
+// =================================================
+//          Bot Configurations
+// =================================================
 // Bot Configurations
 const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "generic";
 
 // Load the configuration specific to the selected bot personality
 export const botConfig = require(`../assets/personalities/${BOT_PERSONALITY}/bot_config.json`);
-
-// Support a generic bot personality
-// =================================
 
 // If we got a bot name, override the default:
 const BOT_NAME_PLACEHOLDER = "<BOT_NAME>";
@@ -45,14 +46,28 @@ if (BOT_IMAGE_URL) {
   botConfig.BOT_IMAGE_URL = BOT_IMAGE_URL;
 }
 
-// Bot responses
+// =================================================
+//          Feature Flags
+// =================================================
+
+export const ENABLE_ASK_SUMMARY =
+  (process.env.ENABLE_ASK_SUMMARY &&
+    process.env.ENABLE_ASK_SUMMARY.toLowerCase() === "true") ||
+  false;
+
 export const ENABLE_BOT_RESPONSES =
   (process.env.ENABLE_BOT_RESPONSES &&
     process.env.ENABLE_BOT_RESPONSES.toLowerCase() === "true") ||
   false;
 const disabledResponsesParam = process.env.DISABLED_RESPONSES || "";
-export const DISABLED_RESPONSES: string[] = disabledResponsesParam.split(",");
 
+// =================================================
+//          Features Configurations
+// =================================================
+//
+
+// Bot responses
+export const DISABLED_RESPONSES: string[] = disabledResponsesParam.split(",");
 const botResponsesChannels = process.env.BOT_RESPONSES_CHANNELS || "";
 export const BOT_RESPONSES_CHANNELS: string[] = botResponsesChannels.split(",");
 
@@ -86,13 +101,13 @@ export const getBoltLogLevel = (logLevel: any) => {
   let boltLogLevel;
 
   switch (logLevel) {
-    case 'error':
+    case "error":
       boltLogLevel = LogLevel.ERROR;
       break;
-    case 'warn':
+    case "warn":
       boltLogLevel = LogLevel.WARN;
       break;
-    case 'debug':
+    case "debug":
       boltLogLevel = LogLevel.DEBUG;
       break;
     default:

@@ -81,7 +81,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     );
     if (params.error) {
       console.log(
-        `There was an error processing the stats params for ${event.text} command: ${params.timeMetric}`
+        `There was an error processing the stats params for ${event.text} command: ${params.error}`
       );
       await sendGenericError(event, slackClient);
       return;

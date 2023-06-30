@@ -70,31 +70,44 @@ export const getConversationId = async (
 export const getConversationHistory = async (
   slackClient: any,
   channelId: string,
-  oldest = "", // Start of time range of messages to include in results (in seconds).
-  latest?: string
+  oldest?: string, // Start of time range of messages to include in results (in seconds).
+  latest?: string,
+  limit?: number,
+  inclusive?: boolean
 ): Promise<any[]> => {
   // TODO: Handle a 'channel not found' error / 'not_in_channel' error
 
   // Get the channels list from slack
   const options: ConversationsHistoryArguments = {
     channel: channelId,
-    oldest,
-    limit: 100,
+    limit: limit || 100,
   };
+
+  if (oldest) {
+    options.oldest = oldest;
+  }
 
   if (latest) {
     options.latest = latest;
   }
 
+  if (inclusive) {
+    options.inclusive = inclusive;
+  }
+
   const results: any[] = [];
+
+  // console.log("FIRING using options", JSON.stringify(options));
 
   let response: ConversationsHistoryResponse =
     await slackClient.conversations.history(options);
 
   do {
+    // console.log("ITERATING RESULTS");
     if (response.messages) {
       response.messages.forEach((message: Message) => {
         // Filter out messages from the bot, and all message events with subtypes that are not bot messages
+        // TODO: Extract this
         if (!shouldMessageBeSkipped(message)) {
           // console.log(`Saving ${JSON.stringify(message)} message`);
           results.push(message);

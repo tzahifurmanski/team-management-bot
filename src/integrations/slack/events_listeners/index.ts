@@ -1,17 +1,26 @@
-const {messageCallback} = require("./message");
-const {appMentionCallback} = require("./app_mention");
+import { ENABLE_ASK_SUMMARY } from "../../../consts";
 
-module.exports.register = (app : any) => {
-    console.log("Setting up events...")
+const { messageCallback } = require("./message");
+const { appMentionCallback } = require("./app_mention");
+const { reactionAddedCallback } = require("./reaction_added");
 
-    app.event("message", messageCallback);
-    app.event("app_mention", appMentionCallback);
+module.exports.register = (app: any) => {
+  console.log("Setting up events...");
 
-    // All errors in listeners are caught here. If this weren't caught, the program would terminate.
-    app.error((error: any ) => {
-        // TODO: Add better error handling
-        console.error(error);
-    });
+  app.event("message", messageCallback);
+  app.event("app_mention", appMentionCallback);
 
-    console.log("Done setting up events.")
+  if (ENABLE_ASK_SUMMARY) {
+    app.event("reaction_added", reactionAddedCallback);
+
+    // TODO: Handle a reaction removed, in case a task marked as DONE is not longer done
+  }
+
+  // All errors in listeners are caught here. If this weren't caught, the program would terminate.
+  app.error((error: any) => {
+    // TODO: Add better error handling
+    console.error(error);
+  });
+
+  console.log("Done setting up events.");
 };
