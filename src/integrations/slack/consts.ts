@@ -1,17 +1,7 @@
 // TODO: Make sure to load src/consts before loading this - Instead, maybe load the dotenv conf?
 
 import { getBotId, getConversationId } from "./conversations";
-
-const handleListParameter = (
-  param: string | undefined,
-  defaultValue = "",
-  delimiter = ","
-): string[] => {
-  const fieldContent = param || defaultValue;
-
-  // Split by , and remove empty elements
-  return fieldContent.split(delimiter).filter((i) => i);
-};
+import { handleListParameter } from "../../consts";
 
 export const SLACK_USER_FORMAT = /<@.*>/;
 

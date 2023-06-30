@@ -25,8 +25,8 @@ oauth_config:
       - incoming-webhook
       - links:read
       - links:write
-      - reactions:read
       - mpim:read
+      - reactions:read
       - reactions:write
       - users.profile:read
       - users:read
@@ -38,6 +38,7 @@ settings:
       - app_mention
       - message.channels
       - message.im
+      - reaction_added
   org_deploy_enabled: false
   socket_mode_enabled: false
   token_rotation_enabled: false

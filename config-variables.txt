@@ -6,6 +6,10 @@ NODE_ENV=
 PORT=
 BOLT_LOG_LEVEL= # Log level to be used for Bolt library logging. Default is 'info', option are 'error', 'warn, 'info', 'debug'.
 
+// Feature Flags
+ENABLE_ASK_SUMMARY= # Enable the bot to post a 'summary' message after an ask has been marked as solved. Default is false.
+ENABLE_BOT_RESPONSES= # Should the bot respond to keywords. Values are True/False, default is False. Example keywords are 'help', 'bug', 'folks', ''review', etc
+
 
 // Bot Configurations
 BOT_NAME= # The name for the bot to use when posting messages. Should be identical to the name of the bot as was set up in the Slack App.
@@ -76,7 +80,6 @@ REACTIONS_HANDLED= # Optional. List of Slack reaction names that will indicate t
 
 # BOT Responses
 # =============
-ENABLE_BOT_RESPONSES= # Should the bot respond to keywords. Values are True/False, default is False. Example keywords are 'help', 'bug', 'folks', ''review', etc
 BOT_RESPONSES_CHANNELS= # Which channels should the bot monitor responses. Default is none. Values are channel IDs.
 DISABLED_RESPONSES= # Optional. List of bot reponses to disable, even if ENABLE_BOT_RESPONSES is enabled.
 
