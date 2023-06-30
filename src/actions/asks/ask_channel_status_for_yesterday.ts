@@ -68,6 +68,7 @@ export class AskChannelStatusForYesterday implements BotAction {
   ): Promise<void> {
     // TODO: Temporary fix. If client is null, get it again from consts.
     if (!slackClient) {
+      console.log("NO VALID SLACK CLIENT, GETTING FROM CONST.");
       slackClient = SlackWebClient;
     }
 

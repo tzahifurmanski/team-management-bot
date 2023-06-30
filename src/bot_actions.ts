@@ -2,7 +2,6 @@ import { BotAction } from "./actions/base_action";
 import { ASKS_ACTIONS } from "./actions/asks";
 import { RESPONSE_ACTIONS } from "./actions/responses";
 import { sendSlackMessage } from "./integrations/slack/messages";
-import { sendGenericError } from "./integrations/slack/utils";
 import { BOT_RESPONSES_CHANNELS } from "./consts";
 
 // This method handles events that are posted directly inside a channel
@@ -28,10 +27,7 @@ export const handleDirectEvent = async (event: any, client: any) => {
   // console.log("Got new direct event", event.type, event);
 
   if (!(await runActions(event, client, ASKS_ACTIONS))) {
-    await sendGenericError(event, client);
-
-    console.log("Unsupported event", JSON.stringify(event));
-    console.log(`Unsupported text "${event.text}"`);
+    console.log("Unsupported text/event", event.text, JSON.stringify(event));
 
     // TODO: Save the unsupported event for later debrief
     // TODO: Reply to unsupported events with a quote

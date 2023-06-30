@@ -20,10 +20,7 @@ import {
   SlackWebClient,
   TEAM_ASK_CHANNEL_ID,
 } from "../../integrations/slack/consts";
-import {
-  sanitizeCommandInput,
-  sendGenericError,
-} from "../../integrations/slack/utils";
+import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { LEADS_SUMMARY_CRON, TEAM_NAME } from "../../consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 
@@ -83,8 +80,10 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
       console.log(
         `There was an error processing the stats params for ${event.text} command: ${params.error}`
       );
-      await sendGenericError(event, slackClient);
-      return;
+
+      throw new Error(
+        `There was an error processing the stats params: ${params.error}`
+      );
     }
 
     const startingDate = getStartingDate(params);

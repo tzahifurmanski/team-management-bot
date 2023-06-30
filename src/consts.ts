@@ -97,6 +97,11 @@ export const MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE: string =
 export const MONITORED_CHANNEL_TRIGGER: string =
   process.env.MONITORED_CHANNEL_TRIGGER || "";
 
+// =================================================
+//          Utils
+// =================================================
+//
+
 export const getBoltLogLevel = (logLevel: any) => {
   let boltLogLevel;
 
@@ -117,4 +122,15 @@ export const getBoltLogLevel = (logLevel: any) => {
   }
 
   return boltLogLevel;
+};
+
+export const handleListParameter = (
+  param: string | undefined,
+  defaultValue = "",
+  delimiter = ","
+): string[] => {
+  const fieldContent = param || defaultValue;
+
+  // Split by , and remove empty elements
+  return fieldContent.split(delimiter).filter((i) => i);
 };
