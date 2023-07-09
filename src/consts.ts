@@ -1,4 +1,42 @@
 // =================================================
+//          Utils
+// =================================================
+//
+
+export const getBoltLogLevel = (logLevel: any) => {
+  let boltLogLevel;
+
+  switch (logLevel) {
+    case "error":
+      boltLogLevel = LogLevel.ERROR;
+      break;
+    case "warn":
+      boltLogLevel = LogLevel.WARN;
+      break;
+    case "debug":
+      boltLogLevel = LogLevel.DEBUG;
+      break;
+    default:
+      // Return INFO as default
+      boltLogLevel = LogLevel.INFO;
+      break;
+  }
+
+  return boltLogLevel;
+};
+
+export const handleListParameter = (
+  param: string | undefined,
+  defaultValue = "",
+  delimiter = ","
+): string[] => {
+  const fieldContent = param || defaultValue;
+
+  // Split by , and remove empty elements
+  return fieldContent.split(delimiter).filter((i) => i);
+};
+
+// =================================================
 //          General Configurations
 // =================================================
 // Load the .env file config for debug
@@ -59,7 +97,6 @@ export const ENABLE_BOT_RESPONSES =
   (process.env.ENABLE_BOT_RESPONSES &&
     process.env.ENABLE_BOT_RESPONSES.toLowerCase() === "true") ||
   false;
-const disabledResponsesParam = process.env.DISABLED_RESPONSES || "";
 
 // =================================================
 //          Features Configurations
@@ -67,9 +104,13 @@ const disabledResponsesParam = process.env.DISABLED_RESPONSES || "";
 //
 
 // Bot responses
-export const DISABLED_RESPONSES: string[] = disabledResponsesParam.split(",");
-const botResponsesChannels = process.env.BOT_RESPONSES_CHANNELS || "";
-export const BOT_RESPONSES_CHANNELS: string[] = botResponsesChannels.split(",");
+export const DISABLED_RESPONSES: string[] = handleListParameter(
+  process.env.DISABLED_RESPONSES
+);
+
+export const BOT_RESPONSES_CHANNELS: string[] = handleListParameter(
+  process.env.BOT_RESPONSES_CHANNELS
+);
 
 // Scheduling Configurations
 export const ASK_CHANNEL_STATS_CRON = process.env.ASK_CHANNEL_STATS_CRON || "";
@@ -80,8 +121,9 @@ export const ONCALL_TICKETS_STATS_CRON =
 // Team Configurations
 export const TEAM_NAME = process.env.TEAM_NAME || "";
 export const TEAM_FOLKS: string = process.env.TEAM_FOLKS || "team";
-export const TEAM_SPECIFIC_COMPLIMENTS: string =
-  process.env.TEAM_SPECIFIC_COMPLIMENTS || "";
+export const TEAM_SPECIFIC_COMPLIMENTS: string[] = handleListParameter(
+  process.env.TEAM_SPECIFIC_COMPLIMENTS
+);
 
 // Monitored Channel Configurations
 export const MONITORED_CHANNEL_ID: string =
@@ -96,41 +138,3 @@ export const MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE: string =
   process.env.MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE || "";
 export const MONITORED_CHANNEL_TRIGGER: string =
   process.env.MONITORED_CHANNEL_TRIGGER || "";
-
-// =================================================
-//          Utils
-// =================================================
-//
-
-export const getBoltLogLevel = (logLevel: any) => {
-  let boltLogLevel;
-
-  switch (logLevel) {
-    case "error":
-      boltLogLevel = LogLevel.ERROR;
-      break;
-    case "warn":
-      boltLogLevel = LogLevel.WARN;
-      break;
-    case "debug":
-      boltLogLevel = LogLevel.DEBUG;
-      break;
-    default:
-      // Return INFO as default
-      boltLogLevel = LogLevel.INFO;
-      break;
-  }
-
-  return boltLogLevel;
-};
-
-export const handleListParameter = (
-  param: string | undefined,
-  defaultValue = "",
-  delimiter = ","
-): string[] => {
-  const fieldContent = param || defaultValue;
-
-  // Split by , and remove empty elements
-  return fieldContent.split(delimiter).filter((i) => i);
-};

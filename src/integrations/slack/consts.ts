@@ -23,9 +23,7 @@ export let TEAM_ASK_CHANNEL_ID: string = process.env.TEAM_ASK_CHANNEL_ID || "";
 const TEAM_ASK_CHANNEL_NAME: string = process.env.TEAM_ASK_CHANNEL_NAME || "";
 
 export const ALLOWED_BOTS: string[] = handleListParameter(
-  process.env.ALLOWED_BOTS,
-  "",
-  ","
+  process.env.ALLOWED_BOTS
 );
 
 // User profile field ids

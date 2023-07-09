@@ -40,3 +40,9 @@
 * Provide a way to 'reload' dynamic in memory data (config, ids)
 * Gather usage stats on activities (what feature is in use the most)
 * Gather a list of commands that bot does not know how to answer (Collect requests for features)
+
+
+
+
+Google calendar integration
+https://developers.google.com/calendar/api/quickstart/nodejs
