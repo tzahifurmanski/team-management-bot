@@ -28,12 +28,20 @@ export const getBoltLogLevel = (logLevel: any) => {
 export const handleListParameter = (
   param: string | undefined,
   defaultValue = "",
-  delimiter = ","
+  delimiter = ",",
+  removeEmpty = true
 ): string[] => {
+  // Check if we got a string that represents an array (or a default value that is an array)
+  // If so, split it by the delimiter and optionally remove empty values.
+  // Then, return the result
   const fieldContent = param || defaultValue;
 
-  // Split by , and remove empty elements
-  return fieldContent.split(delimiter).filter((i) => i);
+  // Split by ,
+  let result = fieldContent.split(delimiter);
+  if (removeEmpty) {
+    result = result.filter((i) => i);
+  }
+  return result;
 };
 
 // =================================================
@@ -113,14 +121,17 @@ export const BOT_RESPONSES_CHANNELS: string[] = handleListParameter(
 );
 
 // Scheduling Configurations
-export const ASK_CHANNEL_STATS_CRON = process.env.ASK_CHANNEL_STATS_CRON || "";
-export const LEADS_SUMMARY_CRON = process.env.LEADS_SUMMARY_CRON || "";
+export const ASK_CHANNEL_STATS_CRON: string[] = handleListParameter(
+  process.env.ASK_CHANNEL_STATS_CRON,
+  "",
+  ",",
+  false
+);
 export const ONCALL_TICKETS_STATS_CRON =
   process.env.ONCALL_TICKETS_STATS_CRON || "";
 
 // Team Configurations
 export const TEAM_NAME = process.env.TEAM_NAME || "";
-export const TEAM_FOLKS: string = process.env.TEAM_FOLKS || "team";
 export const TEAM_SPECIFIC_COMPLIMENTS: string[] = handleListParameter(
   process.env.TEAM_SPECIFIC_COMPLIMENTS
 );

@@ -70,6 +70,7 @@ export class OncallTicketsStatus implements BotAction {
   async getOncallTicketsStatus(event: any, slackClient: any): Promise<void> {
     // TODO: Temporary fix. If client is null, get it again from consts.
     if (!slackClient) {
+      console.log("Slack client is null. Getting it again from consts.");
       slackClient = SlackWebClient;
     }
 

@@ -2,7 +2,6 @@ import { getConversationHistory } from "../integrations/slack/conversations";
 import {
   REACTIONS_HANDLED,
   REACTIONS_IN_PROGRESS,
-  TEAM_ASK_CHANNEL_ID,
   USER_PROFILE_FIELD_ID_TEAM,
 } from "../integrations/slack/consts";
 import {
@@ -43,9 +42,9 @@ export interface AsksChannelStatsResult {
 // This method gets two dates and returns all the messages that were received in the asks channel during this timeframe
 export const getChannelMessages = async (
   slackClient: any,
+  askChannelId: string,
   startingDate: Date,
-  endDate?: Date,
-  askChannelId: string = TEAM_ASK_CHANNEL_ID
+  endDate?: Date
 ): Promise<any[any]> => {
   // console.log(
   //   `Getting ask channels messages between '${startingDate.toUTCString()}' and '${endDate?.toUTCString()}'`
@@ -149,7 +148,7 @@ export const getBucketRange = (messageDate: Date, type: string): Date[] => {
 export const getStatsBuckets = async (
   messages: any[],
   type: string, // This can either be 'days', 'weeks', or 'months'. This is the variable by which we're going to 'group by' the buckets
-  channelId: string = TEAM_ASK_CHANNEL_ID
+  channelId: string
 ): Promise<AsksChannelStatsResult[]> => {
   const buckets = new Map<string, any[]>();
   const bucketsRanges: any = {};

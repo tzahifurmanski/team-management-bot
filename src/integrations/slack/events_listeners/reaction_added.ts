@@ -13,18 +13,18 @@ const reactionAddedCallback = async ({ event, client, logger }: any) => {
     }
 
     // Verify we are in the ask channel
-    if (event.item.channel != TEAM_ASK_CHANNEL_ID) {
+    if (!TEAM_ASK_CHANNEL_ID.includes(event.item.channel)) {
       console.log(
-        "Reaction is not in the ask channel, skipping.",
+        "Reaction is not in an ask channel, skipping.",
         event.channelId,
-        TEAM_ASK_CHANNEL_ID
+        JSON.stringify(TEAM_ASK_CHANNEL_ID)
       );
       return;
     }
 
     // TODO: Maybe unneeded - Could it be that the bot is adding emojis?
     if (isBotMessage(event)) {
-      console.log("Got a message from bot, ignoring...");
+      console.log("Got a message from bot, skipping.");
       return;
     }
 
@@ -41,14 +41,12 @@ const reactionAddedCallback = async ({ event, client, logger }: any) => {
       // Cant find original message,
       // probably a message that should be skipped,
       // therefore this should not operate on
-      console.log("Operation was done on a skipped message, skipping.");
+      console.log("Reaction was added on a skipped message, skipping.");
       return;
     }
 
-    const originalMessage = messages[0];
-    // console.log("ORIGINAL MESSAGE", JSON.stringify(originalMessage));
-
     // Check if the reaction is the first one of it's kind
+    const originalMessage = messages[0];
     if (
       originalMessage.reactions?.filter((reaction: any) => {
         return REACTIONS_HANDLED.includes(reaction.name);

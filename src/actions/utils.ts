@@ -168,9 +168,9 @@ export const scheduleCron = (
 ) => {
   if (condition) {
     console.log(
-      `Setting up a cron to ${description} (cron: ${cronExpression}, ${cronstrue.toString(
+      `Setting up a cron to ${description} ${cronstrue.toString(
         cronExpression
-      )}.)`
+      )}.`
     );
     cron.schedule(cronExpression, () => {
       functionToSchedule(event, slackClient);
@@ -194,4 +194,30 @@ export const getStatsMessage = (
     summary + `• *${stats.totalNumProcessed}* Resolved :white_check_mark:`;
 
   return summary;
+};
+
+const SLACK_CHANNEL_NAME_REGEX = /^<#C[A-Z0-9]{8,10}\|.+>$/;
+
+export const extractNameFromChannelString = (channelString: string): string => {
+  // The channel string is in the format <#C12345678|channel-name>, we want to return the channel name
+  // Example: <#C12345678|channel-name> -> channel-name
+  if (!SLACK_CHANNEL_NAME_REGEX.test(channelString.trim())) {
+    console.log(`NO MATCH for ${channelString} in ${SLACK_CHANNEL_NAME_REGEX}`);
+    // If the channel string is not in the format <#C12345678|channel-name>, return empty
+    return "";
+  }
+
+  return channelString.replace(">", "").trim().split("|")[1];
+};
+
+export const extractIDFromChannelString = (channelString: string): string => {
+  // The channel string is in the format <#C12345678|channel-name>, we want to return the channel name
+  // Example: <#C12345678|channel-name> -> channel-name
+  if (!SLACK_CHANNEL_NAME_REGEX.test(channelString.trim())) {
+    console.log("NO MATCH");
+    // If the channel string is not in the format <#C12345678|channel-name>, return empty
+    return "";
+  }
+
+  return channelString.replace("<#", "").trim().split("|")[0];
 };

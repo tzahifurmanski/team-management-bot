@@ -44,9 +44,9 @@ export class GroupAskChannelMonthlyStats implements BotAction {
 
       const messages: any[any] = await getChannelMessages(
         slackClient,
+        channelId,
         startingDate,
-        undefined,
-        channelId
+        undefined
       );
 
       const statsArray: AsksChannelStatsResult[] = await getStatsBuckets(

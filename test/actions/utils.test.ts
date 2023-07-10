@@ -1,5 +1,6 @@
 import {
   AskChannelParams,
+  extractNameFromChannelString,
   getAskChannelParameters,
   getStartingDate,
   setDateToSunday,
@@ -416,5 +417,27 @@ describe("setDateToSunday", () => {
 
     const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
     expect(result.getTime()).toEqual(expected.getTime());
+  });
+});
+
+describe("getChannelNameFromSlackChannelString", () => {
+  it("should return the channel name from the slack channel string", () => {
+    expect(extractNameFromChannelString("<#C0G9QF9GW|general>")).toBe(
+      "general"
+    );
+  });
+
+  it("should return the channel name from the slack channel string", () => {
+    expect(extractNameFromChannelString("<#C0G9QF9GW|general-number>")).toBe(
+      "general-number"
+    );
+  });
+
+  it("should return empty string if the slack channel string is not in the correct format", () => {
+    expect(extractNameFromChannelString("general")).toBe("");
+  });
+
+  it("should return empty string if the slack channel string is empty", () => {
+    expect(extractNameFromChannelString("")).toBe("");
   });
 });

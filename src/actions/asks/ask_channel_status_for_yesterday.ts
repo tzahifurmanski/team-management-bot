@@ -1,5 +1,6 @@
 import { BotAction } from "../base_action";
 import {
+  extractIDFromChannelString,
   getStatsMessage,
   removeTimeInfoFromDate,
   scheduleCron,
@@ -13,43 +14,88 @@ import {
 import {
   SlackWebClient,
   TEAM_ASK_CHANNEL_ID,
+  TEAM_ASK_CHANNEL_NAME,
 } from "../../integrations/slack/consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
-import { ASK_CHANNEL_STATS_CRON, TEAM_FOLKS } from "../../consts";
+import { ASK_CHANNEL_STATS_CRON } from "../../consts";
 import cronstrue from "cronstrue";
 
+const getChannelNameFromEventText = (eventText: any) => {
+  let askChannelId;
+
+  // If there's a sixth word, then it's a channel name
+  const params = eventText.split(" ");
+  if (params.length === 5) {
+    // Take default
+    askChannelId = TEAM_ASK_CHANNEL_ID[0];
+    console.log(`Using default channel ID ${askChannelId}.`);
+  } else {
+    askChannelId = extractIDFromChannelString(params[5]);
+    console.log(`Found channel ID ${askChannelId}.`);
+  }
+
+  return askChannelId;
+};
+
 export class AskChannelStatusForYesterday implements BotAction {
-  constructor() {
-    if (this.isEnabled()) {
+  scheduleAskChannelsCrons = () => {
+    // Schedule the crons for the ask channels
+    if (ASK_CHANNEL_STATS_CRON.length != TEAM_ASK_CHANNEL_ID.length) {
+      console.log(
+        "ASK_CHANNEL_STATS_CRON and TEAM_ASK_CHANNEL_ID have different lengths, and therefor crons won't be scheduled."
+      );
+      return;
+    }
+
+    // Iterate over the crons and schedule them
+    for (let i = 0; i < ASK_CHANNEL_STATS_CRON.length; i++) {
+      const eventText = {
+        channel: TEAM_ASK_CHANNEL_ID[i],
+        thread_ts: "",
+        scheduled: true,
+        text: `ask channel status for yesterday <#${TEAM_ASK_CHANNEL_ID[i]}|${TEAM_ASK_CHANNEL_NAME[i]}>`,
+      };
+
+      // TODO: SlackWebClient is passed 'by value', and when it does, it is empty. Fix this.
       scheduleCron(
-        !!ASK_CHANNEL_STATS_CRON,
-        "update on ask channel stats",
-        ASK_CHANNEL_STATS_CRON,
+        !!ASK_CHANNEL_STATS_CRON[i],
+        `update on ${TEAM_ASK_CHANNEL_NAME[i]} channel stats for yesterday`,
+        ASK_CHANNEL_STATS_CRON[i],
         this.getAskChannelStatsForYesterday,
-        {
-          channel: TEAM_ASK_CHANNEL_ID,
-          thread_ts: "",
-        },
+        eventText,
         SlackWebClient
       );
+    }
+  };
+
+  constructor() {
+    if (this.isEnabled()) {
+      this.scheduleAskChannelsCrons();
     }
   }
 
   getHelpText(): string {
     let helpMessage =
       "`ask channel status for yesterday` - Get the status of requests in your team ask channel from yesterday and a current status going back for the last 60 days.";
-    if (ASK_CHANNEL_STATS_CRON) {
-      helpMessage += `\n*A recurring ask channel post is scheduled to be sent ${cronstrue.toString(
-        ASK_CHANNEL_STATS_CRON
-      )}.*`;
+    if (ASK_CHANNEL_STATS_CRON.length > 0) {
+      for (let i = 0; i < ASK_CHANNEL_STATS_CRON.length; i++) {
+        // If a schedule is set, add it to the help message
+        if (ASK_CHANNEL_STATS_CRON[i]) {
+          helpMessage += `\n*A recurring ask channel post in <#${
+            TEAM_ASK_CHANNEL_ID[i]
+          }> is scheduled to be sent ${cronstrue.toString(
+            ASK_CHANNEL_STATS_CRON[i]
+          )}.*`;
+        }
+      }
     }
     return helpMessage;
   }
 
   isEnabled(): boolean {
     // This action should be available if there is an asks channel to process
-    return !!TEAM_ASK_CHANNEL_ID;
+    return TEAM_ASK_CHANNEL_ID.length > 0;
   }
 
   doesMatch(event: any): boolean {
@@ -66,13 +112,29 @@ export class AskChannelStatusForYesterday implements BotAction {
     event: any,
     slackClient: any
   ): Promise<void> {
-    // TODO: Temporary fix. If client is null, get it again from consts.
+    if (event.scheduled) {
+      console.log(
+        "Kicking off a scheduled ask channel stats for yesterday action."
+      );
+    }
+
+    // TODO: Temporary fix. If client is null, get it again from consts. Remove once I pass it properly during cron scheduling.
     if (!slackClient) {
-      console.log("NO VALID SLACK CLIENT, GETTING FROM CONST.");
+      console.log("Slack client is null. Getting it again from consts.");
       slackClient = SlackWebClient;
     }
 
-    console.log("Posting the daily asks channel stats summary");
+    const askChannelId = getChannelNameFromEventText(event.text);
+    if (!askChannelId) {
+      console.log(
+        `Unable to find channel ID for channel name. Ask: ${event.text}`
+      );
+      return;
+    }
+
+    console.log(
+      `Posting the daily asks channel stats summary for channel ${askChannelId}`
+    );
 
     // Set the timeframe range to be yesterday
     const startingDate = new Date();
@@ -88,19 +150,20 @@ export class AskChannelStatusForYesterday implements BotAction {
 
     const messages: any[any] = await getChannelMessages(
       slackClient,
+      askChannelId,
       startingDate,
       endingDate
     );
 
     const stats: AsksChannelStatsResult = await getStatsForMessages(
-      TEAM_ASK_CHANNEL_ID,
+      askChannelId,
       messages,
       startingDate.toUTCString(),
       endingDate.toUTCString()
     );
 
-    const yesterdaySummary = `Good morning ${TEAM_FOLKS}:sunny:\nYesterday, ${getStatsMessage(
-      TEAM_ASK_CHANNEL_ID,
+    const yesterdaySummary = `Good morning team:sunny:\nYesterday, ${getStatsMessage(
+      askChannelId,
       stats
     )}`;
 
@@ -116,16 +179,17 @@ export class AskChannelStatusForYesterday implements BotAction {
     const now = new Date();
 
     console.log(
-      `60 days back timeframe is ${beginningOfMonthDate.toUTCString()} to ${now.toUTCString()}`
+      `${DAYS_BACK} days back timeframe is ${beginningOfMonthDate.toUTCString()} to ${now.toUTCString()}`
     );
 
     const monthMessages: any[any] = await getChannelMessages(
       slackClient,
+      askChannelId,
       beginningOfMonthDate,
       now
     );
     const monthStats: AsksChannelStatsResult = await getStatsForMessages(
-      TEAM_ASK_CHANNEL_ID,
+      askChannelId,
       monthMessages,
       beginningOfMonthDate.toUTCString(),
       now.toUTCString()
@@ -133,7 +197,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     await sendSlackMessage(
       slackClient,
       `${yesterdaySummary}\nIn the last ${DAYS_BACK} days, ${getStatsMessage(
-        TEAM_ASK_CHANNEL_ID,
+        askChannelId,
         monthStats
       )}`,
       event.channel,

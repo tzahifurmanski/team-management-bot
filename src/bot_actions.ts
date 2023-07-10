@@ -43,16 +43,27 @@ async function runActions(event: any, client: any, actions: BotAction[]) {
       );
 
       await result.performAction(event, client);
-    } catch (E) {
+    } catch (E: any) {
       console.error(
         `Had an error while executing ${result.constructor.name} action - ${E}!`
       );
-      await sendSlackMessage(
-        client,
-        `Sorry, had an error while performing the action.. :sad:\nMaybe check my logs?`,
-        event.channel,
-        event.thread_ts ? event.thread_ts : event.ts
-      );
+
+      // Handle a specific case where an operation is not allowed due to the bot not being part of the channel
+      if (E.message === "An API error occurred: not_in_channel") {
+        await sendSlackMessage(
+          client,
+          `I'm unable to perform this action, as I'm not part of the channel :sad:\nMaybe add me to the channel?`,
+          event.channel,
+          event.thread_ts ? event.thread_ts : event.ts
+        );
+      } else {
+        await sendSlackMessage(
+          client,
+          `Sorry, had an error while performing the action.. :sad:\nMaybe check my logs?`,
+          event.channel,
+          event.thread_ts ? event.thread_ts : event.ts
+        );
+      }
     }
 
     // Return true even if there was an error

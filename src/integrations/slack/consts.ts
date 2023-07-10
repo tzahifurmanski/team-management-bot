@@ -19,8 +19,12 @@ export let BOT_ID: string;
 // Channels Configurations
 
 // Asks channel stats
-export let TEAM_ASK_CHANNEL_ID: string = process.env.TEAM_ASK_CHANNEL_ID || "";
-const TEAM_ASK_CHANNEL_NAME: string = process.env.TEAM_ASK_CHANNEL_NAME || "";
+export const TEAM_ASK_CHANNEL_ID: string[] = handleListParameter(
+  process.env.TEAM_ASK_CHANNEL_ID
+);
+export const TEAM_ASK_CHANNEL_NAME: string[] = handleListParameter(
+  process.env.TEAM_ASK_CHANNEL_NAME
+);
 
 export const ALLOWED_BOTS: string[] = handleListParameter(
   process.env.ALLOWED_BOTS
@@ -48,12 +52,6 @@ export const REACTIONS_HANDLED: string[] = handleListParameter(
 
 // Cron jobs
 // =============
-
-// Leads summary
-export let LEADS_SUMMARY_CHANNEL_ID: string =
-  process.env.LEADS_SUMMARY_CHANNEL_ID || "";
-export const LEADS_SUMMARY_CHANNEL_NAME: string =
-  process.env.LEADS_SUMMARY_CHANNEL_NAME || "";
 
 // Responses
 // ==========
@@ -91,17 +89,25 @@ export const loadSlackConfig = async (slackClient: any) => {
     BOT_ID = await getBotId(slackClient);
     console.log(`Loaded bot id ${BOT_ID}`);
 
-    TEAM_ASK_CHANNEL_ID =
-      TEAM_ASK_CHANNEL_ID ||
-      (await getConversationId(slackClient, TEAM_ASK_CHANNEL_NAME));
+    // If there are no channel ids, resolve them by names
+    if (TEAM_ASK_CHANNEL_ID.length === 0) {
+      for (const channelName of TEAM_ASK_CHANNEL_NAME) {
+        const channelId: string = await getConversationId(
+          slackClient,
+          channelName
+        );
+        TEAM_ASK_CHANNEL_ID.push(channelId);
+      }
+    } else if (TEAM_ASK_CHANNEL_ID.length != TEAM_ASK_CHANNEL_NAME.length) {
+      console.log(
+        "Error: TEAM_ASK_CHANNEL_ID and TEAM_ASK_CHANNEL_NAME have different lengths"
+      );
+      return false;
+    }
 
     TEAM_CODE_REVIEW_CHANNEL_ID =
       TEAM_CODE_REVIEW_CHANNEL_ID ||
       (await getConversationId(slackClient, TEAM_CODE_REVIEW_CHANNEL_NAME));
-
-    LEADS_SUMMARY_CHANNEL_ID =
-      LEADS_SUMMARY_CHANNEL_ID ||
-      (await getConversationId(slackClient, LEADS_SUMMARY_CHANNEL_NAME));
 
     ONCALL_CHANNEL_ID =
       ONCALL_CHANNEL_ID ||

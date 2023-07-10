@@ -49,9 +49,10 @@ export class IntroduceYourself implements BotAction {
         event.channel,
         event.thread_ts
       );
+      // TODO: Fix this to address multiple ask channels.
       await sendSlackMessage(
         slackClient,
-        `I track the requests in your asks channel (<#${TEAM_ASK_CHANNEL_ID}>) and can post a status report, helping you track the open asks you currently have. For example:`,
+        `I track the requests in your asks channel (<#${TEAM_ASK_CHANNEL_ID[0]}>) and can post a status report, helping you track the open asks you currently have. For example:`,
         event.channel,
         asksMessage.ts
       );

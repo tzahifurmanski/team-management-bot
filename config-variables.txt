@@ -19,7 +19,6 @@ BOT_PERSONALITY= # Default is 'generic'.
 
 // Team Configurations
 TEAM_NAME=
-TEAM_FOLKS= # How the team members should be referred to by the bot. Default is 'team'.
 TEAM_SPECIFIC_COMPLIMENTS=
 
 // Monitored Channel Configurations
@@ -43,20 +42,15 @@ BOT_USER_OAUTH_ACCESS_TOKEN=
 # =================
 
 # Ask Channel Status
-ASK_CHANNEL_STATS_CRON= # Optional, a cron expression for the bot to post in the team ask channel with a current status. For example, '30 08 * * 0-5', which is every day at 8:30 UTC, on Sunday to Friday.
-TEAM_ASK_CHANNEL_ID= # The Slack ID for the team ask channel. Supply either a name, or an ID.
-TEAM_ASK_CHANNEL_NAME= # The name of the Slack ask channel. Supply either a name, or an ID.
+ASK_CHANNEL_STATS_CRON= # A comma (',') separated list of a cron expression for the bot to post in the team ask channel with a current status. For example, '30 08 * * 0-5', which is every day at 8:30 UTC, on Sunday to Friday.
+TEAM_ASK_CHANNEL_ID= # A comma (',') separated list of the Slack IDs for the ask channels for the bot to track. Supply either a name, or an ID.
+TEAM_ASK_CHANNEL_NAME= # A comma (',') separated list of the Slack ask channel names for the bot to track. Supply either a name, or an ID.
 ALLOWED_BOTS= # Optional, a comma (',') separated list of bot usernames to include in the asks channel summary.
 
 # Ask Channel Stats - Optional, needed for the reporting feature
 USER_PROFILE_FIELD_ID_TEAM= # The Slack field ID to get the user's team name, for providing additional stats.
 USER_PROFILE_FIELD_ID_DIVISION= # The Slack field ID to get the user's division name, for providing additional stats.
 USER_PROFILE_FIELD_ID_DEPARTMENT= # The Slack field ID to get the user's department name, for providing additional stats.
-
-# Leads summary
-LEADS_SUMMARY_CRON= # Default is every tuesday at 12 PM
-LEADS_SUMMARY_CHANNEL_ID=
-LEADS_SUMMARY_CHANNEL_NAME=
 
 # Ask Channel Stats - For multiple channels (stats only)
 GROUP_ASK_CHANNELS=
