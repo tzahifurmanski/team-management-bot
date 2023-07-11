@@ -214,10 +214,90 @@ export const extractIDFromChannelString = (channelString: string): string => {
   // The channel string is in the format <#C12345678|channel-name>, we want to return the channel name
   // Example: <#C12345678|channel-name> -> channel-name
   if (!SLACK_CHANNEL_NAME_REGEX.test(channelString.trim())) {
-    console.log("NO MATCH");
+    console.log(`NO MATCH for ${channelString} in ${SLACK_CHANNEL_NAME_REGEX}`);
     // If the channel string is not in the format <#C12345678|channel-name>, return empty
     return "";
   }
 
   return channelString.replace("<#", "").trim().split("|")[0];
+};
+
+export const getChannelIDFromEventText = (
+  eventText: any,
+  nameIndex: number,
+  defaultID: string
+) => {
+  let askChannelID;
+
+  // If there's a sixth word, then it's a channel name
+  const params = eventText.split(" ");
+  if (params.length === nameIndex) {
+    // Take default
+    askChannelID = defaultID;
+    console.log(`Using default channel ID ${askChannelID}.`);
+  } else {
+    askChannelID = extractIDFromChannelString(params[nameIndex]);
+    console.log(`Found channel ID ${askChannelID}.`);
+  }
+
+  return askChannelID;
+};
+
+export const scheduleAskChannelsCrons = (
+  slackClient: any,
+  crons: string[],
+  channelIds: string[],
+  channelNames: string[],
+  action: string,
+  functionToSchedule: any
+) => {
+  // Schedule the crons for the ask channels
+  if (crons.length != channelIds.length) {
+    console.log(
+      `cron (${crons}, ${crons.length}) and channelIds (${channelIds}, ${channelIds.length}) have different lengths, and therefor crons won't be scheduled.`
+    );
+    return;
+  }
+
+  // Iterate over the crons and schedule them
+  for (let i = 0; i < crons.length; i++) {
+    const eventText = {
+      channel: channelIds[i],
+      thread_ts: "",
+      scheduled: true,
+      text: `${action} <#${channelIds[i]}|${channelNames[i]}>`,
+    };
+
+    // TODO: SlackWebClient is passed 'by value', and when it does, it is empty. Fix this.
+    scheduleCron(
+      !!crons[i],
+      `update on ${channelNames[i]} ${action}`,
+      crons[i],
+      functionToSchedule,
+      eventText,
+      slackClient
+    );
+  }
+};
+
+export const getRecurringJobInfo = (
+  jobName: string,
+  crons: string[],
+  channelIds: string[]
+): string => {
+  if (crons.length == 0) {
+    return "";
+  }
+
+  let message = "";
+  for (let i = 0; i < crons.length; i++) {
+    // If a schedule is set, add it to the help message
+    if (crons[i]) {
+      message += `\n*A recurring ${jobName} in <#${
+        channelIds[i]
+      }> is scheduled to be sent ${cronstrue.toString(crons[i])}.*`;
+    }
+  }
+
+  return message;
 };

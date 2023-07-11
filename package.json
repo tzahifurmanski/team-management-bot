@@ -1,7 +1,7 @@
 {
   "name": "team-management-bot",
   "author": "Tzahi Furmanski <tzahi.fur@gmail.com> (https://github.com/tzahifurmanski/)",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "repository": "https://github.com/tzahifurmanski/team-management-bot",
   "description": "A slack bot for engineering teams",
   "main": "dist/app.js",

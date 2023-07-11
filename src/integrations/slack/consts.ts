@@ -67,8 +67,17 @@ export let GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
 export const ZENDESK_TOKEN = process.env.ZENDESK_TOKEN || "";
 export const ZENDESK_BASE_URL = process.env.ZENDESK_BASE_URL || "";
 
-// Oncall Tickets Status Configurations
-export const MONITORED_ZENDESK_VIEW = process.env.MONITORED_ZENDESK_VIEW || "";
+// Zendesk Tickets Status Configurations
+export const ZENDESK_MONITORED_VIEW = handleListParameter(
+  process.env.ZENDESK_MONITORED_VIEW
+);
+export const ZENDESK_TICKETS_CHANNEL_ID: string[] = handleListParameter(
+  process.env.ZENDESK_TICKETS_CHANNEL_ID
+);
+export const ZENDESK_TICKETS_CHANNEL_NAME: string[] = handleListParameter(
+  process.env.ZENDESK_TICKETS_CHANNEL_NAME
+);
+
 export const MONITORED_ZENDESK_FILTER_FIELD_ID =
   process.env.MONITORED_ZENDESK_FILTER_FIELD_ID || "";
 
@@ -78,9 +87,6 @@ export const MONITORED_ZENDESK_FILTER_FIELD_VALUES: string[] =
     "",
     ","
   );
-
-export let ONCALL_CHANNEL_ID: string = process.env.ONCALL_CHANNEL_ID || "";
-const ONCALL_CHANNEL_NAME: string = process.env.ONCALL_CHANNEL_NAME || "";
 
 // Resolve the slack dynamic variables
 export const loadSlackConfig = async (slackClient: any) => {
@@ -105,13 +111,26 @@ export const loadSlackConfig = async (slackClient: any) => {
       return false;
     }
 
+    if (ZENDESK_TICKETS_CHANNEL_ID.length === 0) {
+      for (const channelName of ZENDESK_TICKETS_CHANNEL_NAME) {
+        const channelId: string = await getConversationId(
+          slackClient,
+          channelName
+        );
+        ZENDESK_TICKETS_CHANNEL_ID.push(channelId);
+      }
+    } else if (
+      ZENDESK_TICKETS_CHANNEL_ID.length != ZENDESK_TICKETS_CHANNEL_NAME.length
+    ) {
+      console.log(
+        "Error: TICKETS_CHANNEL_ID and TICKETS_CHANNEL_NAME have different lengths"
+      );
+      return false;
+    }
+
     TEAM_CODE_REVIEW_CHANNEL_ID =
       TEAM_CODE_REVIEW_CHANNEL_ID ||
       (await getConversationId(slackClient, TEAM_CODE_REVIEW_CHANNEL_NAME));
-
-    ONCALL_CHANNEL_ID =
-      ONCALL_CHANNEL_ID ||
-      (await getConversationId(slackClient, ONCALL_CHANNEL_NAME));
 
     // TODO: Allow to add defaults
     GROUP_ASK_CHANNELS_LIST = new Map<string, string>();

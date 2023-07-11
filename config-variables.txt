@@ -42,9 +42,9 @@ BOT_USER_OAUTH_ACCESS_TOKEN=
 # =================
 
 # Ask Channel Status
-ASK_CHANNEL_STATS_CRON= # A comma (',') separated list of a cron expression for the bot to post in the team ask channel with a current status. For example, '30 08 * * 0-5', which is every day at 8:30 UTC, on Sunday to Friday.
-TEAM_ASK_CHANNEL_ID= # A comma (',') separated list of the Slack IDs for the ask channels for the bot to track. Supply either a name, or an ID.
-TEAM_ASK_CHANNEL_NAME= # A comma (',') separated list of the Slack ask channel names for the bot to track. Supply either a name, or an ID.
+ASK_CHANNEL_STATS_CRON= # A separator ('|') separated list of cron expressions for the bot to post in the team ask channel with a current status. For example, '30 08 * * 0-5', which is every day at 8:30 UTC, on Sunday to Friday.
+TEAM_ASK_CHANNEL_ID= # A comma (',') separated list of the Slack IDs for the ask channels for the bot to track.
+TEAM_ASK_CHANNEL_NAME= # A comma (',') separated list of the Slack ask channel names for the bot to track.
 ALLOWED_BOTS= # Optional, a comma (',') separated list of bot usernames to include in the asks channel summary.
 
 # Ask Channel Stats - Optional, needed for the reporting feature
@@ -59,14 +59,14 @@ GROUP_ASK_CHANNELS=
 ZENDESK_TOKEN= # The Basic auth token used to connect to Zendesk
 ZENDESK_BASE_URL= # Base URL for your Zendesk instance
 
-# Oncall Tickets Status Configurations
-MONITORED_ZENDESK_VIEW= # ID of the Zendesk View used by the oncall
-MONITORED_ZENDESK_FILTER_FIELD_ID= # Optional. ID of the a field to filter Zendesk tickets by
+# Zendesk Tickets Status Configurations
+ZENDESK_MONITORED_VIEW= # A comma (',') separated list of IDs for the Zendesk views to monitor.
+MONITORED_ZENDESK_FILTER_FIELD_ID= # Optional. ID of a field to filter Zendesk tickets by
 MONITORED_ZENDESK_FILTER_FIELD_VALUES= # Optional. A list of allowed values for the Zendesk tickets filter field.
 
-ONCALL_CHANNEL_ID= # ID of the Slack channel used by the oncall team
-ONCALL_CHANNEL_NAME= # Name of the Slack channel used by the oncall team
-ONCALL_TICKETS_STATS_CRON=
+ZENDESK_TICKETS_CHANNEL_ID= # A comma (',') separated list of IDs of the Slack channels to report a status in.
+ZENDESK_TICKETS_CHANNEL_NAME= # A comma (',') separated list of Names of the Slack channels to report a status in.
+ZENDESK_TICKETS_STATS_CRON= # A separator ('|') separated list of cron expressions for the bot to post a status in.
 
 # Reactions
 REACTIONS_IN_PROGRESS= # Optional. List of Slack reaction names that will indicate that an ask is in progress.
