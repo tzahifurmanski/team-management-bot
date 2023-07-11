@@ -1,9 +1,10 @@
 import { BotAction } from "../base_action";
 import {
-  extractIDFromChannelString,
+  getChannelIDFromEventText,
+  getRecurringJobInfo,
   getStatsMessage,
   removeTimeInfoFromDate,
-  scheduleCron,
+  scheduleAskChannelsCrons,
 } from "../utils";
 import {
   AsksChannelStatsResult,
@@ -19,77 +20,35 @@ import {
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { ASK_CHANNEL_STATS_CRON } from "../../consts";
-import cronstrue from "cronstrue";
-
-const getChannelNameFromEventText = (eventText: any) => {
-  let askChannelId;
-
-  // If there's a sixth word, then it's a channel name
-  const params = eventText.split(" ");
-  if (params.length === 5) {
-    // Take default
-    askChannelId = TEAM_ASK_CHANNEL_ID[0];
-    console.log(`Using default channel ID ${askChannelId}.`);
-  } else {
-    askChannelId = extractIDFromChannelString(params[5]);
-    console.log(`Found channel ID ${askChannelId}.`);
-  }
-
-  return askChannelId;
-};
 
 export class AskChannelStatusForYesterday implements BotAction {
-  scheduleAskChannelsCrons = () => {
-    // Schedule the crons for the ask channels
-    if (ASK_CHANNEL_STATS_CRON.length != TEAM_ASK_CHANNEL_ID.length) {
-      console.log(
-        "ASK_CHANNEL_STATS_CRON and TEAM_ASK_CHANNEL_ID have different lengths, and therefor crons won't be scheduled."
-      );
-      return;
-    }
-
-    // Iterate over the crons and schedule them
-    for (let i = 0; i < ASK_CHANNEL_STATS_CRON.length; i++) {
-      const eventText = {
-        channel: TEAM_ASK_CHANNEL_ID[i],
-        thread_ts: "",
-        scheduled: true,
-        text: `ask channel status for yesterday <#${TEAM_ASK_CHANNEL_ID[i]}|${TEAM_ASK_CHANNEL_NAME[i]}>`,
-      };
-
-      // TODO: SlackWebClient is passed 'by value', and when it does, it is empty. Fix this.
-      scheduleCron(
-        !!ASK_CHANNEL_STATS_CRON[i],
-        `update on ${TEAM_ASK_CHANNEL_NAME[i]} channel stats for yesterday`,
-        ASK_CHANNEL_STATS_CRON[i],
-        this.getAskChannelStatsForYesterday,
-        eventText,
-        SlackWebClient
-      );
-    }
-  };
+  DAYS_BACK = 60;
 
   constructor() {
     if (this.isEnabled()) {
-      this.scheduleAskChannelsCrons();
+      scheduleAskChannelsCrons(
+        SlackWebClient,
+        ASK_CHANNEL_STATS_CRON,
+        TEAM_ASK_CHANNEL_ID,
+        TEAM_ASK_CHANNEL_NAME,
+        "ask channel status for yesterday",
+        this.getAskChannelStatsForYesterday
+      );
     }
   }
 
   getHelpText(): string {
     let helpMessage =
-      "`ask channel status for yesterday` - Get the status of requests in your team ask channel from yesterday and a current status going back for the last 60 days.";
-    if (ASK_CHANNEL_STATS_CRON.length > 0) {
-      for (let i = 0; i < ASK_CHANNEL_STATS_CRON.length; i++) {
-        // If a schedule is set, add it to the help message
-        if (ASK_CHANNEL_STATS_CRON[i]) {
-          helpMessage += `\n*A recurring ask channel post in <#${
-            TEAM_ASK_CHANNEL_ID[i]
-          }> is scheduled to be sent ${cronstrue.toString(
-            ASK_CHANNEL_STATS_CRON[i]
-          )}.*`;
-        }
-      }
-    }
+      "`ask channel status for yesterday` - Get the status of requests in your team ask channel from yesterday and a current status going back for the last " +
+      this.DAYS_BACK +
+      " days.";
+
+    helpMessage += getRecurringJobInfo(
+      "ask channel post",
+      ASK_CHANNEL_STATS_CRON,
+      TEAM_ASK_CHANNEL_ID
+    );
+
     return helpMessage;
   }
 
@@ -124,11 +83,14 @@ export class AskChannelStatusForYesterday implements BotAction {
       slackClient = SlackWebClient;
     }
 
-    const askChannelId = getChannelNameFromEventText(event.text);
+    const askChannelId = getChannelIDFromEventText(
+      event.text,
+      5,
+      TEAM_ASK_CHANNEL_ID[0]
+    );
+
     if (!askChannelId) {
-      console.log(
-        `Unable to find channel ID for channel name. Ask: ${event.text}`
-      );
+      console.log(`Unable to find channel ID. Ask: ${event.text}`);
       return;
     }
 
@@ -171,15 +133,17 @@ export class AskChannelStatusForYesterday implements BotAction {
     // =============================================================================
 
     // Get the timeframe for the last 60 days
-    const DAYS_BACK = 60;
+
     const beginningOfMonthDate = new Date(
-      new Date().getTime() - DAYS_BACK * 24 * 60 * 60 * 1000
+      new Date().getTime() - this.DAYS_BACK * 24 * 60 * 60 * 1000
     );
     removeTimeInfoFromDate(beginningOfMonthDate);
     const now = new Date();
 
     console.log(
-      `${DAYS_BACK} days back timeframe is ${beginningOfMonthDate.toUTCString()} to ${now.toUTCString()}`
+      `${
+        this.DAYS_BACK
+      } days back timeframe is ${beginningOfMonthDate.toUTCString()} to ${now.toUTCString()}`
     );
 
     const monthMessages: any[any] = await getChannelMessages(
@@ -196,10 +160,9 @@ export class AskChannelStatusForYesterday implements BotAction {
     );
     await sendSlackMessage(
       slackClient,
-      `${yesterdaySummary}\nIn the last ${DAYS_BACK} days, ${getStatsMessage(
-        askChannelId,
-        monthStats
-      )}`,
+      `${yesterdaySummary}\nIn the last ${
+        this.DAYS_BACK
+      } days, ${getStatsMessage(askChannelId, monthStats)}`,
       event.channel,
       event.thread_ts
     );

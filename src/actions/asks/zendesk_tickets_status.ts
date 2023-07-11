@@ -10,73 +10,113 @@ import { getOrganizationByID } from "../../integrations/zendesk/organizations";
 import {
   MONITORED_ZENDESK_FILTER_FIELD_ID,
   MONITORED_ZENDESK_FILTER_FIELD_VALUES,
-  MONITORED_ZENDESK_VIEW,
-  ONCALL_CHANNEL_ID,
   SlackWebClient,
   ZENDESK_BASE_URL,
+  ZENDESK_MONITORED_VIEW,
+  ZENDESK_TICKETS_CHANNEL_ID,
+  ZENDESK_TICKETS_CHANNEL_NAME,
   ZENDESK_TOKEN,
 } from "../../integrations/slack/consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
-import { ONCALL_TICKETS_STATS_CRON } from "../../consts";
+import { ZENDESK_TICKETS_STATS_CRON } from "../../consts";
+import {
+  getChannelIDFromEventText,
+  getRecurringJobInfo,
+  scheduleAskChannelsCrons,
+} from "../utils";
 
-import cronstrue from "cronstrue";
-import { scheduleCron } from "../utils";
-
-export class OncallTicketsStatus implements BotAction {
+export class ZendeskTicketsStatus implements BotAction {
   constructor() {
     if (this.isEnabled()) {
-      scheduleCron(
-        !!ONCALL_TICKETS_STATS_CRON,
-        "update on oncall tickets status",
-        ONCALL_TICKETS_STATS_CRON,
-        this.getOncallTicketsStatus,
-        {
-          channel: ONCALL_CHANNEL_ID,
-          thread_ts: "",
-        },
-        SlackWebClient
+      if (ZENDESK_MONITORED_VIEW.length != ZENDESK_TICKETS_CHANNEL_ID.length) {
+      }
+      scheduleAskChannelsCrons(
+        SlackWebClient,
+        ZENDESK_TICKETS_STATS_CRON,
+        ZENDESK_TICKETS_CHANNEL_ID,
+        ZENDESK_TICKETS_CHANNEL_NAME,
+        "zendesk tickets status",
+        this.getZendeskTicketsStatus
       );
     }
   }
 
   getHelpText(): string {
     let helpMessage =
-      "`oncall tickets status` - Provide a summary of the current tickets currently active for your oncall team.";
-    if (ONCALL_TICKETS_STATS_CRON) {
-      helpMessage += `\n*A recurring ask channel post is scheduled to be sent ${cronstrue.toString(
-        ONCALL_TICKETS_STATS_CRON
-      )}.*`;
-    }
+      "`zendesk tickets status` - Provide a summary of the current Zendesk tickets currently active for your team.";
+
+    helpMessage += getRecurringJobInfo(
+      "zendesk tickets status",
+      ZENDESK_TICKETS_STATS_CRON,
+      ZENDESK_TICKETS_CHANNEL_ID
+    );
+
     return helpMessage;
   }
 
   isEnabled(): boolean {
-    return !!(
-      ZENDESK_BASE_URL &&
-      ZENDESK_TOKEN &&
-      MONITORED_ZENDESK_VIEW &&
-      ONCALL_CHANNEL_ID
-    );
+    const isChannelIdPerName =
+      ZENDESK_TICKETS_CHANNEL_ID.length === ZENDESK_TICKETS_CHANNEL_NAME.length;
+    const isZendeskSetup = !!(ZENDESK_BASE_URL && ZENDESK_TOKEN);
+    const isViewPerChannel =
+      ZENDESK_MONITORED_VIEW.length === ZENDESK_TICKETS_CHANNEL_ID.length;
+    // console.log(
+    //   "conditions:",
+    //   isChannelIdPerName,
+    //   isZendeskSetup,
+    //   isViewPerChannel
+    // );
+
+    return isChannelIdPerName && isZendeskSetup && isViewPerChannel;
   }
 
   doesMatch(event: any): boolean {
-    return sanitizeCommandInput(event.text).startsWith("oncall tickets status");
+    return sanitizeCommandInput(event.text).startsWith(
+      "zendesk tickets status"
+    );
   }
 
   async performAction(event: any, slackClient: any): Promise<void> {
-    await this.getOncallTicketsStatus(event, slackClient);
+    await this.getZendeskTicketsStatus(event, slackClient);
   }
 
-  async getOncallTicketsStatus(event: any, slackClient: any): Promise<void> {
+  async getZendeskTicketsStatus(event: any, slackClient: any): Promise<void> {
     // TODO: Temporary fix. If client is null, get it again from consts.
     if (!slackClient) {
       console.log("Slack client is null. Getting it again from consts.");
       slackClient = SlackWebClient;
     }
 
-    console.log("Running oncall status ask");
+    const askChannelId = getChannelIDFromEventText(
+      event.text,
+      3,
+      ZENDESK_TICKETS_CHANNEL_ID[0]
+    );
+    if (!askChannelId) {
+      console.log(`Unable to find channel ID. Ask: ${event.text}`);
+      return;
+    }
 
-    const tickets: any[] = await getTicketsByView(MONITORED_ZENDESK_VIEW);
+    console.log(`Running zendesk tickets status for channel ${askChannelId}`);
+
+    const viewIndex = ZENDESK_TICKETS_CHANNEL_ID.indexOf(askChannelId);
+    if (viewIndex === -1) {
+      console.log(
+        `Channel ${askChannelId} was not found in the monitored channels list. Skipping.`
+      );
+      await sendSlackMessage(
+        slackClient,
+        `Channel <#${askChannelId}> was not found in the monitored channels list. Unable to create a summary.`,
+        event.channel,
+        event.thread_ts ? event.thread_ts : event.ts
+      );
+
+      return;
+    }
+
+    const tickets: any[] = await getTicketsByView(
+      ZENDESK_MONITORED_VIEW[viewIndex]
+    );
     let filteredTickets: any[];
 
     // Check if we need to filter the tickets
@@ -103,10 +143,13 @@ export class OncallTicketsStatus implements BotAction {
     // messageBlocks.push(createSectionBlock("Good morning on-callers :sunny:\nThere are *total of X tier 3 tickets* assigned to you - *Y open, 3 pending customers and 1 closed*."))
     messageBlocks.push(
       createSectionBlock(
-        `Good morning on-callers :sunny:\nThere are currently ${filteredTickets.length} tier 3 tickets currently assigned to you.`
+        `Good morning team :sunny:\nThere are currently ${filteredTickets.length} tickets currently assigned to you in Zendesk.`
       )
     );
-    messageBlocks.push(createDivider());
+
+    if (filteredTickets.length > 0) {
+      messageBlocks.push(createDivider());
+    }
 
     for (const item of filteredTickets) {
       // Get the details for the tickets
@@ -137,7 +180,7 @@ export class OncallTicketsStatus implements BotAction {
 
     await sendSlackMessage(
       slackClient,
-      "Oncall tickets status",
+      "Zendesk tickets status",
       event.channel,
       event.thread_ts,
       messageBlocks

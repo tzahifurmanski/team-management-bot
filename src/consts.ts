@@ -124,11 +124,15 @@ export const BOT_RESPONSES_CHANNELS: string[] = handleListParameter(
 export const ASK_CHANNEL_STATS_CRON: string[] = handleListParameter(
   process.env.ASK_CHANNEL_STATS_CRON,
   "",
-  ",",
+  "|",
   false
 );
-export const ONCALL_TICKETS_STATS_CRON =
-  process.env.ONCALL_TICKETS_STATS_CRON || "";
+export const ZENDESK_TICKETS_STATS_CRON = handleListParameter(
+  process.env.ZENDESK_TICKETS_STATS_CRON,
+  "",
+  "|",
+  false
+);
 
 // Team Configurations
 export const TEAM_NAME = process.env.TEAM_NAME || "";

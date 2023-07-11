@@ -6,7 +6,7 @@ import { MeaningOfLife } from "./meaning_of_life";
 import { GroupAskChannelMonthlyStats } from "./group_ask_channel_monthly_stats";
 import { MonitoredChannelSummaryStats } from "./monitored_channel_stats";
 import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday";
-import { OncallTicketsStatus } from "./oncall_tickets_status";
+import { ZendeskTicketsStatus } from "./zendesk_tickets_status";
 import { Help } from "./help";
 import { Status } from "./status";
 
@@ -15,7 +15,7 @@ const ACTIONS_LIST: BotAction[] = [
   new AskChannelStatusForYesterday(),
   new AskChannelStatusStatsOrSummary(),
   new GroupAskChannelMonthlyStats(),
-  new OncallTicketsStatus(),
+  new ZendeskTicketsStatus(),
   new MonitoredChannelSummaryStats(),
   new Compliment(),
   new MeaningOfLife(),
