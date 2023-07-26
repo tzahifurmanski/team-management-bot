@@ -22,7 +22,7 @@ import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { ASK_CHANNEL_STATS_CRON } from "../../consts";
 
 export class AskChannelStatusForYesterday implements BotAction {
-  DAYS_BACK = 60;
+  static DAYS_BACK = 60;
 
   constructor() {
     if (this.isEnabled()) {
@@ -40,7 +40,7 @@ export class AskChannelStatusForYesterday implements BotAction {
   getHelpText(): string {
     let helpMessage =
       "`ask channel status for yesterday` - Get the status of requests in your team ask channel from yesterday and a current status going back for the last " +
-      this.DAYS_BACK +
+      AskChannelStatusForYesterday.DAYS_BACK +
       " days.";
 
     helpMessage += getRecurringJobInfo(
@@ -135,14 +135,15 @@ export class AskChannelStatusForYesterday implements BotAction {
     // Get the timeframe for the last 60 days
 
     const beginningOfMonthDate = new Date(
-      new Date().getTime() - this.DAYS_BACK * 24 * 60 * 60 * 1000
+      new Date().getTime() -
+        AskChannelStatusForYesterday.DAYS_BACK * 24 * 60 * 60 * 1000
     );
     removeTimeInfoFromDate(beginningOfMonthDate);
     const now = new Date();
 
     console.log(
       `${
-        this.DAYS_BACK
+        AskChannelStatusForYesterday.DAYS_BACK
       } days back timeframe is ${beginningOfMonthDate.toUTCString()} to ${now.toUTCString()}`
     );
 
@@ -161,7 +162,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     await sendSlackMessage(
       slackClient,
       `${yesterdaySummary}\nIn the last ${
-        this.DAYS_BACK
+        AskChannelStatusForYesterday.DAYS_BACK
       } days, ${getStatsMessage(askChannelId, monthStats)}`,
       event.channel,
       event.thread_ts
