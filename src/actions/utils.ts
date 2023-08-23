@@ -1,5 +1,6 @@
 import cronstrue from "cronstrue";
 import { AsksChannelStatsResult } from "../logic/asks_channel";
+import { sanitizeCommandInput } from "../integrations/slack/utils";
 
 const cron = require("node-cron");
 
@@ -231,7 +232,10 @@ export const getChannelIDFromEventText = (
 
   // If there's a sixth word, then it's a channel name
   const params = eventText.split(" ");
-  if (params.length === nameIndex) {
+  if (
+    !sanitizeCommandInput(eventText).startsWith("ask channel status") ||
+    params.length === nameIndex
+  ) {
     // Take default
     askChannelID = defaultID;
     console.log(`Using default channel ID ${askChannelID}.`);
