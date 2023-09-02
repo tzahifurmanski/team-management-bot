@@ -81,6 +81,10 @@ export class ZendeskTicketsStatus implements BotAction {
   }
 
   async getZendeskTicketsStatus(event: any, slackClient: any): Promise<void> {
+    if (event.scheduled) {
+      console.log("Kicking off a scheduled zendesk tickets status action.");
+    }
+
     // TODO: Temporary fix. If client is null, get it again from consts.
     if (!slackClient) {
       console.log("Slack client is null. Getting it again from consts.");
@@ -112,6 +116,10 @@ export class ZendeskTicketsStatus implements BotAction {
       );
 
       return;
+    } else {
+      console.log(
+        `Found view ${ZENDESK_MONITORED_VIEW[viewIndex]} (index ${viewIndex}) for reporting in channel ${askChannelId}.`
+      );
     }
 
     const tickets: any[] = await getTicketsByView(
