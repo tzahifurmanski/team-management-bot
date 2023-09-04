@@ -3,6 +3,7 @@ import { ASKS_ACTIONS } from "./actions/asks";
 import { RESPONSE_ACTIONS } from "./actions/responses";
 import { sendSlackMessage } from "./integrations/slack/messages";
 import { BOT_RESPONSES_CHANNELS } from "./consts";
+import { BOT_ID } from "./integrations/slack/consts";
 
 // This method handles events that are posted directly inside a channel
 export const handleChannelEvent = async (event: any, client: any) => {
@@ -25,6 +26,9 @@ export const handleChannelEvent = async (event: any, client: any) => {
 // This method handles events that are with direct interaction with the bot (like a DM or when the bot is mentioned)
 export const handleDirectEvent = async (event: any, client: any) => {
   // console.log("Got new direct event", event.type, event);
+
+  // Remove the bot mention from the text
+  event.text = event.text = event.text.replace(`<@${BOT_ID}>`, "").trim();
 
   if (!(await runActions(event, client, ASKS_ACTIONS))) {
     console.log("Unsupported text/event", event.text, JSON.stringify(event));
