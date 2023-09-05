@@ -2,6 +2,7 @@ import {
   AskChannelParams,
   extractNameFromChannelString,
   getAskChannelParameters,
+  getChannelIDFromEventText,
   getStartingDate,
   setDateToSunday,
 } from "../../src/actions/utils";
@@ -439,5 +440,39 @@ describe("getChannelNameFromSlackChannelString", () => {
 
   it("should return empty string if the slack channel string is empty", () => {
     expect(extractNameFromChannelString("")).toBe("");
+  });
+});
+
+describe("getChannelIDFromEventText", () => {
+  it("should return the default channel ID from the event text", () => {
+    expect(getChannelIDFromEventText("ask channel status", 3, "12345")).toBe(
+      "12345"
+    );
+    expect(
+      getChannelIDFromEventText("zendesk tickets status", 3, "12345")
+    ).toBe("12345");
+
+    expect(getChannelIDFromEventText("zigi belo bibi 33223", 3, "12345")).toBe(
+      "12345"
+    );
+
+    expect(getChannelIDFromEventText("", 3, "12345")).toBe("12345");
+  });
+
+  it("should return the user-supplied channel ID from the event text", () => {
+    expect(
+      getChannelIDFromEventText(
+        "ask channel status <#C0422HDF13N|tzahi_bot_test>",
+        3,
+        "12345"
+      )
+    ).toBe("C0422HDF13N");
+    expect(
+      getChannelIDFromEventText(
+        "zendesk tickets status <#C0422HDF13N|tzahi_bot_test>",
+        3,
+        "12345"
+      )
+    ).toBe("C0422HDF13N");
   });
 });
