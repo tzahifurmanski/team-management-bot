@@ -232,8 +232,13 @@ export const getChannelIDFromEventText = (
 
   // If there's a sixth word, then it's a channel name
   const params = eventText.split(" ");
+
+  // Check if no channel ID was provided
   if (
-    !sanitizeCommandInput(eventText).startsWith("ask channel status") ||
+    !(
+      sanitizeCommandInput(eventText).startsWith("ask channel status") ||
+      sanitizeCommandInput(eventText).startsWith("zendesk tickets status")
+    ) ||
     params.length === nameIndex
   ) {
     // Take default

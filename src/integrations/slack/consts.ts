@@ -71,6 +71,14 @@ export const ZENDESK_BASE_URL = process.env.ZENDESK_BASE_URL || "";
 export const ZENDESK_MONITORED_VIEW = handleListParameter(
   process.env.ZENDESK_MONITORED_VIEW
 );
+
+export const ZENDESK_VIEW_AGGREGATED_FIELD_ID = handleListParameter(
+  process.env.ZENDESK_VIEW_AGGREGATED_FIELD_ID,
+  "",
+  ",",
+  false
+);
+
 export const ZENDESK_TICKETS_CHANNEL_ID: string[] = handleListParameter(
   process.env.ZENDESK_TICKETS_CHANNEL_ID
 );
@@ -85,7 +93,8 @@ export const MONITORED_ZENDESK_FILTER_FIELD_VALUES: string[] =
   handleListParameter(
     process.env.MONITORED_ZENDESK_FILTER_FIELD_VALUES,
     "",
-    ","
+    ",",
+    false
   );
 
 // Resolve the slack dynamic variables

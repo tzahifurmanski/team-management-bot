@@ -61,6 +61,7 @@ ZENDESK_BASE_URL= # Base URL for your Zendesk instance
 
 # Zendesk Tickets Status Configurations
 ZENDESK_MONITORED_VIEW= # A comma (',') separated list of IDs for the Zendesk views to monitor.
+ZENDESK_VIEW_AGGREGATED_FIELD_ID=# A comma (',') separated list of field IDs to aggregate the Zendesk views by. This will be used to determine if the summary will be detailed or aggregated.
 MONITORED_ZENDESK_FILTER_FIELD_ID= # Optional. ID of a field to filter Zendesk tickets by
 MONITORED_ZENDESK_FILTER_FIELD_VALUES= # Optional. A list of allowed values for the Zendesk tickets filter field.
 

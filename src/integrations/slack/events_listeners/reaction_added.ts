@@ -4,21 +4,21 @@ import { getUserProfile } from "../users";
 import { getConversationHistory } from "../conversations";
 
 const reactionAddedCallback = async ({ event, client, logger }: any) => {
-  console.log("Got a reaction added callback...", JSON.stringify(event));
+  // console.log("Got a reaction added callback...", JSON.stringify(event));
 
   try {
     if (!REACTIONS_HANDLED.includes(event.reaction)) {
-      console.log("Irrelevant reaction, skipping.");
+      // console.log("Irrelevant reaction, skipping.");
       return;
     }
 
     // Verify we are in the ask channel
     if (!TEAM_ASK_CHANNEL_ID.includes(event.item.channel)) {
-      console.log(
-        "Reaction is not in an ask channel, skipping.",
-        event.channelId,
-        JSON.stringify(TEAM_ASK_CHANNEL_ID)
-      );
+      // console.log(
+      //   "Reaction is not in an ask channel, skipping.",
+      //   `Message channel: ${event.item.channel}`,
+      //   `Allowed channels: ${JSON.stringify(TEAM_ASK_CHANNEL_ID)}`
+      // );
       return;
     }
 
