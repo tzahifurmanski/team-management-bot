@@ -14,7 +14,7 @@
   ],
   "dependencies": {
     "@slack/bolt": "3.13.1",
-    "cronstrue": "2.27.0",
+    "cronstrue": "2.44.0",
     "dotenv": "16.3.1",
     "node-cron": "3.0.2"
   },
