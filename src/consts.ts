@@ -135,7 +135,6 @@ export const ZENDESK_TICKETS_STATS_CRON = handleListParameter(
 );
 
 // Team Configurations
-export const TEAM_NAME = process.env.TEAM_NAME || "";
 export const TEAM_SPECIFIC_COMPLIMENTS: string[] = handleListParameter(
   process.env.TEAM_SPECIFIC_COMPLIMENTS
 );

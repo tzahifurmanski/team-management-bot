@@ -1,5 +1,5 @@
 import { BotAction } from "../base_action";
-import { BOT_NAME, botConfig, TEAM_NAME } from "../../consts";
+import { BOT_NAME, botConfig } from "../../consts";
 import { BOT_ID, TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
 import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday";
 import { Help } from "./help";
@@ -31,7 +31,7 @@ export class IntroduceYourself implements BotAction {
     // Send welcome message
     await sendSlackMessage(
       slackClient,
-      `${botConfig.ACTION_INTRODUCE_YOURSELF_TEXT} I serve at the pleasure of the ${TEAM_NAME} team :wave:\n` +
+      `${botConfig.ACTION_INTRODUCE_YOURSELF_TEXT}\n` +
         "Here are some things you should know about me :in-progress:",
       event.channel,
       event.thread_ts

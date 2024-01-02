@@ -197,7 +197,7 @@ export const getStatsMessage = (
   return summary;
 };
 
-const SLACK_CHANNEL_NAME_REGEX = /^<#C[A-Z0-9]{8,10}\|.+>$/;
+const SLACK_CHANNEL_NAME_REGEX = /^<#C[A-Z0-9]{8,10}\|.*>$/;
 
 export const extractNameFromChannelString = (channelString: string): string => {
   // The channel string is in the format <#C12345678|channel-name>, we want to return the channel name

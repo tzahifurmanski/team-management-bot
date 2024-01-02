@@ -5,7 +5,6 @@ import {
   ConversationsHistoryResponse,
   ConversationsListArguments,
 } from "@slack/web-api";
-import { Message } from "@slack/web-api/dist/response/ConversationsHistoryResponse";
 import { isBotMessage } from "./utils";
 
 // If something is not found, we'll have to go over everything
@@ -105,7 +104,7 @@ export const getConversationHistory = async (
   do {
     // console.log("ITERATING RESULTS");
     if (response.messages) {
-      response.messages.forEach((message: Message) => {
+      response.messages.forEach((message) => {
         // Filter out messages from the bot, and all message events with subtypes that are not bot messages
         // TODO: Extract this
         if (!shouldMessageBeSkipped(message)) {

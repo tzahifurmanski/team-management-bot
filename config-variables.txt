@@ -18,7 +18,6 @@ BOT_PERSONALITY= # Default is 'generic'.
 
 
 // Team Configurations
-TEAM_NAME=
 TEAM_SPECIFIC_COMPLIMENTS=
 
 // Monitored Channel Configurations
