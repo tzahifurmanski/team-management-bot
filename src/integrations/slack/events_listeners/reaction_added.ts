@@ -74,7 +74,7 @@ const reactionAddedCallback = async ({ event, client, logger }: any) => {
       text: promptText,
     });
 
-    console.log("Done handling the reaction.", JSON.stringify(event));
+    console.log("Done handling a reaction.", JSON.stringify(event));
   } catch (error) {
     logger.error(error);
   }
