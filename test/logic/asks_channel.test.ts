@@ -14,14 +14,14 @@ describe("getBucketRange", () => {
   test("by day", async () => {
     const [bucketStartDate, bucketEndDate] = getBucketRange(
       messageDate,
-      "days"
+      "days",
     );
 
     expect(bucketStartDate.toUTCString()).toEqual(
-      "Wed, 14 Sep 2022 00:00:00 GMT"
+      "Wed, 14 Sep 2022 00:00:00 GMT",
     );
     expect(bucketEndDate.toUTCString()).toEqual(
-      "Wed, 14 Sep 2022 23:59:59 GMT"
+      "Wed, 14 Sep 2022 23:59:59 GMT",
     );
   });
 
@@ -31,28 +31,28 @@ describe("getBucketRange", () => {
   test.skip("by weeks", async () => {
     const [bucketStartDate, bucketEndDate] = getBucketRange(
       messageDate,
-      "weeks"
+      "weeks",
     );
 
     expect(bucketStartDate.toUTCString()).toEqual(
-      "Sun, 11 Sep 2022 00:00:00 GMT"
+      "Sun, 11 Sep 2022 00:00:00 GMT",
     );
     expect(bucketEndDate.toUTCString()).toEqual(
-      "Sat, 17 Sep 2022 23:59:59 GMT"
+      "Sat, 17 Sep 2022 23:59:59 GMT",
     );
   });
 
   test("by months", async () => {
     const [bucketStartDate, bucketEndDate] = getBucketRange(
       messageDate,
-      "months"
+      "months",
     );
 
     expect(bucketStartDate.toUTCString()).toEqual(
-      "Thu, 01 Sep 2022 00:00:00 GMT"
+      "Thu, 01 Sep 2022 00:00:00 GMT",
     );
     expect(bucketEndDate.toUTCString()).toEqual(
-      "Fri, 30 Sep 2022 23:59:59 GMT"
+      "Fri, 30 Sep 2022 23:59:59 GMT",
     );
   });
 });
@@ -65,7 +65,7 @@ describe("getStatsForMessages", () => {
       "FAKE_CHANNEL_ID",
       messages,
       "2022-05-01T16:35:13Z",
-      "2022-05-20T16:35:13Z"
+      "2022-05-20T16:35:13Z",
     );
 
     expect(result.totalMessages).toEqual(0);
@@ -85,7 +85,7 @@ describe("getStatsForMessages", () => {
       "FAKE_CHANNEL_ID",
       messages,
       "2022-05-01T16:35:13Z",
-      "2022-05-20T16:35:13Z"
+      "2022-05-20T16:35:13Z",
     );
 
     expect(result.totalMessages).toEqual(4);
@@ -105,7 +105,7 @@ describe("getStatsForMessages", () => {
       "FAKE_CHANNEL_ID",
       messages,
       "2022-05-01T16:35:13Z",
-      "2022-05-20T16:35:13Z"
+      "2022-05-20T16:35:13Z",
     );
 
     expect(result.totalMessages).toEqual(4);
@@ -120,7 +120,6 @@ const getMessageForTest = (userId: string, reactions?: any): any => {
     text: "<TEXT>",
     user: userId,
     ts: 1652116246.760559,
-    team: "<TEAM_NAME>",
     reactions: [],
   };
 
