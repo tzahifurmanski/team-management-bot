@@ -1,4 +1,8 @@
-import { convertSecondsToTimeString, isBotMessage } from "../utils";
+import {
+  convertSecondsToTimeString,
+  countReactions,
+  isBotMessage,
+} from "../utils";
 import { REACTIONS_HANDLED, TEAM_ASK_CHANNEL_ID } from "../consts";
 import { getUserProfile } from "../users";
 import { getConversationHistory } from "../conversations";
@@ -35,7 +39,7 @@ const reactionAddedCallback = async ({ event, client, logger }: any) => {
       event.item.ts,
       event.item.ts,
       1,
-      true
+      true,
     );
     if (messages.length == 0) {
       // Cant find original message,
@@ -47,11 +51,7 @@ const reactionAddedCallback = async ({ event, client, logger }: any) => {
 
     // Check if the reaction is the first one of it's kind
     const originalMessage = messages[0];
-    if (
-      originalMessage.reactions?.filter((reaction: any) => {
-        return REACTIONS_HANDLED.includes(reaction.name);
-      }).length > 1
-    ) {
+    if (countReactions(originalMessage, REACTIONS_HANDLED) > 1) {
       console.log("More then 1 COMPLETED emoji, skipping");
       return;
     }

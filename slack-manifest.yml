@@ -1,7 +1,12 @@
 display_information:
-  name: BOT_NAME
-  description: BOT_DESCRIPTION
-  background_color: "#757575"
+  name: Team Bot
+  description: A slack bot for engineering teams.
+  background_color: "#162836"
+  long_description: "A slack bot for engineering teams.\r
+
+    Homepage: https://team-management-bot.super.site\r
+
+    Source: https://github.com/tzahifurmanski/team-management-bot\r"
 features:
   bot_user:
     display_name: BOT_NAME

@@ -49,7 +49,7 @@ describe("createReport", () => {
     const userProfile: any = getProfileForTest(
       mockedUser.team,
       mockedUser.division,
-      mockedUser.department
+      mockedUser.department,
     );
     mockedUserProfile.mockResolvedValue(userProfile);
 
@@ -118,29 +118,29 @@ describe("createReport", () => {
       getProfileForTest(
         mockedUserA.team,
         mockedUserA.division,
-        mockedUserA.department
-      )
+        mockedUserA.department,
+      ),
     );
     mockedUserProfile.mockResolvedValueOnce(
       getProfileForTest(
         mockedUserB.team,
         mockedUserB.division,
-        mockedUserB.department
-      )
+        mockedUserB.department,
+      ),
     );
     mockedUserProfile.mockResolvedValueOnce(
       getProfileForTest(
         mockedUserC.team,
         mockedUserC.division,
-        mockedUserC.department
-      )
+        mockedUserC.department,
+      ),
     );
     mockedUserProfile.mockResolvedValueOnce(
       getProfileForTest(
         mockedUserD.team,
         mockedUserD.division,
-        mockedUserD.department
-      )
+        mockedUserD.department,
+      ),
     );
 
     // Generate the report
@@ -178,7 +178,6 @@ const getMessageForTest = (userId: string, reactions?: any): any => {
     text: "<TEXT>",
     user: userId,
     ts: 1652116246.760559,
-    team: "<TEAM_NAME>",
     reactions: [],
   };
 
@@ -192,7 +191,7 @@ const getMessageForTest = (userId: string, reactions?: any): any => {
 const getProfileForTest = (
   team: string,
   division: string,
-  department: string
+  department: string,
 ): any => {
   const profile: any = {
     first_name: "<NAME>",
@@ -268,7 +267,7 @@ describe("createReportSection", () => {
   const validateSection = (
     block: SectionBlock,
     text: string,
-    fields: any[]
+    fields: any[],
   ) => {
     // Check the text and the fields
     if (text) {

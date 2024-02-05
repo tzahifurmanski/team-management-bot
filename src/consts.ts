@@ -29,7 +29,7 @@ export const handleListParameter = (
   param: string | undefined,
   defaultValue = "",
   delimiter = ",",
-  removeEmpty = true
+  removeEmpty = true,
 ): string[] => {
   // Check if we got a string that represents an array (or a default value that is an array)
   // If so, split it by the delimiter and optionally remove empty values.
@@ -70,7 +70,9 @@ export const PORT = process.env.PORT || 3000;
 const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "generic";
 
 // Load the configuration specific to the selected bot personality
-export const botConfig = require(`../assets/personalities/${BOT_PERSONALITY}/bot_config.json`);
+export const botConfig = require(
+  `../assets/personalities/${BOT_PERSONALITY}/bot_config.json`,
+);
 
 // If we got a bot name, override the default:
 const BOT_NAME_PLACEHOLDER = "<BOT_NAME>";
@@ -80,10 +82,10 @@ if (BOT_NAME) {
   botConfig.ACTION_INTRODUCE_YOURSELF_TEXT =
     botConfig.ACTION_INTRODUCE_YOURSELF_TEXT.replace(
       BOT_NAME_PLACEHOLDER,
-      BOT_NAME
+      BOT_NAME,
     );
 
-  console.log(`Set up ${botConfig.BOT_NAME} as the bot name.`);
+  console.log(`Set up "${botConfig.BOT_NAME}" as the bot name.`);
 }
 
 // If we got a bot image, override the default:
@@ -113,11 +115,11 @@ export const ENABLE_BOT_RESPONSES =
 
 // Bot responses
 export const DISABLED_RESPONSES: string[] = handleListParameter(
-  process.env.DISABLED_RESPONSES
+  process.env.DISABLED_RESPONSES,
 );
 
 export const BOT_RESPONSES_CHANNELS: string[] = handleListParameter(
-  process.env.BOT_RESPONSES_CHANNELS
+  process.env.BOT_RESPONSES_CHANNELS,
 );
 
 // Scheduling Configurations
@@ -125,18 +127,18 @@ export const ASK_CHANNEL_STATS_CRON: string[] = handleListParameter(
   process.env.ASK_CHANNEL_STATS_CRON,
   "",
   "|",
-  false
+  false,
 );
 export const ZENDESK_TICKETS_STATS_CRON = handleListParameter(
   process.env.ZENDESK_TICKETS_STATS_CRON,
   "",
   "|",
-  false
+  false,
 );
 
 // Team Configurations
 export const TEAM_SPECIFIC_COMPLIMENTS: string[] = handleListParameter(
-  process.env.TEAM_SPECIFIC_COMPLIMENTS
+  process.env.TEAM_SPECIFIC_COMPLIMENTS,
 );
 
 // Monitored Channel Configurations

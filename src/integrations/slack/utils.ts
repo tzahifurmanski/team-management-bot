@@ -6,6 +6,7 @@ export const sanitizeCommandInput = (text: string): string => {
   return text.replace(`<@${BOT_ID}> `, "").trim();
 };
 
+// TODO: Change that to be a generic test, so you won't
 export const isBotMessage = (event: any): boolean => {
   return (
     event.user === BOT_ID ||
@@ -25,7 +26,7 @@ export const getValueFromProfile = (profile: any, fieldId: string): string => {
 };
 
 export const convertSecondsToTimeString = (
-  eventDifferenceInSeconds: number
+  eventDifferenceInSeconds: number,
 ): string => {
   let seconds = Math.floor(eventDifferenceInSeconds);
   let minutes = Math.floor(seconds / 60);
@@ -43,11 +44,21 @@ export const convertSecondsToTimeString = (
   const timeFormat = days
     ? `${MESSAGE_DAYS}, ${MESSAGE_HOURS}, ${MESSAGE_MINUTES}, and ${MESSAGE_SECONDS}`
     : hours
-    ? `${MESSAGE_HOURS}, ${MESSAGE_MINUTES}, and ${MESSAGE_SECONDS}`
-    : minutes
-    ? `${MESSAGE_MINUTES}, and ${MESSAGE_SECONDS}`
-    : `${MESSAGE_SECONDS}`;
+      ? `${MESSAGE_HOURS}, ${MESSAGE_MINUTES}, and ${MESSAGE_SECONDS}`
+      : minutes
+        ? `${MESSAGE_MINUTES}, and ${MESSAGE_SECONDS}`
+        : `${MESSAGE_SECONDS}`;
 
   // console.log("Calculated time:", timeFormat);
   return timeFormat;
+};
+
+/*
+ * This method will count how many times the reactions in the supplied array appear on the message.
+ */
+export const countReactions = (message: any, reactions: string[]): number => {
+  return message.reactions
+    ?.filter((reaction: any) => reactions.includes(reaction.name))
+    .map((reaction: any) => reaction.count)
+    .reduce((acc: number, reaction: any) => acc + reaction, 0);
 };
