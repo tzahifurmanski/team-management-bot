@@ -1,3 +1,20 @@
+// =================================================
+//          General Configurations
+// =================================================
+// Load the .env file config for debug
+if (process.env.NODE_ENV !== "production") {
+  if (typeof process.env.ENV_FILE !== "undefined") {
+    // If there is a custom env file, use it
+    console.log("Loading a custom env file...");
+    require("dotenv").config({ path: process.env.ENV_FILE });
+  } else {
+    console.log("Loading default env file...");
+    require("dotenv").config();
+  }
+}
+
+import { LogLevel } from "@slack/bolt";
+
 const winston = require("winston");
 
 const logLevels = {
@@ -18,6 +35,8 @@ export const logger = winston.createLogger({
 
   transports: [new winston.transports.Console()],
 });
+
+logger.info(`Logger is set up with ${logger.level} level.`);
 
 // =================================================
 //          Utils
@@ -64,23 +83,6 @@ export const handleListParameter = (
   }
   return result;
 };
-
-// =================================================
-//          General Configurations
-// =================================================
-// Load the .env file config for debug
-import { LogLevel } from "@slack/bolt";
-
-if (process.env.NODE_ENV !== "production") {
-  if (typeof process.env.ENV_FILE !== "undefined") {
-    // If there is a custom env file, use it
-    logger.info("Loading a custom env file...");
-    require("dotenv").config({ path: process.env.ENV_FILE });
-  } else {
-    logger.info("Loading default env file...");
-    require("dotenv").config();
-  }
-}
 
 export const PORT = process.env.PORT || 3000;
 
