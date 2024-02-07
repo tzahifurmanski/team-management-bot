@@ -1,7 +1,7 @@
 // TODO: Make sure to load src/consts before loading this - Instead, maybe load the dotenv conf?
 
 import { getBotId, getConversationId } from "./conversations";
-import { handleListParameter } from "../../consts";
+import { handleListParameter, logger } from "../../consts";
 
 export const SLACK_USER_FORMAT = /<@.*>/;
 
@@ -20,14 +20,14 @@ export let BOT_ID: string;
 
 // Asks channel stats
 export const TEAM_ASK_CHANNEL_ID: string[] = handleListParameter(
-  process.env.TEAM_ASK_CHANNEL_ID
+  process.env.TEAM_ASK_CHANNEL_ID,
 );
 export const TEAM_ASK_CHANNEL_NAME: string[] = handleListParameter(
-  process.env.TEAM_ASK_CHANNEL_NAME
+  process.env.TEAM_ASK_CHANNEL_NAME,
 );
 
 export const ALLOWED_BOTS: string[] = handleListParameter(
-  process.env.ALLOWED_BOTS
+  process.env.ALLOWED_BOTS,
 );
 
 // User profile field ids
@@ -42,12 +42,12 @@ export const USER_PROFILE_FIELD_ID_DIVISION =
 export const REACTIONS_IN_PROGRESS: string[] = handleListParameter(
   process.env.REACTIONS_IN_PROGRESS,
   "in-progress,spinner",
-  ","
+  ",",
 );
 export const REACTIONS_HANDLED: string[] = handleListParameter(
   process.env.REACTIONS_HANDLED,
   "white_check_mark,heavy_check_mark,green_tick",
-  ","
+  ",",
 );
 
 // Cron jobs
@@ -69,21 +69,21 @@ export const ZENDESK_BASE_URL = process.env.ZENDESK_BASE_URL || "";
 
 // Zendesk Tickets Status Configurations
 export const ZENDESK_MONITORED_VIEW = handleListParameter(
-  process.env.ZENDESK_MONITORED_VIEW
+  process.env.ZENDESK_MONITORED_VIEW,
 );
 
 export const ZENDESK_VIEW_AGGREGATED_FIELD_ID = handleListParameter(
   process.env.ZENDESK_VIEW_AGGREGATED_FIELD_ID,
   "",
   ",",
-  false
+  false,
 );
 
 export const ZENDESK_TICKETS_CHANNEL_ID: string[] = handleListParameter(
-  process.env.ZENDESK_TICKETS_CHANNEL_ID
+  process.env.ZENDESK_TICKETS_CHANNEL_ID,
 );
 export const ZENDESK_TICKETS_CHANNEL_NAME: string[] = handleListParameter(
-  process.env.ZENDESK_TICKETS_CHANNEL_NAME
+  process.env.ZENDESK_TICKETS_CHANNEL_NAME,
 );
 
 export const MONITORED_ZENDESK_FILTER_FIELD_ID =
@@ -94,28 +94,28 @@ export const MONITORED_ZENDESK_FILTER_FIELD_VALUES: string[] =
     process.env.MONITORED_ZENDESK_FILTER_FIELD_VALUES,
     "",
     ",",
-    false
+    false,
   );
 
 // Resolve the slack dynamic variables
 export const loadSlackConfig = async (slackClient: any) => {
-  console.log("Starting Slack config load...");
+  logger.info("Starting Slack config load...");
   try {
     BOT_ID = await getBotId(slackClient);
-    console.log(`Loaded bot id ${BOT_ID}`);
+    logger.info(`Loaded bot id ${BOT_ID}`);
 
     // If there are no channel ids, resolve them by names
     if (TEAM_ASK_CHANNEL_ID.length === 0) {
       for (const channelName of TEAM_ASK_CHANNEL_NAME) {
         const channelId: string = await getConversationId(
           slackClient,
-          channelName
+          channelName,
         );
         TEAM_ASK_CHANNEL_ID.push(channelId);
       }
     } else if (TEAM_ASK_CHANNEL_ID.length != TEAM_ASK_CHANNEL_NAME.length) {
-      console.log(
-        "Error: TEAM_ASK_CHANNEL_ID and TEAM_ASK_CHANNEL_NAME have different lengths"
+      logger.error(
+        "Error: TEAM_ASK_CHANNEL_ID and TEAM_ASK_CHANNEL_NAME have different lengths",
       );
       return false;
     }
@@ -124,15 +124,15 @@ export const loadSlackConfig = async (slackClient: any) => {
       for (const channelName of ZENDESK_TICKETS_CHANNEL_NAME) {
         const channelId: string = await getConversationId(
           slackClient,
-          channelName
+          channelName,
         );
         ZENDESK_TICKETS_CHANNEL_ID.push(channelId);
       }
     } else if (
       ZENDESK_TICKETS_CHANNEL_ID.length != ZENDESK_TICKETS_CHANNEL_NAME.length
     ) {
-      console.log(
-        "Error: TICKETS_CHANNEL_ID and TICKETS_CHANNEL_NAME have different lengths"
+      logger.error(
+        "Error: TICKETS_CHANNEL_ID and TICKETS_CHANNEL_NAME have different lengths",
       );
       return false;
     }
@@ -153,9 +153,9 @@ export const loadSlackConfig = async (slackClient: any) => {
     // Set global slack client to use in cron jobs
     SlackWebClient = slackClient;
 
-    console.log("Slack config completed successfully.");
+    logger.info("Slack config completed successfully.");
   } catch (err) {
-    console.log("Error while loading Slack Dynamic vars!", err);
+    logger.error("Error while loading Slack Dynamic vars!", err);
     return false;
   }
 

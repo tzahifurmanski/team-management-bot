@@ -19,7 +19,7 @@ import {
 } from "../../integrations/slack/consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
-import { ASK_CHANNEL_STATS_CRON } from "../../consts";
+import { ASK_CHANNEL_STATS_CRON, logger } from "../../consts";
 
 export class AskChannelStatusForYesterday implements BotAction {
   static DAYS_BACK = 60;
@@ -32,7 +32,7 @@ export class AskChannelStatusForYesterday implements BotAction {
         TEAM_ASK_CHANNEL_ID,
         TEAM_ASK_CHANNEL_NAME,
         "ask channel status for yesterday",
-        this.getAskChannelStatsForYesterday
+        this.getAskChannelStatsForYesterday,
       );
     }
   }
@@ -46,7 +46,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     helpMessage += getRecurringJobInfo(
       "ask channel post",
       ASK_CHANNEL_STATS_CRON,
-      TEAM_ASK_CHANNEL_ID
+      TEAM_ASK_CHANNEL_ID,
     );
 
     return helpMessage;
@@ -59,7 +59,7 @@ export class AskChannelStatusForYesterday implements BotAction {
 
   doesMatch(event: any): boolean {
     return sanitizeCommandInput(event.text).startsWith(
-      "ask channel status for yesterday"
+      "ask channel status for yesterday",
     );
   }
 
@@ -69,33 +69,33 @@ export class AskChannelStatusForYesterday implements BotAction {
 
   async getAskChannelStatsForYesterday(
     event: any,
-    slackClient: any
+    slackClient: any,
   ): Promise<void> {
     if (event.scheduled) {
-      console.log(
-        "Kicking off a scheduled ask channel stats for yesterday action."
+      logger.info(
+        "Kicking off a scheduled ask channel stats for yesterday action.",
       );
     }
 
     // TODO: Temporary fix. If client is null, get it again from consts. Remove once I pass it properly during cron scheduling.
     if (!slackClient) {
-      console.log("Slack client is null. Getting it again from consts.");
+      logger.debug("Slack client is null. Getting it again from consts.");
       slackClient = SlackWebClient;
     }
 
     const askChannelId = getChannelIDFromEventText(
       event.text,
       5,
-      TEAM_ASK_CHANNEL_ID[0]
+      TEAM_ASK_CHANNEL_ID[0],
     );
 
     if (!askChannelId) {
-      console.log(`Unable to find channel ID. Ask: ${event.text}`);
+      logger.info(`Unable to find channel ID. Ask: ${event.text}`);
       return;
     }
 
-    console.log(
-      `Posting the daily asks channel stats summary for channel ${askChannelId}`
+    logger.info(
+      `Posting the daily asks channel stats summary for channel ${askChannelId}`,
     );
 
     // Set the timeframe range to be yesterday
@@ -106,27 +106,27 @@ export class AskChannelStatusForYesterday implements BotAction {
     const tempDate = new Date();
     removeTimeInfoFromDate(tempDate);
     const endingDate = new Date(tempDate.getTime() - 1);
-    console.log(
-      `timeframe is ${startingDate.toUTCString()} to ${endingDate.toUTCString()}`
+    logger.info(
+      `timeframe is ${startingDate.toUTCString()} to ${endingDate.toUTCString()}`,
     );
 
     const messages: any[any] = await getChannelMessages(
       slackClient,
       askChannelId,
       startingDate,
-      endingDate
+      endingDate,
     );
 
     const stats: AsksChannelStatsResult = await getStatsForMessages(
       askChannelId,
       messages,
       startingDate.toUTCString(),
-      endingDate.toUTCString()
+      endingDate.toUTCString(),
     );
 
     const yesterdaySummary = `Good morning team:sunny:\nYesterday, ${getStatsMessage(
       askChannelId,
-      stats
+      stats,
     )}`;
 
     // Say what's the total of open asks we have in the last 60 days
@@ -136,28 +136,28 @@ export class AskChannelStatusForYesterday implements BotAction {
 
     const beginningOfMonthDate = new Date(
       new Date().getTime() -
-        AskChannelStatusForYesterday.DAYS_BACK * 24 * 60 * 60 * 1000
+        AskChannelStatusForYesterday.DAYS_BACK * 24 * 60 * 60 * 1000,
     );
     removeTimeInfoFromDate(beginningOfMonthDate);
     const now = new Date();
 
-    console.log(
+    logger.info(
       `${
         AskChannelStatusForYesterday.DAYS_BACK
-      } days back timeframe is ${beginningOfMonthDate.toUTCString()} to ${now.toUTCString()}`
+      } days back timeframe is ${beginningOfMonthDate.toUTCString()} to ${now.toUTCString()}`,
     );
 
     const monthMessages: any[any] = await getChannelMessages(
       slackClient,
       askChannelId,
       beginningOfMonthDate,
-      now
+      now,
     );
     const monthStats: AsksChannelStatsResult = await getStatsForMessages(
       askChannelId,
       monthMessages,
       beginningOfMonthDate.toUTCString(),
-      now.toUTCString()
+      now.toUTCString(),
     );
     await sendSlackMessage(
       slackClient,
@@ -165,7 +165,7 @@ export class AskChannelStatusForYesterday implements BotAction {
         AskChannelStatusForYesterday.DAYS_BACK
       } days, ${getStatsMessage(askChannelId, monthStats)}`,
       event.channel,
-      event.thread_ts
+      event.thread_ts,
     );
 
     // Post the links for the various open stats
@@ -176,7 +176,7 @@ export class AskChannelStatusForYesterday implements BotAction {
       event.thread_ts,
       false,
       true,
-      false
+      false,
     );
   }
 }

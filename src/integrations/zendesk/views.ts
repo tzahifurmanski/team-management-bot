@@ -1,8 +1,9 @@
 import { httpGet } from "../utils";
 import { ZENDESK_BASE_URL, ZENDESK_TOKEN } from "../slack/consts";
+import { logger } from "../../consts";
 
 export const getTicketsByView = async (
-  zendeskViewID: string
+  zendeskViewID: string,
 ): Promise<any[]> => {
   let url = `${ZENDESK_BASE_URL}/api/v2/views/${zendeskViewID}/tickets.json`;
   let zendeskResponse = await httpGet(url, ZENDESK_TOKEN);
@@ -15,7 +16,7 @@ export const getTicketsByView = async (
     all.push(...zendeskResponse.data.tickets);
   }
 
-  console.log(`A total of ${all.length} tickets were returned from Zendesk`);
+  logger.info(`A total of ${all.length} tickets were returned from Zendesk`);
 
   return all;
 };

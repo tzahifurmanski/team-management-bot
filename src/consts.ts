@@ -1,4 +1,44 @@
 // =================================================
+//          General Configurations
+// =================================================
+// Load the .env file config for debug
+if (process.env.NODE_ENV !== "production") {
+  if (typeof process.env.ENV_FILE !== "undefined") {
+    // If there is a custom env file, use it
+    console.log("Loading a custom env file...");
+    require("dotenv").config({ path: process.env.ENV_FILE });
+  } else {
+    console.log("Loading default env file...");
+    require("dotenv").config();
+  }
+}
+
+import { LogLevel } from "@slack/bolt";
+
+const winston = require("winston");
+
+const logLevels = {
+  fatal: 0,
+  error: 1,
+  warn: 2,
+  info: 3,
+  debug: 4,
+  trace: 5,
+};
+
+const { combine, timestamp, json, errors } = winston.format;
+
+export const logger = winston.createLogger({
+  levels: logLevels,
+  level: process.env.LOG_LEVEL || "info",
+  format: combine(errors({ stack: true }), timestamp(), json()),
+
+  transports: [new winston.transports.Console()],
+});
+
+logger.info(`Logger is set up with ${logger.level} level.`);
+
+// =================================================
 //          Utils
 // =================================================
 //
@@ -44,23 +84,6 @@ export const handleListParameter = (
   return result;
 };
 
-// =================================================
-//          General Configurations
-// =================================================
-// Load the .env file config for debug
-import { LogLevel } from "@slack/bolt";
-
-if (process.env.NODE_ENV !== "production") {
-  if (typeof process.env.ENV_FILE !== "undefined") {
-    // If there is a custom env file, use it
-    console.log("Loading a custom env file...");
-    require("dotenv").config({ path: process.env.ENV_FILE });
-  } else {
-    console.log("Loading default env file...");
-    require("dotenv").config();
-  }
-}
-
 export const PORT = process.env.PORT || 3000;
 
 // =================================================
@@ -85,7 +108,7 @@ if (BOT_NAME) {
       BOT_NAME,
     );
 
-  console.log(`Set up "${botConfig.BOT_NAME}" as the bot name.`);
+  logger.info(`Set up "${botConfig.BOT_NAME}" as the bot name.`);
 }
 
 // If we got a bot image, override the default:

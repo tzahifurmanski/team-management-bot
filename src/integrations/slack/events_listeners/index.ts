@@ -1,11 +1,11 @@
-import { ENABLE_ASK_SUMMARY } from "../../../consts";
+import { ENABLE_ASK_SUMMARY, logger } from "../../../consts";
 
 const { messageCallback } = require("./message");
 const { appMentionCallback } = require("./app_mention");
 const { reactionAddedCallback } = require("./reaction_added");
 
 module.exports.register = (app: any) => {
-  console.log("Setting up events...");
+  logger.info("Setting up events...");
 
   app.event("message", messageCallback);
   app.event("app_mention", appMentionCallback);
@@ -19,8 +19,8 @@ module.exports.register = (app: any) => {
   // All errors in listeners are caught here. If this weren't caught, the program would terminate.
   app.error((error: any) => {
     // TODO: Add better error handling
-    console.error(error);
+    logger.error(error);
   });
 
-  console.log("Done setting up events.");
+  logger.info("Done setting up events.");
 };

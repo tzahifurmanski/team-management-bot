@@ -5,7 +5,7 @@ import { FolksResponse } from "./folks";
 import { MergeResponse } from "./merge";
 import { HelpResponse } from "./help";
 import { IThinkResponse } from "./i_think";
-import { DISABLED_RESPONSES, ENABLE_BOT_RESPONSES } from "../../consts";
+import { DISABLED_RESPONSES, ENABLE_BOT_RESPONSES, logger } from "../../consts";
 
 const ACTIONS_LIST: BotAction[] = [
   new BugResponse(),
@@ -19,19 +19,19 @@ const ACTIONS_LIST: BotAction[] = [
 export const RESPONSE_ACTIONS: BotAction[] = [];
 
 if (!ENABLE_BOT_RESPONSES) {
-  console.log("** Bot responses are disabled. **");
+  logger.info("** Bot responses are disabled. **");
 } else {
-  console.log("Bot responses are enabled. Loading responses list...");
+  logger.info("Bot responses are enabled. Loading responses list...");
   ACTIONS_LIST.forEach((action) => {
     if (
       action.isEnabled() &&
       !DISABLED_RESPONSES.includes(action.constructor.name)
     ) {
       RESPONSE_ACTIONS.push(action);
-      console.log(`* '${action.constructor.name}' response is enabled.`);
+      logger.info(`* '${action.constructor.name}' response is enabled.`);
     } else {
-      console.log(`* '${action.constructor.name}' response is skipped.`);
+      logger.info(`* '${action.constructor.name}' response is skipped.`);
     }
   });
-  console.log("Responses list loading is complete.");
+  logger.info("Responses list loading is complete.");
 }

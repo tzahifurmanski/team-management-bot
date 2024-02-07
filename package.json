@@ -1,7 +1,7 @@
 {
   "name": "team-management-bot",
   "author": "Tzahi Furmanski <tzahi.fur@gmail.com> (https://github.com/tzahifurmanski/)",
-  "version": "1.5.8",
+  "version": "1.5.9",
   "repository": "https://github.com/tzahifurmanski/team-management-bot",
   "description": "A slack bot for engineering teams",
   "main": "dist/app.js",
@@ -16,7 +16,8 @@
     "@slack/bolt": "3.17.1",
     "cronstrue": "2.47.0",
     "dotenv": "16.4.1",
-    "node-cron": "3.0.3"
+    "node-cron": "3.0.3",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@types/jest": "29.5.12",
@@ -43,7 +44,7 @@
     "coverage": "cross-env NODE_ENV=test ENV_FILE=.tests_env jest --testTimeout=10000 --collectCoverage=true"
   },
   "engines": {
-    "node": "^14 || ^16",
-    "npm": "^8"
+    "node": "^16 || ^18",
+    "npm": "^9"
   }
 }
