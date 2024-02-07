@@ -1,4 +1,5 @@
 import { sendSlackMessage } from "../integrations/slack/messages";
+import { logger } from "../consts";
 
 export interface MonitoredChannelStatsResult {
   startDateInUTC: string;
@@ -22,7 +23,7 @@ export const getMonitoredChannelStatsForMessages = (
   conditionUsername?: string,
   conditionSuccessMessage?: string,
   conditionFailureMessage?: string,
-  eventEntity?: string
+  eventEntity?: string,
 ): MonitoredChannelStatsResult => {
   // Check if no filter conditions were given. If so, skip filtering and return everything.
   if (
@@ -30,8 +31,8 @@ export const getMonitoredChannelStatsForMessages = (
     !conditionSuccessMessage &&
     !conditionFailureMessage
   ) {
-    console.log(
-      "No monitored channels stats conditions, so stats grouping is unavailable."
+    logger.info(
+      "No monitored channels stats conditions, so stats grouping is unavailable.",
     );
 
     return {
@@ -84,10 +85,10 @@ export const reportMonitoredChannelStatsToSlack = async (
   slackClient: any,
   stats: MonitoredChannelStatsResult,
   destinationChannel: any,
-  destinationThreadTS: any
+  destinationThreadTS: any,
 ) => {
-  // console.log("Time in utc - start", stats.startDateInUTC);
-  // console.log("Time in utc - end", stats.endDateInUTC);
+  logger.trace("Time in utc - start", stats.startDateInUTC);
+  logger.trace("Time in utc - end", stats.endDateInUTC);
 
   await sendSlackMessage(
     slackClient,
@@ -100,6 +101,6 @@ export const reportMonitoredChannelStatsToSlack = async (
       stats.totalNumFailure
     } were failures*.`,
     destinationChannel,
-    destinationThreadTS
+    destinationThreadTS,
   );
 };

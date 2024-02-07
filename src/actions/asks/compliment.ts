@@ -2,7 +2,7 @@ import { BOT_ID } from "../../integrations/slack/consts";
 import { BotAction } from "../base_action";
 import { getRandomFromArray } from "../utils";
 
-import { botConfig, TEAM_SPECIFIC_COMPLIMENTS } from "../../consts";
+import { botConfig, logger, TEAM_SPECIFIC_COMPLIMENTS } from "../../consts";
 
 const {
   sendSlackMessage,
@@ -11,7 +11,7 @@ const {
 
 // Use a predefined compliments pool and anything that is team specific
 const COMPLIMENTS = botConfig.ACTION_COMPLIMENT_POOL.concat(
-  TEAM_SPECIFIC_COMPLIMENTS
+  TEAM_SPECIFIC_COMPLIMENTS,
 );
 
 export class Compliment implements BotAction {
@@ -43,7 +43,7 @@ export class Compliment implements BotAction {
         receiver = `<@${BOT_ID}>`;
       } // TODO: Add a compliment me scenario - https://snyk.slack.com/archives/CL2KB07KN/p1606746944139700?thread_ts=1606746775.138700&cid=CL2KB07KN
       else {
-        console.log(`Did not find a receiver in ${event.text}`);
+        logger.info(`Did not find a receiver in ${event.text}`);
         return;
       }
     }
@@ -53,7 +53,7 @@ export class Compliment implements BotAction {
       slackClient,
       `${receiver} ${compliment}`,
       event.channel,
-      event.thread_ts ? event.thread_ts : event.ts
+      event.thread_ts ? event.thread_ts : event.ts,
     );
   }
 }

@@ -1,11 +1,12 @@
 import healthcheck from "./healthcheck";
+import { logger } from "../../../consts";
 
 // Solution based off of: https://github.com/slackapi/bolt-js/issues/212
-module.exports.register = (receiver : any) => {
-  console.log("Setting up routes...")
+module.exports.register = (receiver: any) => {
+  logger.debug("Setting up routes...");
 
   // Other web requests are methods on receiver.router
-  receiver.router.get('/healthcheck', healthcheck);
+  receiver.router.get("/healthcheck", healthcheck);
 
-  console.log("Done setting up routes.")
+  logger.debug("Done setting up routes.");
 };

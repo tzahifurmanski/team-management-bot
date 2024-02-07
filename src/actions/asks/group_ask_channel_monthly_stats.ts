@@ -9,6 +9,7 @@ import {
   getStatsBuckets,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
+import { logger } from "../../consts";
 
 export class GroupAskChannelMonthlyStats implements BotAction {
   getHelpText(): string {
@@ -36,36 +37,36 @@ export class GroupAskChannelMonthlyStats implements BotAction {
     // Get the timeframe for the beginning of the month
     const date = new Date();
     const startingDate = new Date(
-      Date.UTC(date.getFullYear(), date.getMonth() - numOfMonths, 1, 0)
+      Date.UTC(date.getFullYear(), date.getMonth() - numOfMonths, 1, 0),
     );
 
     for (const [channelName, channelId] of GROUP_ASK_CHANNELS_LIST.entries()) {
-      console.log(`Processing channel '${channelName}' and id '${channelId}'`);
+      logger.debug(`Processing channel '${channelName}' and id '${channelId}'`);
 
       const messages: any[any] = await getChannelMessages(
         slackClient,
         channelId,
         startingDate,
-        undefined
+        undefined,
       );
 
       const statsArray: AsksChannelStatsResult[] = await getStatsBuckets(
         messages,
         "month",
-        channelId
+        channelId,
       );
 
       // TODO: Add a counter to how many bulk we had.
       for (const stats of statsArray) {
-        console.log(
-          `Currently processing block for ${stats.startDateInUTC} to ${stats.endDateInUTC}...`
+        logger.debug(
+          `Currently processing block for ${stats.startDateInUTC} to ${stats.endDateInUTC}...`,
         );
         await reportStatsToSlack(
           slackClient,
           stats,
           event.channel,
           event.thread_ts,
-          false
+          false,
         );
       }
     }

@@ -1,3 +1,24 @@
+const winston = require("winston");
+
+const logLevels = {
+  fatal: 0,
+  error: 1,
+  warn: 2,
+  info: 3,
+  debug: 4,
+  trace: 5,
+};
+
+const { combine, timestamp, json, errors } = winston.format;
+
+export const logger = winston.createLogger({
+  levels: logLevels,
+  level: process.env.LOG_LEVEL || "info",
+  format: combine(errors({ stack: true }), timestamp(), json()),
+
+  transports: [new winston.transports.Console()],
+});
+
 // =================================================
 //          Utils
 // =================================================
@@ -53,10 +74,10 @@ import { LogLevel } from "@slack/bolt";
 if (process.env.NODE_ENV !== "production") {
   if (typeof process.env.ENV_FILE !== "undefined") {
     // If there is a custom env file, use it
-    console.log("Loading a custom env file...");
+    logger.info("Loading a custom env file...");
     require("dotenv").config({ path: process.env.ENV_FILE });
   } else {
-    console.log("Loading default env file...");
+    logger.info("Loading default env file...");
     require("dotenv").config();
   }
 }
@@ -85,7 +106,7 @@ if (BOT_NAME) {
       BOT_NAME,
     );
 
-  console.log(`Set up "${botConfig.BOT_NAME}" as the bot name.`);
+  logger.info(`Set up "${botConfig.BOT_NAME}" as the bot name.`);
 }
 
 // If we got a bot image, override the default:

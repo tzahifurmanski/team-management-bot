@@ -6,29 +6,30 @@ import {
 import { REACTIONS_HANDLED, TEAM_ASK_CHANNEL_ID } from "../consts";
 import { getUserProfile } from "../users";
 import { getConversationHistory } from "../conversations";
+import { logger } from "../../../consts";
 
-const reactionAddedCallback = async ({ event, client, logger }: any) => {
-  // console.log("Got a reaction added callback...", JSON.stringify(event));
+const reactionAddedCallback = async ({ event, client }: any) => {
+  logger.debug("Got a reaction added callback...", JSON.stringify(event));
 
   try {
     if (!REACTIONS_HANDLED.includes(event.reaction)) {
-      // console.log("Irrelevant reaction, skipping.");
+      logger.trace("Irrelevant reaction, skipping.");
       return;
     }
 
     // Verify we are in the ask channel
     if (!TEAM_ASK_CHANNEL_ID.includes(event.item.channel)) {
-      // console.log(
-      //   "Reaction is not in an ask channel, skipping.",
-      //   `Message channel: ${event.item.channel}`,
-      //   `Allowed channels: ${JSON.stringify(TEAM_ASK_CHANNEL_ID)}`
-      // );
+      logger.trace(
+        "Reaction is not in an ask channel, skipping.",
+        `Message channel: ${event.item.channel}`,
+        `Allowed channels: ${JSON.stringify(TEAM_ASK_CHANNEL_ID)}`,
+      );
       return;
     }
 
     // TODO: Maybe unneeded - Could it be that the bot is adding emojis?
     if (isBotMessage(event)) {
-      console.log("Got a message from bot, skipping.");
+      logger.debug("Got a message from bot, skipping.");
       return;
     }
 
@@ -45,18 +46,16 @@ const reactionAddedCallback = async ({ event, client, logger }: any) => {
       // Cant find original message,
       // probably a message that should be skipped,
       // therefore this should not operate on
-      console.log("Reaction was added on a skipped message, skipping.");
+      logger.debug("Reaction was added on a skipped message, skipping.");
       return;
     }
 
     // Check if the reaction is the first one of it's kind
     const originalMessage = messages[0];
     if (countReactions(originalMessage, REACTIONS_HANDLED) > 1) {
-      console.log("More then 1 COMPLETED emoji, skipping");
+      logger.debug("More then 1 COMPLETED emoji, skipping");
       return;
     }
-
-    // console.log("Starting logic", event.reaction, REACTIONS_HANDLED);
 
     // Calculate the time from start to resolution
     const duration = convertSecondsToTimeString(event.event_ts - event.item.ts);
@@ -74,7 +73,7 @@ const reactionAddedCallback = async ({ event, client, logger }: any) => {
       text: promptText,
     });
 
-    console.log("Done handling the reaction.", JSON.stringify(event));
+    logger.debug("Done handling the reaction.", JSON.stringify(event));
   } catch (error) {
     logger.error(error);
   }

@@ -6,20 +6,21 @@ import {
   ConversationsListArguments,
 } from "@slack/web-api";
 import { isBotMessage } from "./utils";
+import { logger } from "../../consts";
 
 // If something is not found, we'll have to go over everything
 export const getConversationId = async (
   slackClient: any,
   name: string,
   typesList = "public_channel,private_channel",
-  cursor = ""
+  cursor = "",
 ): Promise<string> => {
   // Return fast if there's no name
   if (!name) {
     return "";
   }
 
-  console.log("Resolving conversation id for channel", name);
+  logger.info("Resolving conversation id for channel", name);
   // Get the channels list from slack
   const options: ConversationsListArguments = {
     types: typesList,
@@ -39,20 +40,20 @@ export const getConversationId = async (
   // If we've found it, return the ID.
   if (filtered.length > 0) {
     // TODO: If there's more than 1, we'll return the first
-    console.log(
+    logger.info(
       "Resolved conversation id for channel '" +
         name +
         "' with '" +
         filtered[0].id +
-        "'"
+        "'",
     );
     return filtered[0].id;
   } else {
     //  If possible, get the next cursor and look again
     if (!channelsList.response_metadata.next_cursor) {
       // No more data, we didn't find return empty
-      console.log(
-        "Could not resolve conversation id for channel '" + name + "'"
+      logger.warning(
+        "Could not resolve conversation id for channel '" + name + "'",
       );
       return "";
     } else {
@@ -60,7 +61,7 @@ export const getConversationId = async (
         slackClient,
         name,
         typesList,
-        channelsList.response_metadata.next_cursor
+        channelsList.response_metadata.next_cursor,
       );
     }
   }
@@ -72,7 +73,7 @@ export const getConversationHistory = async (
   oldest?: string, // Start of time range of messages to include in results (in seconds).
   latest?: string,
   limit?: number,
-  inclusive?: boolean
+  inclusive?: boolean,
 ): Promise<any[]> => {
   // TODO: Handle a 'channel not found' error / 'not_in_channel' error
 
@@ -96,22 +97,22 @@ export const getConversationHistory = async (
 
   const results: any[] = [];
 
-  // console.log("FIRING using options", JSON.stringify(options));
+  logger.trace("FIRING using options", JSON.stringify(options));
 
   let response: ConversationsHistoryResponse =
     await slackClient.conversations.history(options);
 
   do {
-    // console.log("ITERATING RESULTS");
+    logger.debug("ITERATING RESULTS");
     if (response.messages) {
       response.messages.forEach((message) => {
         // Filter out messages from the bot, and all message events with subtypes that are not bot messages
         // TODO: Extract this
         if (!shouldMessageBeSkipped(message)) {
-          // console.log(`Saving ${JSON.stringify(message)} message`);
+          logger.trace(`Saving ${JSON.stringify(message)} message`);
           results.push(message);
         } else {
-          // console.log(`Skipped ${JSON.stringify(message)} message`);
+          logger.trace(`Skipped ${JSON.stringify(message)} message`);
         }
       });
 
@@ -142,7 +143,7 @@ export const getBotId = async (slackClient: any) => {
 // Skip all bot_message except for messages from allowed bots
 export const isBotAllowed = (
   message: any,
-  allowedBotsList: string[]
+  allowedBotsList: string[],
 ): boolean => {
   return message.username && allowedBotsList.includes(message.username);
 };

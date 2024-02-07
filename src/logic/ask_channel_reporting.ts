@@ -7,6 +7,7 @@ import {
   USER_PROFILE_FIELD_ID_DIVISION,
   USER_PROFILE_FIELD_ID_TEAM,
 } from "../integrations/slack/consts";
+import { logger } from "../consts";
 
 export interface AsksChannelReportResult {
   statsByTeam: Map<string, number>;
@@ -16,7 +17,7 @@ export interface AsksChannelReportResult {
 
 export const createReport = async (
   slackClient: any,
-  messages: any[]
+  messages: any[],
 ): Promise<AsksChannelReportResult> => {
   const statsByTeam: Map<string, number> = new Map<string, number>();
   const statsByDivision: Map<string, number> = new Map<string, number>();
@@ -28,27 +29,27 @@ export const createReport = async (
         (await getUserProfile(slackClient, message.user)) || {};
       const teamName: string = getValueFromProfile(
         userProfile,
-        USER_PROFILE_FIELD_ID_TEAM
+        USER_PROFILE_FIELD_ID_TEAM,
       );
       const divisionName: string = getValueFromProfile(
         userProfile,
-        USER_PROFILE_FIELD_ID_DIVISION
+        USER_PROFILE_FIELD_ID_DIVISION,
       );
       const departmentName: string = getValueFromProfile(
         userProfile,
-        USER_PROFILE_FIELD_ID_DEPARTMENT
+        USER_PROFILE_FIELD_ID_DEPARTMENT,
       );
 
       countEntry(statsByTeam, teamName);
       countEntry(statsByDivision, divisionName);
       countEntry(statsByDepartment, departmentName);
-    })
+    }),
   );
 
   // TODO: If I remove this, the sorting gets mixed up. IDK why :|
-  console.log(statsByTeam.values());
-  console.log(statsByDivision.values());
-  console.log(statsByDepartment.values());
+  logger.info(statsByTeam.values());
+  logger.info(statsByDivision.values());
+  logger.info(statsByDepartment.values());
 
   return { statsByTeam, statsByDivision, statsByDepartment };
 };
@@ -65,14 +66,14 @@ const countEntry = (collection: Map<string, number>, key: string) => {
 
 export const createReportSection = (
   collection: Map<string, number>,
-  criteria: string
+  criteria: string,
 ): SectionBlock[] => {
   const messageBlocks: SectionBlock[] = [];
 
   if (collection.size > 0) {
     const fields: any[] = [createText(`*${criteria}*`), createText("*Count*")];
     messageBlocks.push(
-      createSectionBlock(`*Asks divided by ${criteria}:*`, fields)
+      createSectionBlock(`*Asks divided by ${criteria}:*`, fields),
     );
 
     // Sort from highest to lower

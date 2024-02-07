@@ -1,5 +1,5 @@
 // Remove the name of the bot, in case it was mentioned
-import { botConfig } from "../../consts";
+import { botConfig, logger } from "../../consts";
 import { BOT_ID } from "./consts";
 
 export const sanitizeCommandInput = (text: string): string => {
@@ -49,7 +49,7 @@ export const convertSecondsToTimeString = (
         ? `${MESSAGE_MINUTES}, and ${MESSAGE_SECONDS}`
         : `${MESSAGE_SECONDS}`;
 
-  // console.log("Calculated time:", timeFormat);
+  logger.trace("Calculated time:", timeFormat);
   return timeFormat;
 };
 

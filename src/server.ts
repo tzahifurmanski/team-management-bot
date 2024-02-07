@@ -1,5 +1,5 @@
 // Always load consts first
-import { getBoltLogLevel, PORT } from "./consts";
+import { getBoltLogLevel, logger, PORT } from "./consts";
 import {
   loadSlackConfig,
   SLACK_SIGNING_SECRET,
@@ -24,18 +24,18 @@ registerListeners(boltApp, receiver);
 
 (async () => {
   // Print server time
-  console.log(
-    `Server starting at ${new Date().toUTCString()}, version ${version}`
+  logger.info(
+    `Server starting at ${new Date().toUTCString()}, version ${version}`,
   );
 
   const loadResult = await loadSlackConfig(boltApp.client);
   if (!loadResult) {
-    console.log("Loading failed!");
+    logger.error("Loading failed!");
     process.exit(0);
   }
 
   // Start the app
   await boltApp.start(PORT);
 
-  console.log("⚡️ Bolt app is running!");
+  logger.info("⚡️ Bolt app is running!");
 })();

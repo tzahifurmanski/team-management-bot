@@ -1,6 +1,7 @@
 import cronstrue from "cronstrue";
 import { AsksChannelStatsResult } from "../logic/asks_channel";
 import { sanitizeCommandInput } from "../integrations/slack/utils";
+import { logger } from "../consts";
 
 const cron = require("node-cron");
 
@@ -39,7 +40,7 @@ export class AskChannelParams {
     public count: number,
     public timeMetric: string,
     public groupBy: string,
-    public error?: string
+    public error?: string,
   ) {}
 }
 
@@ -115,7 +116,7 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
       -1,
       "",
       "",
-      "Invalid group by clause provided"
+      "Invalid group by clause provided",
     );
   }
 
@@ -124,7 +125,7 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
     Number(count),
     timeMetric,
     groupBy,
-    ""
+    "",
   );
 };
 
@@ -152,7 +153,7 @@ export const getStartingDate = (params: AskChannelParams): Date => {
     // Get the timeframe for the beginning of the month
     const date = new Date();
     startingDate = new Date(
-      Date.UTC(date.getFullYear(), date.getMonth() - adjustedCount, 1, 0)
+      Date.UTC(date.getFullYear(), date.getMonth() - adjustedCount, 1, 0),
     );
   }
 
@@ -165,25 +166,25 @@ export const scheduleCron = (
   cronExpression: string,
   functionToSchedule: any,
   event: any,
-  slackClient: any
+  slackClient: any,
 ) => {
   if (condition) {
-    console.log(
+    logger.info(
       `Setting up a cron to ${description} ${cronstrue.toString(
-        cronExpression
-      )}.`
+        cronExpression,
+      )}.`,
     );
     cron.schedule(cronExpression, () => {
       functionToSchedule(event, slackClient);
     });
   } else {
-    console.log(`Skipping on setting up a cron to ${description}.`);
+    logger.info(`Skipping on setting up a cron to ${description}.`);
   }
 };
 
 export const getStatsMessage = (
   channelId: string,
-  stats: AsksChannelStatsResult
+  stats: AsksChannelStatsResult,
 ): string => {
   let summary = `<#${channelId}> received *${stats.totalMessages} new asks*:\n`;
   summary =
@@ -203,7 +204,7 @@ export const extractNameFromChannelString = (channelString: string): string => {
   // The channel string is in the format <#C12345678|channel-name>, we want to return the channel name
   // Example: <#C12345678|channel-name> -> channel-name
   if (!SLACK_CHANNEL_NAME_REGEX.test(channelString.trim())) {
-    console.log(`NO MATCH for ${channelString} in ${SLACK_CHANNEL_NAME_REGEX}`);
+    logger.info(`NO MATCH for ${channelString} in ${SLACK_CHANNEL_NAME_REGEX}`);
     // If the channel string is not in the format <#C12345678|channel-name>, return empty
     return "";
   }
@@ -215,7 +216,7 @@ export const extractIDFromChannelString = (channelString: string): string => {
   // The channel string is in the format <#C12345678|channel-name>, we want to return the channel name
   // Example: <#C12345678|channel-name> -> channel-name
   if (!SLACK_CHANNEL_NAME_REGEX.test(channelString.trim())) {
-    console.log(`NO MATCH for ${channelString} in ${SLACK_CHANNEL_NAME_REGEX}`);
+    logger.info(`NO MATCH for ${channelString} in ${SLACK_CHANNEL_NAME_REGEX}`);
     // If the channel string is not in the format <#C12345678|channel-name>, return empty
     return "";
   }
@@ -226,7 +227,7 @@ export const extractIDFromChannelString = (channelString: string): string => {
 export const getChannelIDFromEventText = (
   eventText: any,
   nameIndex: number,
-  defaultID: string
+  defaultID: string,
 ) => {
   let askChannelID;
 
@@ -243,10 +244,10 @@ export const getChannelIDFromEventText = (
   ) {
     // Take default
     askChannelID = defaultID;
-    console.log(`Using default channel ID ${askChannelID}.`);
+    logger.info(`Using default channel ID ${askChannelID}.`);
   } else {
     askChannelID = extractIDFromChannelString(params[nameIndex]);
-    console.log(`Found channel ID ${askChannelID}.`);
+    logger.info(`Found channel ID ${askChannelID}.`);
   }
 
   return askChannelID;
@@ -258,12 +259,12 @@ export const scheduleAskChannelsCrons = (
   channelIds: string[],
   channelNames: string[],
   action: string,
-  functionToSchedule: any
+  functionToSchedule: any,
 ) => {
   // Schedule the crons for the ask channels
   if (crons.length != channelIds.length) {
-    console.log(
-      `cron (${crons}, ${crons.length}) and channelIds (${channelIds}, ${channelIds.length}) have different lengths, and therefor crons won't be scheduled.`
+    logger.info(
+      `cron (${crons}, ${crons.length}) and channelIds (${channelIds}, ${channelIds.length}) have different lengths, and therefor crons won't be scheduled.`,
     );
     return;
   }
@@ -284,7 +285,7 @@ export const scheduleAskChannelsCrons = (
       crons[i],
       functionToSchedule,
       eventText,
-      slackClient
+      slackClient,
     );
   }
 };
@@ -292,7 +293,7 @@ export const scheduleAskChannelsCrons = (
 export const getRecurringJobInfo = (
   jobName: string,
   crons: string[],
-  channelIds: string[]
+  channelIds: string[],
 ): string => {
   if (crons.length == 0) {
     return "";

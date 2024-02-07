@@ -14,6 +14,7 @@ import {
 } from "../../logic/asks_channel";
 import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
+import { logger } from "../../consts";
 
 export class AskChannelStatusStatsOrSummary implements BotAction {
   getHelpText(): string {
@@ -47,22 +48,22 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
 
     // Get the timeframe to operate on
     const params: AskChannelParams = getAskChannelParameters(
-      sanitizeCommandInput(event.text)
+      sanitizeCommandInput(event.text),
     );
     if (params.error) {
-      console.log(
-        `There was an error processing the stats params for ${event.text} command: ${params.error}`
+      logger.error(
+        `There was an error processing the stats params for ${event.text} command: ${params.error}`,
       );
 
       throw new Error(
-        `There was an error processing the stats params: ${params.error}`
+        `There was an error processing the stats params: ${params.error}`,
       );
     }
 
     const startingDate = getStartingDate(params);
     const endingDate = new Date();
-    console.log(
-      `"Date between ${startingDate.toUTCString()} and ${endingDate.toUTCString()}`
+    logger.debug(
+      `"Date between ${startingDate.toUTCString()} and ${endingDate.toUTCString()}`,
     );
 
     // Get the stats
@@ -70,7 +71,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
       slackClient,
       TEAM_ASK_CHANNEL_ID[0],
       startingDate,
-      endingDate
+      endingDate,
     );
 
     // Check if there is a group by clause or is this a total
@@ -82,7 +83,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
         startingDate,
         endingDate,
         event,
-        messages
+        messages,
       );
     } else {
       await this.processGroupByRequest(
@@ -91,7 +92,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
         startingDate,
         endingDate,
         event,
-        messages
+        messages,
       );
     }
   }
@@ -102,14 +103,14 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     startingDate: any,
     endingDate: any,
     event: any,
-    messages: any[any]
+    messages: any[any],
   ) {
-    console.log("Handling a total request..");
+    logger.debug("Handling a total request..");
     const stats: AsksChannelStatsResult = await getStatsForMessages(
       TEAM_ASK_CHANNEL_ID[0],
       messages,
       startingDate.toUTCString(),
-      endingDate.toUTCString()
+      endingDate.toUTCString(),
     );
 
     // Report the results based on the requested status
@@ -137,7 +138,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
       event.thread_ts,
       includeSummary,
       includeAsks,
-      includeReport
+      includeReport,
     );
   }
 
@@ -147,19 +148,19 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     startingDate: any,
     endingDate: any,
     event: any,
-    messages: any[any]
+    messages: any[any],
   ) {
-    console.log("Handling a group by request..");
+    logger.info("Handling a group by request..");
     const statsArray: AsksChannelStatsResult[] = await getStatsBuckets(
       messages,
       params.groupBy,
-      TEAM_ASK_CHANNEL_ID[0]
+      TEAM_ASK_CHANNEL_ID[0],
     );
 
     // TODO: Add a counter to how many bulk we had.
     for (const stats of statsArray) {
-      console.log(
-        `Currently processing block for ${stats.startDateInUTC} to ${stats.endDateInUTC}...`
+      logger.info(
+        `Currently processing block for ${stats.startDateInUTC} to ${stats.endDateInUTC}...`,
       );
       // Report the results based on the requested status
       let includeSummary;
@@ -185,7 +186,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
         event.thread_ts,
         includeSummary,
         includeAsks,
-        includeReport
+        includeReport,
       );
     }
 
@@ -194,12 +195,12 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
         slackClient,
         statsArray,
         event.channel,
-        event.thread_ts
+        event.thread_ts,
       );
 
       // TODO: Add a total message
     }
 
-    console.log("Done handling a group by request..");
+    logger.info("Done handling a group by request.");
   }
 }

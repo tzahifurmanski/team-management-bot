@@ -9,6 +9,7 @@ import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday
 import { ZendeskTicketsStatus } from "./zendesk_tickets_status";
 import { Help } from "./help";
 import { Status } from "./status";
+import { logger } from "../../consts";
 
 const helpCommand = new Help();
 const ACTIONS_LIST: BotAction[] = [
@@ -26,15 +27,15 @@ const ACTIONS_LIST: BotAction[] = [
 
 export const ASKS_ACTIONS: BotAction[] = [];
 
-console.log("Loading actions list...");
+logger.info("Loading actions list...");
 ACTIONS_LIST.forEach((action) => {
   if (action.isEnabled()) {
     ASKS_ACTIONS.push(action);
-    console.log(`* '${action.constructor.name}' action is enabled.`);
+    logger.info(`* '${action.constructor.name}' action is enabled.`);
   } else {
-    console.log(`* '${action.constructor.name}' action is skipped.`);
+    logger.info(`* '${action.constructor.name}' action is skipped.`);
   }
 });
-console.log("Actions list loading is complete.");
+logger.info("Actions list loading is complete.");
 
 helpCommand.setActionsList(ASKS_ACTIONS);

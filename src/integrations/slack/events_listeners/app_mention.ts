@@ -1,9 +1,10 @@
 import { handleDirectEvent } from "../../../bot_actions";
 import { isBotMessage } from "../utils";
+import { logger } from "../../../consts";
 
-const appMentionCallback = async ({ event, client, logger }: any) => {
+const appMentionCallback = async ({ event, client }: any) => {
   if (isBotMessage(event)) {
-    console.log("Got a message from bot, ignoring...");
+    logger.info("Got a message from bot, ignoring...");
     return;
   }
 

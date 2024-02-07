@@ -8,7 +8,7 @@ import {
 
 import { Block, DividerBlock, KnownBlock, MrkdwnElement } from "@slack/types";
 import { BOT_ID, SLACK_USER_FORMAT } from "./consts";
-import { botConfig } from "../../consts";
+import { botConfig, logger } from "../../consts";
 import { ImageBlock } from "@slack/bolt";
 
 // Post a message to the channel, and await the result.
@@ -19,7 +19,7 @@ export const sendSlackMessage = async (
   channel: string,
   threadTS = "",
   blocks: (KnownBlock | Block)[] = [],
-  disableUnfurl = false
+  disableUnfurl = false,
 ): Promise<ChatPostMessageResponse> => {
   const options: ChatPostMessageArguments = {
     text,
@@ -50,16 +50,16 @@ export const sendSlackMessage = async (
       // Get blocks batch up to the size of a chunk
       options.blocks = blocks.slice(i, i + chunk);
       result = await slackClient.chat.postMessage(options);
-      console.log(
-        `Successfully send message ${result.ts} in conversation ${channel}`
+      logger.info(
+        `Successfully send message ${result.ts} in conversation ${channel}`,
       );
     }
   }
   // If there are no blocks, just send the message
   else {
     result = await slackClient.chat.postMessage(options);
-    console.log(
-      `Successfully send message ${result.ts} in conversation ${channel}`
+    logger.info(
+      `Successfully send message ${result.ts} in conversation ${channel}`,
     );
   }
 
@@ -71,7 +71,7 @@ export const sendSlackMessage = async (
 export const createSectionBlock = (
   text?: string,
   fields?: any[],
-  accessory?: Button
+  accessory?: Button,
 ): SectionBlock => {
   // TODO: This currently only supports SectionBlock. Make it more dynamic?
   const section: SectionBlock = {
@@ -105,7 +105,7 @@ export const createDivider = (): DividerBlock => ({
 export const createImageBlock = (
   alt_text: string,
   image_url: string,
-  title?: string
+  title?: string,
 ): ImageBlock => {
   const section: ImageBlock = {
     type: "image",
@@ -138,7 +138,7 @@ export const getUserIDInText = (text: string) => {
 export const getMessagePermalink = async (
   slackClient: any,
   channelId: string,
-  messageTS: string
+  messageTS: string,
 ): Promise<string> => {
   const options: ChatGetPermalinkArguments = {
     channel: channelId,
@@ -149,11 +149,11 @@ export const getMessagePermalink = async (
     if (response.ok) {
       return response.permalink;
     } else {
-      console.log("getMessagePermalink got bad response", response);
+      logger.info("getMessagePermalink got bad response", response);
       return "";
     }
   } catch (error) {
-    console.log("Error in message", messageTS, error);
+    logger.error("Error in message", messageTS, error);
     return "";
   }
 };
