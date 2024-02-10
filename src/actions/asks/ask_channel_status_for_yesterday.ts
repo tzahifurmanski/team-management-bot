@@ -24,6 +24,9 @@ import { ASK_CHANNEL_STATS_CRON, logger } from "../../consts";
 export class AskChannelStatusForYesterday implements BotAction {
   static DAYS_BACK = 60;
 
+  // Initialize a maps to keep track of the last time a scheduled message was sent for a specific channel
+  scheduledMessageLastSent = new Map<string, Date>();
+
   constructor() {
     if (this.isEnabled()) {
       scheduleAskChannelsCrons(
@@ -92,6 +95,28 @@ export class AskChannelStatusForYesterday implements BotAction {
     if (!askChannelId) {
       logger.info(`Unable to find channel ID. Ask: ${event.text}`);
       return;
+    }
+
+    // Check if a similar scheduled ask was requested less than a minute ago, and if so, skip
+    if (event.scheduled) {
+      if (this.scheduledMessageLastSent.has(askChannelId)) {
+        const lastSent = this.scheduledMessageLastSent.get(askChannelId);
+        if (lastSent) {
+          const now = new Date();
+          const diff = now.getTime() - lastSent.getTime();
+          if (diff < 60 * 1000) {
+            logger.info(
+              `Skipping scheduled ask channel status for yesterday for channel ${askChannelId} as it was requested less than a minute ago.`,
+            );
+            return;
+          }
+        }
+      }
+
+      // Set now as the last time this was sent
+      // TODO: Potential problem - this will show sent even if there was an error and the message was not sent.
+      //      Could move it to the end of the function, but then if the time between scheduled requests is short, might not be effective.
+      this.scheduledMessageLastSent.set(askChannelId, new Date());
     }
 
     logger.info(
