@@ -161,3 +161,6 @@ export const loadSlackConfig = async (slackClient: any) => {
 
   return true;
 };
+
+// Initialize a maps to keep track of the last time a scheduled message was sent for a specific channel
+export const scheduledMessageLastSent = new Map<string, Date>();

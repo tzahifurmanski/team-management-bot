@@ -13,6 +13,7 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import {
+  scheduledMessageLastSent,
   SlackWebClient,
   TEAM_ASK_CHANNEL_ID,
   TEAM_ASK_CHANNEL_NAME,
@@ -23,9 +24,6 @@ import { ASK_CHANNEL_STATS_CRON, logger } from "../../consts";
 
 export class AskChannelStatusForYesterday implements BotAction {
   static DAYS_BACK = 60;
-
-  // Initialize a maps to keep track of the last time a scheduled message was sent for a specific channel
-  scheduledMessageLastSent = new Map<string, Date>();
 
   constructor() {
     if (this.isEnabled()) {
@@ -74,6 +72,8 @@ export class AskChannelStatusForYesterday implements BotAction {
     event: any,
     slackClient: any,
   ): Promise<void> {
+    logger.trace(`Entering 'getAskChannelStatsForYesterday' function.`);
+
     if (event.scheduled) {
       logger.info(
         "Kicking off a scheduled ask channel stats for yesterday action.",
@@ -99,8 +99,8 @@ export class AskChannelStatusForYesterday implements BotAction {
 
     // Check if a similar scheduled ask was requested less than a minute ago, and if so, skip
     if (event.scheduled) {
-      if (this.scheduledMessageLastSent.has(askChannelId)) {
-        const lastSent = this.scheduledMessageLastSent.get(askChannelId);
+      if (scheduledMessageLastSent.has(askChannelId)) {
+        const lastSent = scheduledMessageLastSent.get(askChannelId);
         if (lastSent) {
           const now = new Date();
           const diff = now.getTime() - lastSent.getTime();
@@ -116,7 +116,7 @@ export class AskChannelStatusForYesterday implements BotAction {
       // Set now as the last time this was sent
       // TODO: Potential problem - this will show sent even if there was an error and the message was not sent.
       //      Could move it to the end of the function, but then if the time between scheduled requests is short, might not be effective.
-      this.scheduledMessageLastSent.set(askChannelId, new Date());
+      scheduledMessageLastSent.set(askChannelId, new Date());
     }
 
     logger.info(
