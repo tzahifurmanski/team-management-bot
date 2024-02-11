@@ -1,4 +1,8 @@
-import { isBotAllowed } from "../../../src/integrations/slack/conversations";
+import {
+  isBotAllowed,
+  shouldMessageBeSkipped,
+} from "../../../src/integrations/slack/conversations";
+import { BOT_ID } from "../../../src/integrations/slack/consts";
 
 describe("isBotAllowed", () => {
   test("Empty list - disallowed", () => {
@@ -38,5 +42,64 @@ describe("isBotAllowed", () => {
     const botName = "Zigi The Bot";
     const message = { bot_id: "zigi", username: botName };
     expect(isBotAllowed(message, ALLOWED_BOTS_LIST)).toBeFalsy();
+  });
+});
+
+describe("shouldMessageBeSkipped", () => {
+  afterEach(() => {
+    delete process.env.NODE_ENV;
+  });
+
+  test("Allowed", () => {
+    // TODO: Fix this, there's got to be a better way to do this
+    // @ts-ignore
+    BOT_ID = "B02B6HYMEMU";
+    console.log(BOT_ID);
+
+    const ALLOWED_BOTS_LIST: string[] = [
+      "Zorg",
+      "Zeke The Magnificent",
+      "zigiBot",
+    ];
+
+    const message = {
+      bot_id: "BOT_ID",
+      type: "message",
+      text: "Handover to OOO",
+      user: "USER_ID",
+      ts: "1702675238.305599",
+      app_id: "APP_ID",
+      blocks: [
+        {
+          type: "rich_text",
+          block_id: "H3O",
+          elements: [
+            {
+              type: "rich_text_section",
+              elements: [{ type: "text", text: "Handover to OOO" }],
+            },
+          ],
+        },
+      ],
+      team: "TEAM_ID",
+      bot_profile: {
+        id: "BOT_ID",
+        app_id: "APP_ID",
+        name: "zigiBot",
+        icons: {
+          image_36:
+            "https://avatars.slack-edge.com/2021-05-19/2090618498164_72adc1b36522bcaf0734_36.png",
+          image_48:
+            "https://avatars.slack-edge.com/2021-05-19/2090618498164_72adc1b36522bcaf0734_48.png",
+          image_72:
+            "https://avatars.slack-edge.com/2021-05-19/2090618498164_72adc1b36522bcaf0734_72.png",
+        },
+        deleted: false,
+        updated: 1629168655,
+        team_id: "TEAM_ID",
+      },
+    };
+
+    expect(shouldMessageBeSkipped(message, ALLOWED_BOTS_LIST)).toBeFalsy();
   });
 });

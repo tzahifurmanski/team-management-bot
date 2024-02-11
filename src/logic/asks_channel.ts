@@ -378,13 +378,16 @@ const getPermalinkBlocks = async (
         // TODO: Maybe only display the team name, when doing 'ask channel stats', and not when showing the stats for yesterday. Requires refactor.
         const userProfile =
           (await getUserProfile(slackClient, message.user)) || {};
+        console.log("PROFILE", JSON.stringify(userProfile));
         let teamName = getValueFromProfile(
           userProfile,
           USER_PROFILE_FIELD_ID_TEAM,
         );
         teamName = teamName !== "Unknown" ? ` (Team ${teamName})` : "";
         const fromClause = `${
-          message.user ? userProfile?.display_name : message.username
+          message.user
+            ? userProfile?.display_name || userProfile?.real_name
+            : message.username
         }${teamName}`;
 
         const blockText = `<${permalink}|Link to ask> from ${fromClause} at ${messageDate.toLocaleDateString()}${daysMessage}`;

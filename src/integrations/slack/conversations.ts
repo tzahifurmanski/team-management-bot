@@ -75,6 +75,8 @@ export const getConversationHistory = async (
   limit?: number,
   inclusive?: boolean,
 ): Promise<any[]> => {
+  logger.trace("Entering getConversationHistory");
+
   // TODO: Handle a 'channel not found' error / 'not_in_channel' error
 
   // Get the channels list from slack
@@ -124,14 +126,17 @@ export const getConversationHistory = async (
   return results;
 };
 
-export const shouldMessageBeSkipped = (message: any) => {
+export const shouldMessageBeSkipped = (
+  message: any,
+  allowed_bots: string[] = ALLOWED_BOTS,
+) => {
   return (
     isBotMessage(message) ||
     // TODO: Put this in a env var
     message.text.includes(`<@${BOT_ID}>`) || // Skip any messages that refer the bot
     (message.subtype && message.subtype !== "bot_message") || // Skip any message that has a subtype, that is not a bot (We filter the bot later)
     ((message.bot_id || message.subtype) &&
-      !isBotAllowed(message, ALLOWED_BOTS))
+      !isBotAllowed(message, allowed_bots))
   );
 };
 export const getBotId = async (slackClient: any) => {
@@ -145,5 +150,8 @@ export const isBotAllowed = (
   message: any,
   allowedBotsList: string[],
 ): boolean => {
-  return message.username && allowedBotsList.includes(message.username);
+  return (
+    (message.username && allowedBotsList.includes(message.username)) ||
+    (message.bot_profile && allowedBotsList.includes(message.bot_profile.name))
+  );
 };
