@@ -117,6 +117,8 @@ export class ZendeskTicketsStatus implements BotAction {
       return;
     }
 
+    // TODO: Prevent this from running twice, like we did for ask_channel_status_for_yesterday.ts
+
     logger.info(`Running zendesk tickets status for channel ${askChannelId}`);
 
     const viewIndex = ZENDESK_TICKETS_CHANNEL_ID.indexOf(askChannelId);
