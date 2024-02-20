@@ -13,6 +13,7 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import {
+  ALLOWED_BOTS_PER_TEAM,
   scheduledMessageLastSent,
   SlackWebClient,
   TEAM_ASK_CHANNEL_ID,
@@ -138,6 +139,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     const messages: any[any] = await getChannelMessages(
       slackClient,
       askChannelId,
+      ALLOWED_BOTS_PER_TEAM.get(askChannelId) || [],
       startingDate,
       endingDate,
     );
@@ -175,6 +177,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     const monthMessages: any[any] = await getChannelMessages(
       slackClient,
       askChannelId,
+      ALLOWED_BOTS_PER_TEAM.get(askChannelId) || [],
       beginningOfMonthDate,
       now,
     );

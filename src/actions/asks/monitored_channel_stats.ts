@@ -6,7 +6,7 @@ import {
   MonitoredChannelStatsResult,
   reportMonitoredChannelStatsToSlack,
 } from "../../logic/monitored_channel";
-import { BOT_ID } from "../../integrations/slack/consts";
+import { ALLOWED_BOTS_PER_TEAM, BOT_ID } from "../../integrations/slack/consts";
 import {
   MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE,
   MONITORED_CHANNEL_CONDITION_MESSAGE_SUCCESS,
@@ -48,8 +48,9 @@ export class MonitoredChannelSummaryStats implements BotAction {
     const messages: any[any] = await getChannelMessages(
       slackClient,
       MONITORED_CHANNEL_ID,
+      ALLOWED_BOTS_PER_TEAM.get(MONITORED_CHANNEL_ID) || [],
       startingDate,
-      endingDate
+      endingDate,
     );
 
     const stats: MonitoredChannelStatsResult =
@@ -60,14 +61,14 @@ export class MonitoredChannelSummaryStats implements BotAction {
         endingDate.toUTCString(),
         MONITORED_CHANNEL_CONDITION_USERNAME,
         MONITORED_CHANNEL_CONDITION_MESSAGE_SUCCESS,
-        MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE
+        MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE,
       );
 
     await reportMonitoredChannelStatsToSlack(
       slackClient,
       stats,
       event.channel,
-      event.thread_ts
+      event.thread_ts,
     );
   }
 }

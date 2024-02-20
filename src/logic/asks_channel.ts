@@ -44,6 +44,7 @@ export interface AsksChannelStatsResult {
 export const getChannelMessages = async (
   slackClient: any,
   askChannelId: string,
+  allowed_bots: string[],
   startingDate: Date,
   endDate?: Date,
 ): Promise<any[any]> => {
@@ -58,6 +59,7 @@ export const getChannelMessages = async (
   return await getConversationHistory(
     slackClient,
     askChannelId,
+    allowed_bots,
     oldestMessage,
     latestMessage,
   );

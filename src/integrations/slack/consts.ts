@@ -26,9 +26,14 @@ export const TEAM_ASK_CHANNEL_NAME: string[] = handleListParameter(
   process.env.TEAM_ASK_CHANNEL_NAME,
 );
 
-export const ALLOWED_BOTS: string[] = handleListParameter(
+const ALLOWED_BOTS: string[] = handleListParameter(
   process.env.ALLOWED_BOTS,
+  "",
+  "|",
+  false,
 );
+
+export let ALLOWED_BOTS_PER_TEAM = new Map<string, string[]>();
 
 // User profile field ids
 export const USER_PROFILE_FIELD_ID_TEAM =
@@ -115,7 +120,12 @@ export const loadSlackConfig = async (slackClient: any) => {
       }
     } else if (TEAM_ASK_CHANNEL_ID.length != TEAM_ASK_CHANNEL_NAME.length) {
       logger.error(
-        "Error: TEAM_ASK_CHANNEL_ID and TEAM_ASK_CHANNEL_NAME have different lengths",
+        `Error: TEAM_ASK_CHANNEL_ID ${TEAM_ASK_CHANNEL_ID.length} and TEAM_ASK_CHANNEL_NAME ${TEAM_ASK_CHANNEL_NAME.length} have different lengths`,
+      );
+      return false;
+    } else if (TEAM_ASK_CHANNEL_ID.length != ALLOWED_BOTS.length) {
+      logger.error(
+        `Error: TEAM_ASK_CHANNEL_ID ${TEAM_ASK_CHANNEL_ID.length} and ALLOWED_BOTS ${ALLOWED_BOTS.length} have different lengths`,
       );
       return false;
     }
@@ -148,6 +158,17 @@ export const loadSlackConfig = async (slackClient: any) => {
     asksChannels.forEach((channelDetails: string) => {
       const details = channelDetails.split(":");
       GROUP_ASK_CHANNELS_LIST.set(details[0], details[1]);
+    });
+
+    // Load ALLOWED_BOTS per team
+    ALLOWED_BOTS_PER_TEAM = new Map<string, string[]>();
+
+    ALLOWED_BOTS.forEach((teamBotConfiguration: string, index) => {
+      logger.info(`LOADING CONF ${teamBotConfiguration}, ${index}`);
+      ALLOWED_BOTS_PER_TEAM.set(
+        TEAM_ASK_CHANNEL_ID[index],
+        teamBotConfiguration.split(","),
+      );
     });
 
     // Set global slack client to use in cron jobs

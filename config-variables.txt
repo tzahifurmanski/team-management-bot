@@ -44,7 +44,7 @@ BOT_USER_OAUTH_ACCESS_TOKEN=
 ASK_CHANNEL_STATS_CRON= # A separator ('|') separated list of cron expressions for the bot to post in the team ask channel with a current status. For example, '30 08 * * 0-5', which is every day at 8:30 UTC, on Sunday to Friday.
 TEAM_ASK_CHANNEL_ID= # A comma (',') separated list of the Slack IDs for the ask channels for the bot to track.
 TEAM_ASK_CHANNEL_NAME= # A comma (',') separated list of the Slack ask channel names for the bot to track.
-ALLOWED_BOTS= # Optional, a comma (',') separated list of bot usernames to include in the asks channel summary.
+ALLOWED_BOTS= # A separator ('|') separated list of a comma (',') separated lists of bot usernames to include in the asks channel summary.
 
 # Ask Channel Stats - Optional, needed for the reporting feature
 USER_PROFILE_FIELD_ID_TEAM= # The Slack field ID to get the user's team name, for providing additional stats.
