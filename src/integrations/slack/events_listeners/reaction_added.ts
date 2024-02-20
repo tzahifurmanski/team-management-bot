@@ -3,7 +3,11 @@ import {
   countReactions,
   isBotMessage,
 } from "../utils";
-import { REACTIONS_HANDLED, TEAM_ASK_CHANNEL_ID } from "../consts";
+import {
+  ALLOWED_BOTS_PER_TEAM,
+  REACTIONS_HANDLED,
+  TEAM_ASK_CHANNEL_ID,
+} from "../consts";
 import { getUserProfile } from "../users";
 import { getConversationHistory } from "../conversations";
 import { logger } from "../../../consts";
@@ -37,6 +41,7 @@ const reactionAddedCallback = async ({ event, client }: any) => {
     const messages = await getConversationHistory(
       client,
       event.item.channel,
+      ALLOWED_BOTS_PER_TEAM.get(event.item.channel) || [],
       event.item.ts,
       event.item.ts,
       1,

@@ -12,7 +12,10 @@ import {
   reportChartToSlack,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
-import { TEAM_ASK_CHANNEL_ID } from "../../integrations/slack/consts";
+import {
+  ALLOWED_BOTS_PER_TEAM,
+  TEAM_ASK_CHANNEL_ID,
+} from "../../integrations/slack/consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../consts";
 
@@ -70,6 +73,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     const messages: any[any] = await getChannelMessages(
       slackClient,
       TEAM_ASK_CHANNEL_ID[0],
+      ALLOWED_BOTS_PER_TEAM.get(TEAM_ASK_CHANNEL_ID[0]) || [],
       startingDate,
       endingDate,
     );

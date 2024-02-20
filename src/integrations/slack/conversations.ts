@@ -1,5 +1,5 @@
 // This is a util function that is able to look for the ID of a conversation / channel by name
-import { ALLOWED_BOTS, BOT_ID } from "./consts";
+import { BOT_ID } from "./consts";
 import {
   ConversationsHistoryArguments,
   ConversationsHistoryResponse,
@@ -70,6 +70,7 @@ export const getConversationId = async (
 export const getConversationHistory = async (
   slackClient: any,
   channelId: string,
+  allowed_bots: string[],
   oldest?: string, // Start of time range of messages to include in results (in seconds).
   latest?: string,
   limit?: number,
@@ -110,7 +111,7 @@ export const getConversationHistory = async (
       response.messages.forEach((message) => {
         // Filter out messages from the bot, and all message events with subtypes that are not bot messages
         // TODO: Extract this
-        if (!shouldMessageBeSkipped(message)) {
+        if (!shouldMessageBeSkipped(message, allowed_bots)) {
           logger.trace(`Saving ${JSON.stringify(message)} message`);
           results.push(message);
         } else {
@@ -128,7 +129,7 @@ export const getConversationHistory = async (
 
 export const shouldMessageBeSkipped = (
   message: any,
-  allowed_bots: string[] = ALLOWED_BOTS,
+  allowed_bots: string[],
 ) => {
   return (
     isBotMessage(message) ||
