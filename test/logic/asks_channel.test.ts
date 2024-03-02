@@ -9,7 +9,6 @@ describe("getBucketRange", () => {
   // Date and time (GMT): Wednesday, September 14, 2022 10:38:27 AM
   // Epoch timestamp: 1663151907
   const messageDate: Date = toDateTime(1663151907);
-  console.log(`Tested date ${new Date().toUTCString()}`);
 
   test("by day", async () => {
     const [bucketStartDate, bucketEndDate] = getBucketRange(
