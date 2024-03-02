@@ -10,15 +10,18 @@ export const getRandomFromArray = (array: any[]) => {
   return array[random];
 };
 
-// TODO Make this prettier and add tests for this
 export const toDateTime = (secs: any): Date => {
   const time = new Date(1970, 0, 1); // Set to Epoch
   time.setSeconds(secs);
   return time;
 };
 
-// This method takes a date and removes all time information from it
-export const removeTimeInfoFromDate = (date: Date): Date => {
+// This method takes a UTC date and removes all time information from it
+// Note that:
+// 1. This method changes the input date.
+// 2. The input date is expected to be in UTC time.
+export const removeTimeInfoFromDate = (date: Date): Date => { 
+  // TODO: Is there a reason why I'm using UTC methods here?
   date.setUTCHours(0);
   date.setUTCMinutes(0);
   date.setUTCSeconds(0);
@@ -28,6 +31,8 @@ export const removeTimeInfoFromDate = (date: Date): Date => {
 };
 
 export const setDateToSunday = (date: Date): Date => {
+  // TODO: Should this be getUTCDay()?
+  // Both setDateToSunday and removeTimeInfoFromDate should use the same date type (UTC or not)
   const day = date.getDay();
   if (day !== 0) date.setHours(-24 * (day - 1));
   date = removeTimeInfoFromDate(date);

@@ -5,8 +5,118 @@ import {
   getChannelIDFromEventText,
   getStartingDate,
   setDateToSunday,
+  toDateTime,
 } from "../../src/actions/utils";
 import * as MockDate from "mockdate";
+
+
+
+import { getRandomFromArray } from "../../src/actions/utils";
+
+describe("getRandomFromArray", () => {
+  test("returns a random element from the array", () => {
+    const array = [1, 2, 3, 4, 5];
+    const result = getRandomFromArray(array);
+    expect(array).toContain(result);
+  });
+
+  test("returns undefined if the array is empty", () => {
+    const array: number[] = [];
+    const result = getRandomFromArray(array);
+    expect(result).toBeUndefined();
+  });
+
+  test("returns the only element in the array", () => {
+    const array = [1];
+    const result = getRandomFromArray(array);
+    expect(result).toEqual(1);
+  });
+});
+
+describe("toDateTime", () => {
+  test("Convert 0 seconds", () => {
+    const input = 0;
+    const expected = new Date(1970, 0, 1);
+    const result = toDateTime(input);
+    expect(result).toEqual(expected);
+  });
+
+  test("Convert 1 second", () => {
+    const input = 1;
+    const expected = new Date(1970, 0, 1, 0, 0, 1);
+    const result = toDateTime(input);
+    expect(result).toEqual(expected);
+  });
+
+  test("Convert 60 seconds (1 minute)", () => {
+    const input = 60;
+    const expected = new Date(1970, 0, 1, 0, 1, 0);
+    const result = toDateTime(input);
+    expect(result).toEqual(expected);
+  });
+
+  test("Convert 3600 seconds (1 hour)", () => {
+    const input = 3600;
+    const expected = new Date(1970, 0, 1, 1, 0, 0);
+    const result = toDateTime(input);
+    expect(result).toEqual(expected);
+  });
+
+  test("Convert 86400 seconds (1 day)", () => {
+    const input = 86400;
+    const expected = new Date(1970, 0, 2);
+    const result = toDateTime(input);
+    expect(result).toEqual(expected);
+  });
+
+  test("Convert non-integer seconds", () => {
+    const input = 0.5;
+    const expected = new Date(1970, 0, 1, 0, 0, 0, 0);
+    const result = toDateTime(input);
+    expect(result).toEqual(expected);
+  });
+
+  test("Convert negative seconds", () => {
+    const input = -1;
+    const expected = new Date(1969, 11, 31, 23, 59, 59);
+    const result = toDateTime(input);
+    expect(result).toEqual(expected);
+  });
+});
+
+
+
+import { removeTimeInfoFromDate } from "../../src/actions/utils";
+
+describe("removeTimeInfoFromDate", () => {
+  test("removes time info from a date", () => {
+    const date = new Date(Date.UTC(2022, 4, 5, 10, 30, 45, 500)); // May 5, 2022 10:30:45.500
+    const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
+    const result = removeTimeInfoFromDate(date);
+    expect(result).toEqual(expected);
+  });
+
+  test("removes time info from a date with no time info", () => {
+    const date = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
+    const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
+    const result = removeTimeInfoFromDate(date);
+    expect(result).toEqual(expected);
+  });
+
+  test("removes time info from a date with time info set to 0", () => {
+    const date = new Date(Date.UTC(2022, 4, 5, 0, 0, 0, 0)); // May 5, 2022 00:00:00.000
+    const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
+    const result = removeTimeInfoFromDate(date);
+    expect(result).toEqual(expected);
+  });
+
+  test("removes time info from a date with time info set to 0 and milliseconds", () => {
+    const date = new Date(Date.UTC(2022, 4, 5, 0, 0, 0, 500)); // May 5, 2022 00:00:00.500
+    const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
+    const result = removeTimeInfoFromDate(date);
+    expect(result).toEqual(expected);
+  });
+});
 
 const verifyAskChannelParamsResult = (
   result: AskChannelParams,
@@ -14,7 +124,7 @@ const verifyAskChannelParamsResult = (
   timeMetric: string,
   count: number,
   groupBy: string,
-  error: string
+  error: string,
 ) => {
   expect(result.actionType).toEqual(actionType);
   expect(result.timeMetric).toEqual(timeMetric);
@@ -23,59 +133,50 @@ const verifyAskChannelParamsResult = (
   expect(result.error).toEqual(error);
 };
 
-describe("getAskChannelStatsParameters - Valid, Default", () => {
-  test("default stats ask", async () => {
-    const ask = "ask channel stats";
+describe("getAskChannelStatsParameters", () => {
+  test("default stats ask  - Valid, Default", async () => {
+    let ask = "ask channel stats";
 
-    const result: AskChannelParams = getAskChannelParameters(ask);
+    let result: AskChannelParams = getAskChannelParameters(ask);
 
     // Check that we got the default - 7 days
     verifyAskChannelParamsResult(result, "stats", "days", 7, "", "");
-  });
 
-  test("default status ask", async () => {
-    const ask = "ask channel status";
+    ask = "ask channel status";
 
-    const result: AskChannelParams = getAskChannelParameters(ask);
+    result = getAskChannelParameters(ask);
 
     // Check that we got the default - 7 days
     verifyAskChannelParamsResult(result, "status", "days", 7, "", "");
-  });
 
-  test("default summary ask", async () => {
-    const ask = "ask channel summary";
+    ask = "ask channel summary";
 
-    const result: AskChannelParams = getAskChannelParameters(ask);
+    result = getAskChannelParameters(ask);
 
     // Check that we got the default - 7 days
     verifyAskChannelParamsResult(result, "summary", "days", 7, "", "");
   });
-});
 
-describe("getAskChannelStatsParameters - Valid, dates", () => {
-  test("one days stats", async () => {
-    const ask = "ask channel stats 1 days";
+  test("one days", async () => {
+    let ask = "ask channel stats 1 days";
 
-    const result: AskChannelParams = getAskChannelParameters(ask);
+    let result: AskChannelParams = getAskChannelParameters(ask);
 
     verifyAskChannelParamsResult(result, "stats", "days", 1, "", "");
-  });
 
-  test("one day status", async () => {
-    const ask = "ask channel status 1 day";
+    ask = "ask channel status 1 day";
 
-    const result: AskChannelParams = getAskChannelParameters(ask);
+    result = getAskChannelParameters(ask);
 
     verifyAskChannelParamsResult(result, "status", "days", 1, "", "");
-  });
 
-  test("one day summary", async () => {
-    const ask = "ask channel summary 1 day";
+    ask = "ask channel summary 1 day";
 
-    const result: AskChannelParams = getAskChannelParameters(ask);
+    result = getAskChannelParameters(ask);
 
     verifyAskChannelParamsResult(result, "summary", "days", 1, "", "");
   });
+
 
   test("multiple days stats", async () => {
     const ask = "ask channel stats 5 days";
@@ -234,7 +335,7 @@ describe("getStartingDate", () => {
       "stats",
       1,
       "days",
-      ""
+      "",
     );
     const result: Date = getStartingDate(params);
 
@@ -252,7 +353,7 @@ describe("getStartingDate", () => {
       "stats",
       3,
       "days",
-      ""
+      "",
     );
     const result: Date = getStartingDate(params);
 
@@ -270,7 +371,7 @@ describe("getStartingDate", () => {
       "stats",
       8,
       "days",
-      ""
+      "",
     );
     const result: Date = getStartingDate(params);
 
@@ -288,7 +389,7 @@ describe("getStartingDate", () => {
       "stats",
       1,
       "weeks",
-      ""
+      "",
     );
     const result: Date = getStartingDate(params);
 
@@ -306,7 +407,7 @@ describe("getStartingDate", () => {
       "stats",
       2,
       "weeks",
-      ""
+      "",
     );
     const result: Date = getStartingDate(params);
 
@@ -324,7 +425,7 @@ describe("getStartingDate", () => {
       "stats",
       6,
       "weeks",
-      ""
+      "",
     );
     const result: Date = getStartingDate(params);
 
@@ -342,7 +443,7 @@ describe("getStartingDate", () => {
       "stats",
       1,
       "month",
-      ""
+      "",
     );
     const result: Date = getStartingDate(params);
 
@@ -360,7 +461,7 @@ describe("getStartingDate", () => {
       "stats",
       3,
       "month",
-      ""
+      "",
     );
     const result: Date = getStartingDate(params);
 
@@ -378,7 +479,7 @@ describe("getStartingDate", () => {
       "stats",
       14,
       "month",
-      ""
+      "",
     );
     const result: Date = getStartingDate(params);
 
@@ -392,6 +493,7 @@ describe("getStartingDate", () => {
 
 // TODO: This doesn't work in CI, or in the bot, but tests are passing locally.
 //  (Date should be reset to Sunday but it actually being reset to Monday, both in CI and in Heroku)
+// MAYBE BECAUSE the removeTimeInfoFromDate method is expecting a UTC date, but the date is not in UTC
 describe("setDateToSunday", () => {
   test("Sunday is same day", async () => {
     const inputDate: Date = new Date(1651438799000); // 01/05/2022 20:16:40 UTC
@@ -424,13 +526,13 @@ describe("setDateToSunday", () => {
 describe("getChannelNameFromSlackChannelString", () => {
   it("should return the channel name from the slack channel string", () => {
     expect(extractNameFromChannelString("<#C0G9QF9GW|general>")).toBe(
-      "general"
+      "general",
     );
   });
 
   it("should return the channel name from the slack channel string", () => {
     expect(extractNameFromChannelString("<#C0G9QF9GW|general-number>")).toBe(
-      "general-number"
+      "general-number",
     );
   });
 
@@ -446,14 +548,14 @@ describe("getChannelNameFromSlackChannelString", () => {
 describe("getChannelIDFromEventText", () => {
   it("should return the default channel ID from the event text", () => {
     expect(getChannelIDFromEventText("ask channel status", 3, "12345")).toBe(
-      "12345"
+      "12345",
     );
     expect(
-      getChannelIDFromEventText("zendesk tickets status", 3, "12345")
+      getChannelIDFromEventText("zendesk tickets status", 3, "12345"),
     ).toBe("12345");
 
     expect(getChannelIDFromEventText("zigi belo bibi 33223", 3, "12345")).toBe(
-      "12345"
+      "12345",
     );
 
     expect(getChannelIDFromEventText("", 3, "12345")).toBe("12345");
@@ -464,15 +566,15 @@ describe("getChannelIDFromEventText", () => {
       getChannelIDFromEventText(
         "ask channel status <#C0422HDF13N|tzahi_bot_test>",
         3,
-        "12345"
-      )
+        "12345",
+      ),
     ).toBe("C0422HDF13N");
     expect(
       getChannelIDFromEventText(
         "zendesk tickets status <#C0422HDF13N|tzahi_bot_test>",
         3,
-        "12345"
-      )
+        "12345",
+      ),
     ).toBe("C0422HDF13N");
   });
 });
