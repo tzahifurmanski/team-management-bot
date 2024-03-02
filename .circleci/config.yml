@@ -3,26 +3,9 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.2
   codecov: codecov/codecov@4.0.1
-jobs:
-  test:
-    executor:
-      name: node/default
-      tag: '14.19.3'
-    steps:
-      - checkout
-      - node/install-packages
-      - run:
-          command: npm run coverage
-      - store_artifacts:
-          path: coverage
-
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  test:
-    jobs:
-      - test
   upload-to-codecov:
     jobs:
-      - checkout 
-      - codecov/upload
+      - node/test:
+          post-steps:
+            - codecov/upload
