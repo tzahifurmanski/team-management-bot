@@ -15,9 +15,8 @@ jobs:
           command: npm run coverage
       - store_artifacts:
           path: coverage
-
+      - codecov/upload
 workflows:
   test:
     jobs:
       - test
-      - codecov/upload
