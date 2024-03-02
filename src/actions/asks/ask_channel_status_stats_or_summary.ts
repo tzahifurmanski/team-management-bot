@@ -1,9 +1,5 @@
 import { BotAction } from "../base_action";
-import {
-  AskChannelParams,
-  getAskChannelParameters,
-  getStartingDate,
-} from "../utils";
+import { AskChannelParams, getAskChannelParameters } from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -18,6 +14,7 @@ import {
 } from "../../integrations/slack/consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../consts";
+import { getStartingDate } from "../date_utils";
 
 export class AskChannelStatusStatsOrSummary implements BotAction {
   getHelpText(): string {
@@ -63,7 +60,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
       );
     }
 
-    const startingDate = getStartingDate(params);
+    const startingDate = getStartingDate(params.timeMetric, params.count);
     const endingDate = new Date();
     logger.debug(
       `"Date between ${startingDate.toUTCString()} and ${endingDate.toUTCString()}`,

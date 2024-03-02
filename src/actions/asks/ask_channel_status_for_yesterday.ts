@@ -3,7 +3,6 @@ import {
   getChannelIDFromEventText,
   getRecurringJobInfo,
   getStatsMessage,
-  removeTimeInfoFromDate,
   scheduleAskChannelsCrons,
 } from "../utils";
 import {
@@ -22,6 +21,7 @@ import {
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { ASK_CHANNEL_STATS_CRON, logger } from "../../consts";
+import { removeTimeInfoFromDate } from "../date_utils";
 
 export class AskChannelStatusForYesterday implements BotAction {
   static DAYS_BACK = 60;

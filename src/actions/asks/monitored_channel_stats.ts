@@ -1,5 +1,5 @@
 import { BotAction } from "../base_action";
-import { removeTimeInfoFromDate } from "../utils";
+import { removeTimeInfoFromDate } from "../date_utils";
 import { getChannelMessages } from "../../logic/asks_channel";
 import {
   getMonitoredChannelStatsForMessages,
