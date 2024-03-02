@@ -20,8 +20,7 @@ export const toDateTime = (secs: any): Date => {
 // Note that:
 // 1. This method changes the input date.
 // 2. The input date is expected to be in UTC time.
-export const removeTimeInfoFromDate = (date: Date): Date => { 
-  // TODO: Is there a reason why I'm using UTC methods here?
+export const removeTimeInfoFromDate = (date: Date): Date => {
   date.setUTCHours(0);
   date.setUTCMinutes(0);
   date.setUTCSeconds(0);
@@ -30,12 +29,13 @@ export const removeTimeInfoFromDate = (date: Date): Date => {
   return date;
 };
 
+// This function receives a date object, and returns the same date object with the date set to the previous Sunday, without time info.
+// If the provided date is already a sunday, it will return the same date.
 export const setDateToSunday = (date: Date): Date => {
-  // TODO: Should this be getUTCDay()?
-  // Both setDateToSunday and removeTimeInfoFromDate should use the same date type (UTC or not)
-  const day = date.getDay();
-  if (day !== 0) date.setHours(-24 * (day - 1));
-  date = removeTimeInfoFromDate(date);
+  const day = date.getUTCDay();
+  const diff = date.getDate() - day;
+
+  date = removeTimeInfoFromDate(new Date(date.setDate(diff)));
   return date;
 };
 
@@ -209,7 +209,9 @@ export const extractNameFromChannelString = (channelString: string): string => {
   // The channel string is in the format <#C12345678|channel-name>, we want to return the channel name
   // Example: <#C12345678|channel-name> -> channel-name
   if (!SLACK_CHANNEL_NAME_REGEX.test(channelString.trim())) {
-    logger.info(`NO MATCH for ${channelString} in ${SLACK_CHANNEL_NAME_REGEX}`);
+    logger.debug(
+      `NO MATCH for ${channelString} in ${SLACK_CHANNEL_NAME_REGEX}`,
+    );
     // If the channel string is not in the format <#C12345678|channel-name>, return empty
     return "";
   }
@@ -221,7 +223,9 @@ export const extractIDFromChannelString = (channelString: string): string => {
   // The channel string is in the format <#C12345678|channel-name>, we want to return the channel name
   // Example: <#C12345678|channel-name> -> channel-name
   if (!SLACK_CHANNEL_NAME_REGEX.test(channelString.trim())) {
-    logger.info(`NO MATCH for ${channelString} in ${SLACK_CHANNEL_NAME_REGEX}`);
+    logger.debug(
+      `NO MATCH for ${channelString} in ${SLACK_CHANNEL_NAME_REGEX}`,
+    );
     // If the channel string is not in the format <#C12345678|channel-name>, return empty
     return "";
   }
@@ -249,10 +253,10 @@ export const getChannelIDFromEventText = (
   ) {
     // Take default
     askChannelID = defaultID;
-    logger.info(`Using default channel ID ${askChannelID}.`);
+    logger.debug(`Using default channel ID ${askChannelID}.`);
   } else {
     askChannelID = extractIDFromChannelString(params[nameIndex]);
-    logger.info(`Found channel ID ${askChannelID}.`);
+    logger.debug(`Found channel ID ${askChannelID}.`);
   }
 
   return askChannelID;
