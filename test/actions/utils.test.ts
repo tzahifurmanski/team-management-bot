@@ -3,15 +3,13 @@ import {
   extractNameFromChannelString,
   getAskChannelParameters,
   getChannelIDFromEventText,
+  getRandomFromArray,
   getStartingDate,
+  removeTimeInfoFromDate,
   setDateToSunday,
   toDateTime,
 } from "../../src/actions/utils";
 import * as MockDate from "mockdate";
-
-
-
-import { getRandomFromArray } from "../../src/actions/utils";
 
 describe("getRandomFromArray", () => {
   test("returns a random element from the array", () => {
@@ -84,15 +82,12 @@ describe("toDateTime", () => {
   });
 });
 
-
-
-import { removeTimeInfoFromDate } from "../../src/actions/utils";
-
 describe("removeTimeInfoFromDate", () => {
   test("removes time info from a date", () => {
     const date = new Date(Date.UTC(2022, 4, 5, 10, 30, 45, 500)); // May 5, 2022 10:30:45.500
     const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
     const result = removeTimeInfoFromDate(date);
+    expect(result.getTime()).not.toBeNaN();
     expect(result).toEqual(expected);
   });
 
@@ -100,6 +95,7 @@ describe("removeTimeInfoFromDate", () => {
     const date = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
     const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
     const result = removeTimeInfoFromDate(date);
+    expect(result.getTime()).not.toBeNaN();
     expect(result).toEqual(expected);
   });
 
@@ -107,6 +103,7 @@ describe("removeTimeInfoFromDate", () => {
     const date = new Date(Date.UTC(2022, 4, 5, 0, 0, 0, 0)); // May 5, 2022 00:00:00.000
     const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
     const result = removeTimeInfoFromDate(date);
+    expect(result.getTime()).not.toBeNaN();
     expect(result).toEqual(expected);
   });
 
@@ -114,6 +111,7 @@ describe("removeTimeInfoFromDate", () => {
     const date = new Date(Date.UTC(2022, 4, 5, 0, 0, 0, 500)); // May 5, 2022 00:00:00.500
     const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
     const result = removeTimeInfoFromDate(date);
+    expect(result.getTime()).not.toBeNaN();
     expect(result).toEqual(expected);
   });
 });
@@ -176,7 +174,6 @@ describe("getAskChannelStatsParameters", () => {
 
     verifyAskChannelParamsResult(result, "summary", "days", 1, "", "");
   });
-
 
   test("multiple days stats", async () => {
     const ask = "ask channel stats 5 days";
@@ -328,6 +325,10 @@ describe("getAskChannelStatsParameters - Invalid", () => {
 // TODO: This doesn't work in CI, or in the bot, but tests are passing locally.
 //  (Date should be reset to Sunday but it actaully being reset to Monday, both in CI and in Heroku)
 describe("getStartingDate", () => {
+  afterEach(() => {
+    MockDate.reset();
+  });
+
   test("one day", async () => {
     MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
@@ -382,7 +383,7 @@ describe("getStartingDate", () => {
     MockDate.reset();
   });
 
-  test.skip("one week", async () => {
+  test("one week", async () => {
     MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
     const params: AskChannelParams = new AskChannelParams(
@@ -400,7 +401,7 @@ describe("getStartingDate", () => {
     MockDate.reset();
   });
 
-  test.skip("multiple weeks", async () => {
+  test("multiple weeks", async () => {
     MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
     const params: AskChannelParams = new AskChannelParams(
@@ -418,7 +419,7 @@ describe("getStartingDate", () => {
     MockDate.reset();
   });
 
-  test.skip("multiple weeks - more than a month", async () => {
+  test("multiple weeks - more than a month", async () => {
     MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
 
     const params: AskChannelParams = new AskChannelParams(
@@ -491,34 +492,34 @@ describe("getStartingDate", () => {
   });
 });
 
-// TODO: This doesn't work in CI, or in the bot, but tests are passing locally.
-//  (Date should be reset to Sunday but it actually being reset to Monday, both in CI and in Heroku)
-// MAYBE BECAUSE the removeTimeInfoFromDate method is expecting a UTC date, but the date is not in UTC
 describe("setDateToSunday", () => {
   test("Sunday is same day", async () => {
-    const inputDate: Date = new Date(Date.UTC(1651438799000)); // 01/05/2022 20:16:40 UTC
-    const expected: Date = new Date(Date.UTC(1651363200000)); // 01/05/2022 00:00:00 UTC
+    const inputDate = new Date(Date.UTC(2022, 4, 1, 20, 59, 59)); // 01/05/2022 20:59:59 UTC
+    const expected = new Date(Date.UTC(2022, 4, 1)); // 01/05/2022 00:00:00 UTC
 
     const result: Date = setDateToSunday(inputDate);
 
+    expect(result.getTime()).not.toBeNaN();
     expect(result.getTime()).toEqual(expected.getTime());
   });
 
   test("Middle of the week", async () => {
-    const inputDate: Date = new Date(Date.UTC(1651611599000)); // 03/05/2022 20:59:59 UTC
-    const expected: Date = new Date(Date.UTC(1651363200000)); // 01/05/2022 00:00:00 UTC
+    const inputDate = new Date(Date.UTC(2022, 4, 3, 20, 59, 59)); // 03/05/2022 20:59:59 UTC
+    const expected = new Date(Date.UTC(2022, 4, 1)); // 01/05/2022 00:00:00 UTC
 
     const result: Date = setDateToSunday(inputDate);
 
+    expect(result.getTime()).not.toBeNaN();
     expect(result.getTime()).toEqual(expected.getTime());
   });
 
   test("Saturday night", async () => {
-    const inputDate: Date = new Date(Date.UTC(1651957199000)); // 07/05/2022 20:59:59 UTC
-    const expected: Date = new Date(Date.UTC(1651363200000)); // 01/05/2022 00:00:00 UTC
+    const inputDate = new Date(Date.UTC(2022, 4, 7, 20, 59, 59)); // 07/05/2022 20:59:59 UTC
+    const expected = new Date(Date.UTC(2022, 4, 1)); // 01/05/2022 00:00:00 UTC
 
     const result: Date = setDateToSunday(inputDate);
 
+    expect(result.getTime()).not.toBeNaN();
     expect(result.getTime()).toEqual(expected.getTime());
   });
 });
