@@ -93,6 +93,7 @@ describe("removeTimeInfoFromDate", () => {
     const date = new Date(Date.UTC(2022, 4, 5, 10, 30, 45, 500)); // May 5, 2022 10:30:45.500
     const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
     const result = removeTimeInfoFromDate(date);
+    expect(result.getTime()).not.toBeNaN();
     expect(result).toEqual(expected);
   });
 
@@ -100,6 +101,7 @@ describe("removeTimeInfoFromDate", () => {
     const date = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
     const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
     const result = removeTimeInfoFromDate(date);
+    expect(result.getTime()).not.toBeNaN();
     expect(result).toEqual(expected);
   });
 
@@ -107,6 +109,7 @@ describe("removeTimeInfoFromDate", () => {
     const date = new Date(Date.UTC(2022, 4, 5, 0, 0, 0, 0)); // May 5, 2022 00:00:00.000
     const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
     const result = removeTimeInfoFromDate(date);
+    expect(result.getTime()).not.toBeNaN();
     expect(result).toEqual(expected);
   });
 
@@ -114,6 +117,7 @@ describe("removeTimeInfoFromDate", () => {
     const date = new Date(Date.UTC(2022, 4, 5, 0, 0, 0, 500)); // May 5, 2022 00:00:00.500
     const expected = new Date(Date.UTC(2022, 4, 5)); // May 5, 2022 00:00:00.000
     const result = removeTimeInfoFromDate(date);
+    expect(result.getTime()).not.toBeNaN();
     expect(result).toEqual(expected);
   });
 });
@@ -496,29 +500,32 @@ describe("getStartingDate", () => {
 // MAYBE BECAUSE the removeTimeInfoFromDate method is expecting a UTC date, but the date is not in UTC
 describe("setDateToSunday", () => {
   test("Sunday is same day", async () => {
-    const inputDate: Date = new Date(Date.UTC(1651438799000)); // 01/05/2022 20:16:40 UTC
-    const expected: Date = new Date(Date.UTC(1651363200000)); // 01/05/2022 00:00:00 UTC
+    const inputDate = new Date(Date.UTC(2022, 4, 1, 20, 59, 59)); // 01/05/2022 20:59:59 UTC
+    const expected = new Date(Date.UTC(2022, 4, 1)); // 01/05/2022 00:00:00 UTC
 
     const result: Date = setDateToSunday(inputDate);
 
+    expect(result.getTime()).not.toBeNaN();
     expect(result.getTime()).toEqual(expected.getTime());
   });
 
   test("Middle of the week", async () => {
-    const inputDate: Date = new Date(Date.UTC(1651611599000)); // 03/05/2022 20:59:59 UTC
-    const expected: Date = new Date(Date.UTC(1651363200000)); // 01/05/2022 00:00:00 UTC
+    const inputDate = new Date(Date.UTC(2022, 4, 3, 20, 59, 59)); // 03/05/2022 20:59:59 UTC
+    const expected = new Date(Date.UTC(2022, 4, 1)); // 01/05/2022 00:00:00 UTC
 
     const result: Date = setDateToSunday(inputDate);
 
+    expect(result.getTime()).not.toBeNaN();
     expect(result.getTime()).toEqual(expected.getTime());
   });
 
   test("Saturday night", async () => {
-    const inputDate: Date = new Date(Date.UTC(1651957199000)); // 07/05/2022 20:59:59 UTC
-    const expected: Date = new Date(Date.UTC(1651363200000)); // 01/05/2022 00:00:00 UTC
+    const inputDate = new Date(Date.UTC(2022, 4, 7, 20, 59, 59)); // 07/05/2022 20:59:59 UTC
+    const expected = new Date(Date.UTC(2022, 4, 1)); // 01/05/2022 00:00:00 UTC
 
     const result: Date = setDateToSunday(inputDate);
-
+    
+    expect(result.getTime()).not.toBeNaN();
     expect(result.getTime()).toEqual(expected.getTime());
   });
 });
