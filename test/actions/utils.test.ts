@@ -496,29 +496,29 @@ describe("getStartingDate", () => {
 // MAYBE BECAUSE the removeTimeInfoFromDate method is expecting a UTC date, but the date is not in UTC
 describe("setDateToSunday", () => {
   test("Sunday is same day", async () => {
-    const inputDate: Date = new Date(1651438799000); // 01/05/2022 20:16:40 UTC
+    const inputDate: Date = new Date(Date.UTC(1651438799000)); // 01/05/2022 20:16:40 UTC
+    const expected: Date = new Date(Date.UTC(1651363200000)); // 01/05/2022 00:00:00 UTC
 
     const result: Date = setDateToSunday(inputDate);
 
-    const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
     expect(result.getTime()).toEqual(expected.getTime());
   });
 
-  test.skip("Middle of the week", async () => {
-    const inputDate: Date = new Date(1651611599000); // 03/05/2022 20:59:59 UTC
+  test("Middle of the week", async () => {
+    const inputDate: Date = new Date(Date.UTC(1651611599000)); // 03/05/2022 20:59:59 UTC
+    const expected: Date = new Date(Date.UTC(1651363200000)); // 01/05/2022 00:00:00 UTC
 
     const result: Date = setDateToSunday(inputDate);
 
-    const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
     expect(result.getTime()).toEqual(expected.getTime());
   });
 
-  test.skip("Saturday night", async () => {
-    const inputDate: Date = new Date(1651957199000); // 07/05/2022 20:59:59 UTC
+  test("Saturday night", async () => {
+    const inputDate: Date = new Date(Date.UTC(1651957199000)); // 07/05/2022 20:59:59 UTC
+    const expected: Date = new Date(Date.UTC(1651363200000)); // 01/05/2022 00:00:00 UTC
 
     const result: Date = setDateToSunday(inputDate);
 
-    const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
     expect(result.getTime()).toEqual(expected.getTime());
   });
 });

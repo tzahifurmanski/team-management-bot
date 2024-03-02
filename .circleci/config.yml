@@ -15,14 +15,8 @@ jobs:
           command: npm run coverage
       - store_artifacts:
           path: coverage
-
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+      - codecov/upload
 workflows:
   test:
     jobs:
       - test
-  upload-to-codecov:
-    jobs:
-      - checkout 
-      - codecov/upload
