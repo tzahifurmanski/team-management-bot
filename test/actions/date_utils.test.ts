@@ -4,7 +4,6 @@ import {
     setDateToSunday,
     toDateTime,
   } from "../../src/actions/date_utils";
-import { AskChannelParams } from "../../src/actions/utils";
 import * as MockDate from "mockdate";
 
 
@@ -102,13 +101,7 @@ describe("getStartingDate", () => {
     test("one day", async () => {
       MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
   
-      const params: AskChannelParams = new AskChannelParams(
-        "stats",
-        1,
-        "days",
-        "",
-      );
-      const result: Date = getStartingDate(params);
+      const result: Date = getStartingDate("days", 1);
   
       // Check that the start date is the beginning of this day
       const expected: Date = new Date(1651708800000); // 05/05/2022 00:00:00 UTC
@@ -120,13 +113,7 @@ describe("getStartingDate", () => {
     test("multiple days", async () => {
       MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
   
-      const params: AskChannelParams = new AskChannelParams(
-        "stats",
-        3,
-        "days",
-        "",
-      );
-      const result: Date = getStartingDate(params);
+      const result: Date = getStartingDate("days", 3);
   
       // Check that the start date is the wanted date
       const expected: Date = new Date(1651536000000); // 03/05/2022 00:00:00 UTC
@@ -138,13 +125,7 @@ describe("getStartingDate", () => {
     test("multiple days - more than a week", async () => {
       MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
   
-      const params: AskChannelParams = new AskChannelParams(
-        "stats",
-        8,
-        "days",
-        "",
-      );
-      const result: Date = getStartingDate(params);
+      const result: Date = getStartingDate("days", 8);
   
       // Check that the start date is the wanted date
       const expected: Date = new Date(1651104000000); // 28/04/2022 00:00:00 UTC
@@ -156,13 +137,7 @@ describe("getStartingDate", () => {
     test("one week", async () => {
       MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
   
-      const params: AskChannelParams = new AskChannelParams(
-        "stats",
-        1,
-        "weeks",
-        "",
-      );
-      const result: Date = getStartingDate(params);
+      const result: Date = getStartingDate("weeks", 1);
   
       // Check that the start date is the beginning of this week
       const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
@@ -174,13 +149,7 @@ describe("getStartingDate", () => {
     test("multiple weeks", async () => {
       MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
   
-      const params: AskChannelParams = new AskChannelParams(
-        "stats",
-        2,
-        "weeks",
-        "",
-      );
-      const result: Date = getStartingDate(params);
+      const result: Date = getStartingDate("weeks", 2);
   
       // Check that the start date is the beginning of the previous week
       const expected: Date = new Date(1650758400000); // 24/04/2022 00:00:00 UTC
@@ -192,13 +161,7 @@ describe("getStartingDate", () => {
     test("multiple weeks - more than a month", async () => {
       MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
   
-      const params: AskChannelParams = new AskChannelParams(
-        "stats",
-        6,
-        "weeks",
-        "",
-      );
-      const result: Date = getStartingDate(params);
+      const result: Date = getStartingDate("weeks", 6);
   
       // Check that the start date is the wanted date
       const expected: Date = new Date(1648339200000); // 27/03/2022 00:00:00 UTC
@@ -209,14 +172,8 @@ describe("getStartingDate", () => {
   
     test("one month", async () => {
       MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
-  
-      const params: AskChannelParams = new AskChannelParams(
-        "stats",
-        1,
-        "month",
-        "",
-      );
-      const result: Date = getStartingDate(params);
+
+      const result: Date = getStartingDate("month", 1);
   
       // Check that the start date is the beginning of this month
       const expected: Date = new Date(1651363200000); // 01/05/2022 00:00:00 UTC
@@ -228,13 +185,7 @@ describe("getStartingDate", () => {
     test("multiple months", async () => {
       MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
   
-      const params: AskChannelParams = new AskChannelParams(
-        "stats",
-        3,
-        "month",
-        "",
-      );
-      const result: Date = getStartingDate(params);
+      const result: Date = getStartingDate("month", 3);
   
       // Check that the start date is the beginning of the wanted month
       const expected: Date = new Date(1646092800000); // 01/03/2022 00:00:00 UTC
@@ -246,13 +197,7 @@ describe("getStartingDate", () => {
     test("multiple months - more than a year", async () => {
       MockDate.set(new Date(1651781800964)); // 05/05/2022 20:16:40 UTC
   
-      const params: AskChannelParams = new AskChannelParams(
-        "stats",
-        14,
-        "month",
-        "",
-      );
-      const result: Date = getStartingDate(params);
+      const result: Date = getStartingDate("month", 14);
   
       // Check that the start date is the wanted date
       const expected: Date = new Date(1617235200000); // 01/04/2021 00:00:00 UTC

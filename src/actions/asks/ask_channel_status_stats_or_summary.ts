@@ -60,7 +60,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
       );
     }
 
-    const startingDate = getStartingDate(params);
+    const startingDate = getStartingDate(params.timeMetric, params.count);
     const endingDate = new Date();
     logger.debug(
       `"Date between ${startingDate.toUTCString()} and ${endingDate.toUTCString()}`,

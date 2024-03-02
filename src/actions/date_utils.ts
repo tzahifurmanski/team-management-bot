@@ -1,5 +1,3 @@
-import { AskChannelParams } from "./utils";
-
 export const toDateTime = (secs: any): Date => {
   const time = new Date(1970, 0, 1); // Set to Epoch
   time.setSeconds(secs);
@@ -29,23 +27,23 @@ export const setDateToSunday = (date: Date): Date => {
   return date;
 };
 
-export const getStartingDate = (params: AskChannelParams): Date => {
+export const getStartingDate = (timeMetric: string, count: number): Date => {
   // How to calculate:
   // For days - count backwards from today
   // For weeks - count backwards from the beginning of the week
   // For months - count backwards from the beginning of the month
   let startingDate;
 
-  const adjustedCount = params.count - 1; // Remove 1 from the number of requested count,
+  const adjustedCount = count - 1; // Remove 1 from the number of requested count,
   // so '1' will be treated as 'this' (AKA '1 day' will be beginning of today, '1 week' will be beginning of this week,
   // and '1 month' will be beginning of this month)
 
   // Get the starting date - Days
-  if (params.timeMetric === "days") {
+  if (timeMetric === "days") {
     startingDate = new Date();
     startingDate.setDate(startingDate.getDate() - adjustedCount);
     removeTimeInfoFromDate(startingDate);
-  } else if (params.timeMetric === "weeks") {
+  } else if (timeMetric === "weeks") {
     startingDate = setDateToSunday(new Date());
     startingDate.setDate(startingDate.getDate() - 7 * adjustedCount);
     removeTimeInfoFromDate(startingDate);

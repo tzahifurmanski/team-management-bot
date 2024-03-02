@@ -42,6 +42,7 @@ const verifyAskChannelParamsResult = (
 };
 
 describe("getAskChannelStatsParameters", () => {
+
   test("default stats ask  - Valid, Default", async () => {
     let ask = "ask channel stats";
 
@@ -188,9 +189,7 @@ describe("getAskChannelStatsParameters", () => {
 
     verifyAskChannelParamsResult(result, "stats", "months", 2, "months", "");
   });
-});
-
-describe("getAskChannelStatsParameters - Invalid", () => {
+  
   test("invalid action type metric", async () => {
     const ask = "ask channel statszig 5 days";
 
@@ -232,6 +231,7 @@ describe("getAskChannelStatsParameters - Invalid", () => {
   });
 });
 
+
 describe("getChannelNameFromSlackChannelString", () => {
   it("should return the channel name from the slack channel string", () => {
     expect(extractNameFromChannelString("<#C0G9QF9GW|general>")).toBe(
@@ -253,6 +253,7 @@ describe("getChannelNameFromSlackChannelString", () => {
     expect(extractNameFromChannelString("")).toBe("");
   });
 });
+
 
 describe("getChannelIDFromEventText", () => {
   it("should return the default channel ID from the event text", () => {
