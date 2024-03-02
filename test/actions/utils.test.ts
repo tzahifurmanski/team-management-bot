@@ -504,7 +504,7 @@ describe("setDateToSunday", () => {
     expect(result.getTime()).toEqual(expected.getTime());
   });
 
-  test.skip("Middle of the week", async () => {
+  test("Middle of the week", async () => {
     const inputDate: Date = new Date(1651611599000); // 03/05/2022 20:59:59 UTC
 
     const result: Date = setDateToSunday(inputDate);
@@ -513,7 +513,7 @@ describe("setDateToSunday", () => {
     expect(result.getTime()).toEqual(expected.getTime());
   });
 
-  test.skip("Saturday night", async () => {
+  test("Saturday night", async () => {
     const inputDate: Date = new Date(1651957199000); // 07/05/2022 20:59:59 UTC
 
     const result: Date = setDateToSunday(inputDate);
