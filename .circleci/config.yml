@@ -3,9 +3,21 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.2
   codecov: codecov/codecov@4.0.1
+jobs:
+  test:
+    executor:
+      name: node/default
+      tag: '14.19.3'
+    steps:
+      - checkout
+      - node/install-packages
+      - run:
+          command: npm run coverage
+      - store_artifacts:
+          path: coverage
+
 workflows:
-  upload-to-codecov:
+  test:
     jobs:
-      - node/test:
-          post-steps:
-            - codecov/upload
+      - test
+      - codecov/upload
