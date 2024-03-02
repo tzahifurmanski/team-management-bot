@@ -3,7 +3,7 @@ import {
   getBucketRange,
   getStatsForMessages,
 } from "../../src/logic/asks_channel";
-import { toDateTime } from "../../src/actions/utils";
+import { toDateTime } from "../../src/actions/date_utils";
 
 describe("getBucketRange", () => {
   // Date and time (GMT): Wednesday, September 14, 2022 10:38:27 AM

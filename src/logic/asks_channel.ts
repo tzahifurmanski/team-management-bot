@@ -15,7 +15,7 @@ import {
   removeTimeInfoFromDate,
   setDateToSunday,
   toDateTime,
-} from "../actions/utils";
+} from "../actions/date_utils";
 import { SectionBlock } from "@slack/web-api";
 import { getUserProfile } from "../integrations/slack/users";
 import { getValueFromProfile } from "../integrations/slack/utils";

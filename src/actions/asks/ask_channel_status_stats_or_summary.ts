@@ -1,9 +1,5 @@
 import { BotAction } from "../base_action";
-import {
-  AskChannelParams,
-  getAskChannelParameters,
-  getStartingDate,
-} from "../utils";
+import { AskChannelParams, getAskChannelParameters } from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -18,6 +14,7 @@ import {
 } from "../../integrations/slack/consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../consts";
+import { getStartingDate } from "../date_utils";
 
 export class AskChannelStatusStatsOrSummary implements BotAction {
   getHelpText(): string {
