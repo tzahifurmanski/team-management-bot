@@ -506,6 +506,7 @@ describe("setDateToSunday", () => {
     const result: Date = setDateToSunday(inputDate);
 
     expect(result.getTime()).not.toBeNaN();
+
     expect(result.getTime()).toEqual(expected.getTime());
   });
 
