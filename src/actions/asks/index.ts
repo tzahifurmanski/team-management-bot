@@ -9,7 +9,7 @@ import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday
 import { ZendeskTicketsStatus } from "./zendesk_tickets_status";
 import { Help } from "./help";
 import { Status } from "./status";
-import { logger } from "../../consts";
+import { logger } from "../../settings/server_consts";
 
 const helpCommand = new Help();
 const ACTIONS_LIST: BotAction[] = [

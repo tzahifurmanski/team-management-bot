@@ -1,5 +1,5 @@
 import healthcheck from "./healthcheck";
-import { logger } from "../../../consts";
+import { logger } from "../../../settings/server_consts";
 
 // Solution based off of: https://github.com/slackapi/bolt-js/issues/212
 module.exports.register = (receiver: any) => {

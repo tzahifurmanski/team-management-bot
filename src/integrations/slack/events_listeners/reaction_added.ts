@@ -5,12 +5,11 @@ import {
 } from "../utils";
 import {
   ALLOWED_BOTS_PER_TEAM,
-  REACTIONS_HANDLED,
   TEAM_ASK_CHANNEL_ID,
-} from "../consts";
+} from "../../../settings/team_consts";
 import { getUserProfile } from "../users";
 import { getConversationHistory } from "../conversations";
-import { logger } from "../../../consts";
+import { logger, REACTIONS_HANDLED } from "../../../settings/server_consts";
 
 const reactionAddedCallback = async ({ event, client }: any) => {
   logger.debug("Got a reaction added callback...", JSON.stringify(event));

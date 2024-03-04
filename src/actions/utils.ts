@@ -1,7 +1,7 @@
 import cronstrue from "cronstrue";
 import { AsksChannelStatsResult } from "../logic/asks_channel";
 import { sanitizeCommandInput } from "../integrations/slack/utils";
-import { logger } from "../consts";
+import { logger } from "../settings/server_consts";
 
 const cron = require("node-cron");
 
@@ -9,7 +9,6 @@ export const getRandomFromArray = (array: any[]) => {
   const random = Math.floor(Math.random() * array.length);
   return array[random];
 };
-
 
 export class AskChannelParams {
   constructor(

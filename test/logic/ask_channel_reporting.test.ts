@@ -10,7 +10,7 @@ import {
   USER_PROFILE_FIELD_ID_DEPARTMENT,
   USER_PROFILE_FIELD_ID_DIVISION,
   USER_PROFILE_FIELD_ID_TEAM,
-} from "../../src/integrations/slack/consts";
+} from "../../src/settings/team_consts";
 
 jest.mock("../../src/integrations/slack/users");
 

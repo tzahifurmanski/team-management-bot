@@ -5,7 +5,11 @@ import { FolksResponse } from "./folks";
 import { MergeResponse } from "./merge";
 import { HelpResponse } from "./help";
 import { IThinkResponse } from "./i_think";
-import { DISABLED_RESPONSES, ENABLE_BOT_RESPONSES, logger } from "../../consts";
+import {
+  DISABLED_RESPONSES,
+  ENABLE_BOT_RESPONSES,
+  logger,
+} from "../../settings/server_consts";
 
 const ACTIONS_LIST: BotAction[] = [
   new BugResponse(),

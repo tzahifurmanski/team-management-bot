@@ -6,7 +6,10 @@ import {
   MonitoredChannelStatsResult,
   reportMonitoredChannelStatsToSlack,
 } from "../../logic/monitored_channel";
-import { ALLOWED_BOTS_PER_TEAM, BOT_ID } from "../../integrations/slack/consts";
+import {
+  ALLOWED_BOTS_PER_TEAM,
+  BOT_SLACK_ID,
+} from "../../settings/team_consts";
 import {
   MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE,
   MONITORED_CHANNEL_CONDITION_MESSAGE_SUCCESS,
@@ -14,7 +17,7 @@ import {
   MONITORED_CHANNEL_DAYS_INDEX,
   MONITORED_CHANNEL_ID,
   MONITORED_CHANNEL_TRIGGER,
-} from "../../consts";
+} from "../../settings/server_consts";
 
 export class MonitoredChannelSummaryStats implements BotAction {
   getHelpText(): string {
@@ -36,7 +39,7 @@ export class MonitoredChannelSummaryStats implements BotAction {
 
     // TODO: Make this prettier - This is needed because we need to count for a scenario where the text starts with @unibot so we needs to exclude it
     const numOfDays =
-      (event.text.replace(`<@${BOT_ID}> `, "").split(" ")[
+      (event.text.replace(`<@${BOT_SLACK_ID}> `, "").split(" ")[
         MONITORED_CHANNEL_DAYS_INDEX || 0
       ] || 1) - 1;
     const startingDate = new Date();

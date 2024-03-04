@@ -1,6 +1,7 @@
 // =================================================
-//          General Configurations
+//          Env Configurations
 // =================================================
+
 // Load the .env file config for debug
 if (process.env.NODE_ENV !== "production") {
   if (typeof process.env.ENV_FILE !== "undefined") {
@@ -13,8 +14,7 @@ if (process.env.NODE_ENV !== "production") {
   }
 }
 
-import { LogLevel } from "@slack/bolt";
-
+// Initialize logger
 const winston = require("winston");
 
 const logLevels = {
@@ -38,63 +38,19 @@ export const logger = winston.createLogger({
 
 logger.info(`Logger is set up with ${logger.level} level.`);
 
-// =================================================
-//          Utils
-// =================================================
-//
-
-export const getBoltLogLevel = (logLevel: any) => {
-  let boltLogLevel;
-
-  switch (logLevel) {
-    case "error":
-      boltLogLevel = LogLevel.ERROR;
-      break;
-    case "warn":
-      boltLogLevel = LogLevel.WARN;
-      break;
-    case "debug":
-      boltLogLevel = LogLevel.DEBUG;
-      break;
-    default:
-      // Return INFO as default
-      boltLogLevel = LogLevel.INFO;
-      break;
-  }
-
-  return boltLogLevel;
-};
-
-export const handleListParameter = (
-  param: string | undefined,
-  defaultValue = "",
-  delimiter = ",",
-  removeEmpty = true,
-): string[] => {
-  // Check if we got a string that represents an array (or a default value that is an array)
-  // If so, split it by the delimiter and optionally remove empty values.
-  // Then, return the result
-  const fieldContent = param || defaultValue;
-
-  // Split by ,
-  let result = fieldContent.split(delimiter);
-  if (removeEmpty) {
-    result = result.filter((i) => i);
-  }
-  return result;
-};
-
+// Set the port for the server
 export const PORT = process.env.PORT || 3000;
 
 // =================================================
 //          Bot Configurations
 // =================================================
+
 // Bot Configurations
 const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "generic";
 
 // Load the configuration specific to the selected bot personality
 export const botConfig = require(
-  `../assets/personalities/${BOT_PERSONALITY}/bot_config.json`,
+  `../../assets/personalities/${BOT_PERSONALITY}/bot_config.json`,
 );
 
 // If we got a bot name, override the default:
@@ -116,6 +72,21 @@ const BOT_IMAGE_URL = process.env.BOT_IMAGE_URL || "";
 if (BOT_IMAGE_URL) {
   botConfig.BOT_IMAGE_URL = BOT_IMAGE_URL;
 }
+
+import { handleListParameter } from "../utils";
+
+// Reactions parameters
+export const REACTIONS_IN_PROGRESS: string[] = handleListParameter(
+  process.env.REACTIONS_IN_PROGRESS,
+  "in-progress,spinner",
+  ",",
+);
+
+export const REACTIONS_HANDLED: string[] = handleListParameter(
+  process.env.REACTIONS_HANDLED,
+  "white_check_mark,heavy_check_mark,green_tick",
+  ",",
+);
 
 // =================================================
 //          Feature Flags
@@ -140,30 +111,16 @@ export const ENABLE_BOT_RESPONSES =
 export const DISABLED_RESPONSES: string[] = handleListParameter(
   process.env.DISABLED_RESPONSES,
 );
-
 export const BOT_RESPONSES_CHANNELS: string[] = handleListParameter(
   process.env.BOT_RESPONSES_CHANNELS,
 );
 
-// Scheduling Configurations
-export const ASK_CHANNEL_STATS_CRON: string[] = handleListParameter(
-  process.env.ASK_CHANNEL_STATS_CRON,
-  "",
-  "|",
-  false,
-);
-export const ZENDESK_TICKETS_STATS_CRON = handleListParameter(
-  process.env.ZENDESK_TICKETS_STATS_CRON,
-  "",
-  "|",
-  false,
+// Compliments
+export const USER_SPECIFIC_COMPLIMENTS: string[] = handleListParameter(
+  process.env.USER_SPECIFIC_COMPLIMENTS,
 );
 
-// Team Configurations
-export const TEAM_SPECIFIC_COMPLIMENTS: string[] = handleListParameter(
-  process.env.TEAM_SPECIFIC_COMPLIMENTS,
-);
-
+// TODO: Remove this or move this to the slack consts. This also doesn't support multi teams
 // Monitored Channel Configurations
 export const MONITORED_CHANNEL_ID: string =
   process.env.MONITORED_CHANNEL_ID || "";

@@ -1,4 +1,5 @@
-import { handleListParameter } from "../src/consts";
+import { handleListParameter, getBoltLogLevel } from "../src/utils";
+import { LogLevel } from "@slack/bolt";
 
 describe("handleListParameter", () => {
   test("Empty Param", async () => {
@@ -69,6 +70,33 @@ describe("handleListParameter", () => {
     expect(result[1]).toEqual("Zag");
     expect(result[2]).toEqual("Zug");
   });
+
+  // TODO: Add more tests for the other (param) scenarios
 });
 
-// TODO: Add more tests for the other (param) scenarios
+
+describe("getBoltLogLevel", () => {
+  test("Should return ERROR for logLevel 'error'", () => {
+    const logLevel = "error";
+    const result = getBoltLogLevel(logLevel);
+    expect(result).toEqual(LogLevel.ERROR);
+  });
+
+  test("Should return WARN for logLevel 'warn'", () => {
+    const logLevel = "warn";
+    const result = getBoltLogLevel(logLevel);
+    expect(result).toEqual(LogLevel.WARN);
+  });
+
+  test("Should return DEBUG for logLevel 'debug'", () => {
+    const logLevel = "debug";
+    const result = getBoltLogLevel(logLevel);
+    expect(result).toEqual(LogLevel.DEBUG);
+  });
+
+  test("Should return INFO for unknown logLevel", () => {
+    const logLevel = "unknown";
+    const result = getBoltLogLevel(logLevel);
+    expect(result).toEqual(LogLevel.INFO);
+  });
+});

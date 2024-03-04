@@ -11,9 +11,9 @@ import {
 import {
   ALLOWED_BOTS_PER_TEAM,
   TEAM_ASK_CHANNEL_ID,
-} from "../../integrations/slack/consts";
+} from "../../settings/team_consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
-import { logger } from "../../consts";
+import { logger } from "../../settings/server_consts";
 import { getStartingDate } from "../date_utils";
 
 export class AskChannelStatusStatsOrSummary implements BotAction {

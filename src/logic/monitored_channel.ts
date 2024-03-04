@@ -1,5 +1,5 @@
 import { sendSlackMessage } from "../integrations/slack/messages";
-import { logger } from "../consts";
+import { logger } from "../settings/server_consts";
 
 export interface MonitoredChannelStatsResult {
   startDateInUTC: string;

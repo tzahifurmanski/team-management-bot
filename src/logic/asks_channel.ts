@@ -1,9 +1,5 @@
 import { getConversationHistory } from "../integrations/slack/conversations";
-import {
-  REACTIONS_HANDLED,
-  REACTIONS_IN_PROGRESS,
-  USER_PROFILE_FIELD_ID_TEAM,
-} from "../integrations/slack/consts";
+import { USER_PROFILE_FIELD_ID_TEAM } from "../settings/team_consts";
 import {
   createDivider,
   createImageBlock,
@@ -25,7 +21,11 @@ import {
   createReport,
   createReportSection,
 } from "./ask_channel_reporting";
-import { logger } from "../consts";
+import {
+  logger,
+  REACTIONS_HANDLED,
+  REACTIONS_IN_PROGRESS,
+} from "../settings/server_consts";
 
 export interface AsksChannelStatsResult {
   startDateInUTC: string;
@@ -380,7 +380,7 @@ const getPermalinkBlocks = async (
         // TODO: Maybe only display the team name, when doing 'ask channel stats', and not when showing the stats for yesterday. Requires refactor.
         const userProfile =
           (await getUserProfile(slackClient, message.user)) || {};
-        
+
         let teamName = getValueFromProfile(
           userProfile,
           USER_PROFILE_FIELD_ID_TEAM,

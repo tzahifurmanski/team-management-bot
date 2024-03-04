@@ -1,6 +1,6 @@
 import { BotAction } from "../base_action";
-import { BOT_NAME, botConfig } from "../../consts";
-import { BOT_ID } from "../../integrations/slack/consts";
+import { BOT_NAME, botConfig } from "../../settings/server_consts";
+import { BOT_SLACK_ID } from "../../settings/team_consts";
 import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday";
 import { Help } from "./help";
 
@@ -87,7 +87,7 @@ export class IntroduceYourself implements BotAction {
     );
     await sendSlackMessage(
       slackClient,
-      `You can communicate with me everywhere - Either by DMing me with what you'd like me to run (DM <@${BOT_ID}> with \`help\`) or tagging me in a message (\`@${BOT_NAME} help\`) in a channel I'm in.`,
+      `You can communicate with me everywhere - Either by DMing me with what you'd like me to run (DM <@${BOT_SLACK_ID}> with \`help\`) or tagging me in a message (\`@${BOT_NAME} help\`) in a channel I'm in.`,
       event.channel,
       result.ts,
     );

@@ -2,10 +2,10 @@ import { SectionBlock } from "@slack/web-api";
 import { getUserByID } from "../integrations/zendesk/users";
 import { getOrganizationByID } from "../integrations/zendesk/organizations";
 import { createSectionBlock } from "../integrations/slack/messages";
-import { ZENDESK_BASE_URL } from "../integrations/slack/consts";
+import { ZENDESK_BASE_URL } from "../settings/team_consts";
 
 export const createDetailModeBlocks = async (
-  item: any
+  item: any,
 ): Promise<SectionBlock[]> => {
   // Get the details for the tickets
   const assigneeName: any = item.assignee_id
@@ -19,7 +19,7 @@ export const createDetailModeBlocks = async (
   // createSectionBlock(`*${item.subject}* / ${organizationName}.\nAssignee: *${userResponse}*, Priority *${item.priority}*, Status *${item.status}*`, createButton("Details", `${ZENDESK_BASE_URL}/agent/tickets/${item.id}`));
   const blocks: SectionBlock[] = [
     createSectionBlock(
-      `<${ZENDESK_BASE_URL}/agent/tickets/${item.id}|*${item.subject}*> / *${organizationName}*.\nAssignee: *${assigneeName}*, Priority *${item.priority}*, Status *${item.status}*`
+      `<${ZENDESK_BASE_URL}/agent/tickets/${item.id}|*${item.subject}*> / *${organizationName}*.\nAssignee: *${assigneeName}*, Priority *${item.priority}*, Status *${item.status}*`,
     ),
   ];
 
@@ -35,14 +35,14 @@ export const createDetailModeBlocks = async (
 };
 export const createAggregateMessage = (
   aggregateBuckets: Map<string, number>,
-  aggregateKeyFieldId: string
+  aggregateKeyFieldId: string,
 ): SectionBlock => {
   // Summarize the aggregated results.
   let aggregateMessage = `Num of tickets aggregated by the '${aggregateKeyFieldId}' field:\n`;
 
   // Sort buckets by number of tickets
   const sortedAggregateBuckets = new Map(
-    [...aggregateBuckets.entries()].sort((a, b) => b[1] - a[1])
+    [...aggregateBuckets.entries()].sort((a, b) => b[1] - a[1]),
   );
   for (const [key, count] of sortedAggregateBuckets.entries()) {
     aggregateMessage = aggregateMessage + `${key} - *${count}*\n`;

@@ -1,11 +1,10 @@
 // Always load consts first
-import { getBoltLogLevel, logger, PORT } from "./consts";
-import {
-  loadSlackConfig,
-  SLACK_SIGNING_SECRET,
-} from "./integrations/slack/consts";
+import { logger, PORT } from "./settings/server_consts";
+import { loadSlackConfig } from "./settings/team_consts";
 
 import { App, ExpressReceiver } from "@slack/bolt";
+import { getBoltLogLevel } from "./utils";
+import { SLACK_SIGNING_SECRET } from "./integrations/slack/consts";
 
 const { version } = require("../package.json");
 

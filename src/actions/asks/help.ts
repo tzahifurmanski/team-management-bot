@@ -1,6 +1,6 @@
 import { BotAction } from "../base_action";
 import { sendSlackMessage } from "../../integrations/slack/messages";
-import { botConfig } from "../../consts";
+import { botConfig } from "../../settings/server_consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 
 export class Help implements BotAction {
@@ -38,7 +38,7 @@ export class Help implements BotAction {
       slackClient,
       message,
       event.channel,
-      event.thread_ts
+      event.thread_ts,
     );
   }
 }

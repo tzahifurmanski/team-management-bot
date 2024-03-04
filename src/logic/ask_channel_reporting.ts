@@ -6,8 +6,8 @@ import {
   USER_PROFILE_FIELD_ID_DEPARTMENT,
   USER_PROFILE_FIELD_ID_DIVISION,
   USER_PROFILE_FIELD_ID_TEAM,
-} from "../integrations/slack/consts";
-import { logger } from "../consts";
+} from "../settings/team_consts";
+import { logger } from "../settings/server_consts";
 
 export interface AsksChannelReportResult {
   statsByTeam: Map<string, number>;

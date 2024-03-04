@@ -1,6 +1,6 @@
-import { handleDirectEvent } from "../../../bot_actions";
+import { handleDirectEvent } from "../events";
 import { isBotMessage } from "../utils";
-import { logger } from "../../../consts";
+import { logger } from "../../../settings/server_consts";
 
 const appMentionCallback = async ({ event, client }: any) => {
   if (isBotMessage(event)) {

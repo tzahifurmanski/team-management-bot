@@ -1,5 +1,5 @@
 import { AxiosRequestConfig, default as axios } from "axios";
-import { logger } from "../consts";
+import { logger } from "../settings/server_consts";
 
 export const httpGet = async (
   url: string,

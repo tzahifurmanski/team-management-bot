@@ -1,4 +1,4 @@
-import { ENABLE_ASK_SUMMARY, logger } from "../../../consts";
+import { ENABLE_ASK_SUMMARY, logger } from "../../../settings/server_consts";
 
 const { messageCallback } = require("./message");
 const { appMentionCallback } = require("./app_mention");

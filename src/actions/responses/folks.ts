@@ -1,7 +1,7 @@
 import { BotAction } from "../base_action";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import { getRandomFromArray } from "../utils";
-import { botConfig } from "../../consts";
+import { botConfig } from "../../settings/server_consts";
 
 const GIFS: string[] = botConfig.RESPONSE_FOLKS_POOL;
 
@@ -26,7 +26,7 @@ export class FolksResponse implements BotAction {
       slackClient,
       gif,
       event.channel,
-      event.thread_ts ? event.thread_ts : event.ts
+      event.thread_ts ? event.thread_ts : event.ts,
     );
   }
 }

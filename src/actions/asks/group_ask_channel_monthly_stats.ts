@@ -1,16 +1,16 @@
 import { BotAction } from "../base_action";
 import {
   ALLOWED_BOTS_PER_TEAM,
-  BOT_ID,
+  BOT_SLACK_ID,
   GROUP_ASK_CHANNELS_LIST,
-} from "../../integrations/slack/consts";
+} from "../../settings/team_consts";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
   getStatsBuckets,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
-import { logger } from "../../consts";
+import { logger } from "../../settings/server_consts";
 
 export class GroupAskChannelMonthlyStats implements BotAction {
   getHelpText(): string {
@@ -33,7 +33,7 @@ export class GroupAskChannelMonthlyStats implements BotAction {
     // Added 1 as default so I can reduce the user input by 1 (because week 0 is the first month)
     // TODO: Make this prettier - This is needed because we need to count for a scenario where the text starts with @unibot so we needs to exclude it
     const numOfMonths =
-      (event.text.replace(`<@${BOT_ID}> `, "").split(" ")[5] || 1) - 1;
+      (event.text.replace(`<@${BOT_SLACK_ID}> `, "").split(" ")[5] || 1) - 1;
 
     // Get the timeframe for the beginning of the month
     const date = new Date();
