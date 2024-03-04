@@ -1,15 +1,15 @@
 // Remove the name of the bot, in case it was mentioned
-import { botConfig, logger } from "../../consts";
-import { BOT_ID } from "./consts";
+import { botConfig, logger } from "../../settings/server_consts";
+import { BOT_SLACK_ID } from "../../settings/team_consts";
 
 export const sanitizeCommandInput = (text: string): string => {
-  return text.replace(`<@${BOT_ID}> `, "").trim();
+  return text.replace(`<@${BOT_SLACK_ID}> `, "").trim();
 };
 
 // TODO: Change that to be a generic test, so you won't
 export const isBotMessage = (event: any): boolean => {
   return (
-    event.user === BOT_ID ||
+    event.user === BOT_SLACK_ID ||
     event.username === botConfig.BOT_NAME ||
     event.message?.username === botConfig.BOT_NAME
   );

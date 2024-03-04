@@ -1,7 +1,7 @@
 import { BotAction } from "../base_action";
 import { getRandomFromArray } from "../utils";
 import { sendSlackMessage } from "../../integrations/slack/messages";
-import { botConfig } from "../../consts";
+import { botConfig } from "../../settings/server_consts";
 
 const GIFS = botConfig.RESPONSE_I_THINK_POOL || [];
 

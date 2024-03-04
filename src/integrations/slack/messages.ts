@@ -7,9 +7,10 @@ import {
 } from "@slack/web-api";
 
 import { Block, DividerBlock, KnownBlock, MrkdwnElement } from "@slack/types";
-import { BOT_ID, SLACK_USER_FORMAT } from "./consts";
-import { botConfig, logger } from "../../consts";
+import { BOT_SLACK_ID } from "../../settings/team_consts";
+import { botConfig, logger } from "../../settings/server_consts";
 import { ImageBlock } from "@slack/bolt";
+import { SLACK_USER_FORMAT } from "./consts";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
@@ -127,7 +128,9 @@ export const getUserIDInText = (text: string) => {
   // Remove the bot id and look for other slack users
   // TODO: This currently has a 'bug' where we can grab multiple users and compliment multiple users in one go
   //       it can create a corrupted output for 'compliment @Yossi and also say hi to @Zigi
-  const slackUsers = text.replace(`<@${BOT_ID}>`, "").match(SLACK_USER_FORMAT);
+  const slackUsers = text
+    .replace(`<@${BOT_SLACK_ID}>`, "")
+    .match(SLACK_USER_FORMAT);
 
   // TODO: This will return the first user_id that is not the bot. If there's more than 1 user, we'll return the first one
   // TODO: Verify that this is an actual user

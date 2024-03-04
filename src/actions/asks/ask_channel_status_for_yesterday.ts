@@ -13,15 +13,16 @@ import {
 } from "../../logic/asks_channel";
 import {
   ALLOWED_BOTS_PER_TEAM,
+  ASK_CHANNEL_STATS_CRON,
   scheduledMessageLastSent,
-  SlackWebClient,
   TEAM_ASK_CHANNEL_ID,
   TEAM_ASK_CHANNEL_NAME,
-} from "../../integrations/slack/consts";
+} from "../../settings/team_consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
-import { ASK_CHANNEL_STATS_CRON, logger } from "../../consts";
+import { logger } from "../../settings/server_consts";
 import { removeTimeInfoFromDate } from "../date_utils";
+import { SlackWebClient } from "../../integrations/slack/consts";
 
 export class AskChannelStatusForYesterday implements BotAction {
   static DAYS_BACK = 60;

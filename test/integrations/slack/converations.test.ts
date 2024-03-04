@@ -2,7 +2,7 @@ import {
   isBotAllowed,
   shouldMessageBeSkipped,
 } from "../../../src/integrations/slack/conversations";
-import { BOT_ID } from "../../../src/integrations/slack/consts";
+import { setBotSlackId } from "../../../src/settings/team_consts";
 
 describe("isBotAllowed", () => {
   test("Empty list - disallowed", () => {
@@ -51,10 +51,7 @@ describe("shouldMessageBeSkipped", () => {
   });
 
   test("Allowed", () => {
-    // TODO: Fix this, there's got to be a better way to do this
-    // @ts-ignore
-    BOT_ID = "B02B6HYMEMU";
-    console.log(BOT_ID);
+    setBotSlackId("B02B6HYMEMU");
 
     const ALLOWED_BOTS_LIST: string[] = [
       "Zorg",

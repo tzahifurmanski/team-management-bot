@@ -1,6 +1,6 @@
 import { isBotMessage } from "../utils";
-import { handleChannelEvent, handleDirectEvent } from "../../../bot_actions";
-import { logger } from "../../../consts";
+import { handleChannelEvent, handleDirectEvent } from "../events";
+import { logger } from "../../../settings/server_consts";
 
 const messageCallback = async ({ event, client }: any) => {
   try {

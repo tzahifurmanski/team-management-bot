@@ -1,6 +1,6 @@
 import { httpGet } from "../utils";
-import { ZENDESK_BASE_URL, ZENDESK_TOKEN } from "../slack/consts";
-import { logger } from "../../consts";
+import { ZENDESK_BASE_URL, ZENDESK_TOKEN } from "../../settings/team_consts";
+import { logger } from "../../settings/server_consts";
 
 export const getTicketsByView = async (
   zendeskViewID: string,

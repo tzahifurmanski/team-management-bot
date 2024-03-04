@@ -1,7 +1,7 @@
 import { getRandomFromArray } from "../utils";
 import { BotAction } from "../base_action";
-import { botConfig } from "../../consts";
-import { TEAM_CODE_REVIEW_CHANNEL_ID } from "../../integrations/slack/consts";
+import { botConfig } from "../../settings/server_consts";
+import { TEAM_CODE_REVIEW_CHANNEL_ID } from "../../settings/team_consts";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
