@@ -4,7 +4,7 @@ import { loadSlackConfig } from "./settings/team_consts";
 
 import { App, ExpressReceiver } from "@slack/bolt";
 import { getBoltLogLevel } from "./utils";
-import { SLACK_SIGNING_SECRET } from "./integrations/slack/consts";
+import { SLACK_SIGNING_SECRET } from "./integrations/consts";
 
 const { version } = require("../package.json");
 

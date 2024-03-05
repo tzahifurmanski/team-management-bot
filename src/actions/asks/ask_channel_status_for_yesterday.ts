@@ -22,7 +22,7 @@ import { sendSlackMessage } from "../../integrations/slack/messages";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../settings/server_consts";
 import { removeTimeInfoFromDate } from "../date_utils";
-import { SlackWebClient } from "../../integrations/slack/consts";
+import { SlackWebClient } from "../../integrations/consts";
 
 export class AskChannelStatusForYesterday implements BotAction {
   static DAYS_BACK = 60;

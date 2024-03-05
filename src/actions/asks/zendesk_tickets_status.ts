@@ -8,12 +8,10 @@ import { getTicketsByView, showView } from "../../integrations/zendesk/views";
 import {
   MONITORED_ZENDESK_FILTER_FIELD_ID,
   MONITORED_ZENDESK_FILTER_FIELD_VALUES,
-  ZENDESK_BASE_URL,
   ZENDESK_MONITORED_VIEW,
   ZENDESK_TICKETS_CHANNEL_ID,
   ZENDESK_TICKETS_CHANNEL_NAME,
   ZENDESK_TICKETS_STATS_CRON,
-  ZENDESK_TOKEN,
   ZENDESK_VIEW_AGGREGATED_FIELD_ID,
 } from "../../settings/team_consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
@@ -27,7 +25,11 @@ import {
   createAggregateMessage,
   createDetailModeBlocks,
 } from "../../logic/zendesk_tickets_utils";
-import { SlackWebClient } from "../../integrations/slack/consts";
+import {
+  SlackWebClient,
+  ZENDESK_BASE_URL,
+  ZENDESK_TOKEN,
+} from "../../integrations/consts";
 
 export class ZendeskTicketsStatus implements BotAction {
   constructor() {

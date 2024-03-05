@@ -1,5 +1,4 @@
-// TODO: Make sure to load src/consts before loading this - Instead, maybe load the dotenv conf?
-// This is no longer a slack consts, but where team configurations are loaded. It should be refactored
+// TODO: Make sure to load server_consts.ts before loading this - Instead, maybe load the dotenv conf?
 
 import {
   getBotId,
@@ -7,7 +6,7 @@ import {
 } from "../integrations/slack/conversations";
 import { logger } from "./server_consts";
 import { handleListParameter } from "../utils";
-import { setSlackWebClient } from "../integrations/slack/consts";
+import { setSlackWebClient } from "../integrations/consts";
 
 // ====================
 // Teams Configurations
@@ -97,10 +96,6 @@ const TEAM_CODE_REVIEW_CHANNEL_NAME: string =
 
 const GROUP_ASK_CHANNELS: string = process.env.GROUP_ASK_CHANNELS || "";
 export let GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
-
-// Zendesk Integration Configurations
-export const ZENDESK_TOKEN = process.env.ZENDESK_TOKEN || "";
-export const ZENDESK_BASE_URL = process.env.ZENDESK_BASE_URL || "";
 
 // Zendesk Tickets Status Configurations
 export const ZENDESK_MONITORED_VIEW = handleListParameter(
