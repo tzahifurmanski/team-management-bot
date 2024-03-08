@@ -8,10 +8,10 @@ import { getTicketsByView, showView } from "../../integrations/zendesk/views";
 import {
   MONITORED_ZENDESK_FILTER_FIELD_ID,
   MONITORED_ZENDESK_FILTER_FIELD_VALUES,
+  TEAMS_LIST,
   ZENDESK_MONITORED_VIEW,
   ZENDESK_TICKETS_CHANNEL_ID,
   ZENDESK_TICKETS_CHANNEL_NAME,
-  ZENDESK_TICKETS_STATS_CRON,
   ZENDESK_VIEW_AGGREGATED_FIELD_ID,
 } from "../../settings/team_consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
@@ -30,15 +30,17 @@ import {
   ZENDESK_BASE_URL,
   ZENDESK_TOKEN,
 } from "../../integrations/consts";
+import { getTeamByChannelID } from "../../settings/team_utils";
 
 export class ZendeskTicketsStatus implements BotAction {
   constructor() {
     if (this.isEnabled()) {
       scheduleAskChannelsCrons(
         SlackWebClient,
-        ZENDESK_TICKETS_STATS_CRON,
-        ZENDESK_TICKETS_CHANNEL_ID,
-        ZENDESK_TICKETS_CHANNEL_NAME,
+        TEAMS_LIST,
+        "zendesk_channel_id",
+        "zendesk_channel_name",
+        "zendesk_channel_cron",
         "zendesk tickets status",
         this.getZendeskTicketsStatus,
       );
@@ -51,8 +53,9 @@ export class ZendeskTicketsStatus implements BotAction {
 
     helpMessage += getRecurringJobInfo(
       "zendesk tickets status",
-      ZENDESK_TICKETS_STATS_CRON,
-      ZENDESK_TICKETS_CHANNEL_ID,
+      [...TEAMS_LIST.values()],
+      "zendesk_channel_id",
+      "zendesk_channel_cron",
     );
 
     return helpMessage;
@@ -115,23 +118,31 @@ export class ZendeskTicketsStatus implements BotAction {
       3,
       ZENDESK_TICKETS_CHANNEL_ID[0],
     );
-    if (!askChannelId) {
-      logger.info(`Unable to find channel ID. Ask: ${event.text}`);
+
+    const team = getTeamByChannelID(askChannelId);
+    if (!team) {
+      logger.error(
+        `Unable to find team for channel ID ${askChannelId}. Ask: ${event.text}`,
+      );
       return;
     }
-
     // TODO: Prevent this from running twice, like we did for ask_channel_status_for_yesterday.ts
 
-    logger.info(`Running zendesk tickets status for channel ${askChannelId}`);
+    logger.info(
+      `Running zendesk tickets status for channel ${team.zendesk_channel_id}`,
+    );
 
-    const viewIndex = ZENDESK_TICKETS_CHANNEL_ID.indexOf(askChannelId);
+    // TODO: Include this in the team config
+    const viewIndex = ZENDESK_TICKETS_CHANNEL_ID.indexOf(
+      team.zendesk_channel_id,
+    );
     if (viewIndex === -1) {
       logger.info(
-        `Channel ${askChannelId} was not found in the monitored channels list. Skipping.`,
+        `Channel ${team.zendesk_channel_id} was not found in the monitored channels list. Skipping.`,
       );
       await sendSlackMessage(
         slackClient,
-        `Channel <#${askChannelId}> was not found in the monitored channels list. Unable to create a summary.`,
+        `Channel <#${team.zendesk_channel_id}> was not found in the monitored channels list. Unable to create a summary.`,
         event.channel,
         event.thread_ts ? event.thread_ts : event.ts,
       );

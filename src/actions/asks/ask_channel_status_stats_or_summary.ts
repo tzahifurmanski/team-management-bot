@@ -9,12 +9,13 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import {
-  ALLOWED_BOTS_PER_TEAM,
   TEAM_ASK_CHANNEL_ID,
+  Team,
 } from "../../settings/team_consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../settings/server_consts";
 import { getStartingDate } from "../date_utils";
+import { getTeamByChannelID } from "../../settings/team_utils";
 
 export class AskChannelStatusStatsOrSummary implements BotAction {
   getHelpText(): string {
@@ -44,8 +45,6 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
   }
 
   async performAction(event: any, slackClient: any): Promise<void> {
-    // TODO: Handle a situation of multiple ask channels
-
     // Get the timeframe to operate on
     const params: AskChannelParams = getAskChannelParameters(
       sanitizeCommandInput(event.text),
@@ -66,11 +65,20 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
       `"Date between ${startingDate.toUTCString()} and ${endingDate.toUTCString()}`,
     );
 
+    // TODO: Handle a situation of multiple ask channels
+    const team : Team = getTeamByChannelID(TEAM_ASK_CHANNEL_ID[0]);
+    if (!team) {
+      logger.error(
+        `Unable to find team for channel ID ${TEAM_ASK_CHANNEL_ID[0]}. Ask: ${event.text}`,
+      );
+      return;
+    }
+    
     // Get the stats
     const messages: any[any] = await getChannelMessages(
       slackClient,
-      TEAM_ASK_CHANNEL_ID[0],
-      ALLOWED_BOTS_PER_TEAM.get(TEAM_ASK_CHANNEL_ID[0]) || [],
+      team.ask_channel_id,
+      team.allowed_bots,
       startingDate,
       endingDate,
     );

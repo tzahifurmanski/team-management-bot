@@ -4,12 +4,13 @@ import {
   isBotMessage,
 } from "../utils";
 import {
-  ALLOWED_BOTS_PER_TEAM,
+  Team,
   TEAM_ASK_CHANNEL_ID,
 } from "../../../settings/team_consts";
 import { getUserProfile } from "../users";
 import { getConversationHistory } from "../conversations";
 import { logger, REACTIONS_HANDLED } from "../../../settings/server_consts";
+import { getTeamByChannelID } from "../../../settings/team_utils";
 
 const reactionAddedCallback = async ({ event, client }: any) => {
   logger.debug("Got a reaction added callback...", JSON.stringify(event));
@@ -20,8 +21,10 @@ const reactionAddedCallback = async ({ event, client }: any) => {
       return;
     }
 
-    // Verify we are in the ask channel
-    if (!TEAM_ASK_CHANNEL_ID.includes(event.item.channel)) {
+    const team : Team = getTeamByChannelID(event.item.channel);
+    if (!team) {
+      logger.error("Could not find team for ask channel", event.item.channel);
+
       logger.trace(
         "Reaction is not in an ask channel, skipping.",
         `Message channel: ${event.item.channel}`,
@@ -29,7 +32,7 @@ const reactionAddedCallback = async ({ event, client }: any) => {
       );
       return;
     }
-
+    
     // TODO: Maybe unneeded - Could it be that the bot is adding emojis?
     if (isBotMessage(event)) {
       logger.debug("Got a message from bot, skipping.");
@@ -39,8 +42,8 @@ const reactionAddedCallback = async ({ event, client }: any) => {
     // Check if the emoji was applied on a message that is skipped
     const messages = await getConversationHistory(
       client,
-      event.item.channel,
-      ALLOWED_BOTS_PER_TEAM.get(event.item.channel) || [],
+      team.ask_channel_id,
+      team.allowed_bots || [],
       event.item.ts,
       event.item.ts,
       1,
@@ -72,7 +75,7 @@ const reactionAddedCallback = async ({ event, client }: any) => {
     } has resolved this ask after ${duration}.`;
 
     await client.chat.postMessage({
-      channel: event.item.channel,
+      channel: team.ask_channel_id,
       thread_ts: event.item.ts,
       text: promptText,
     });

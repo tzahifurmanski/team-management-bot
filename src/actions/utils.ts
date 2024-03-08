@@ -2,6 +2,7 @@ import cronstrue from "cronstrue";
 import { AsksChannelStatsResult } from "../logic/asks_channel";
 import { sanitizeCommandInput } from "../integrations/slack/utils";
 import { logger } from "../settings/server_consts";
+import { Team } from "../settings/team_consts";
 
 const cron = require("node-cron");
 
@@ -177,7 +178,7 @@ export const getChannelIDFromEventText = (
   eventText: any,
   nameIndex: number,
   defaultID: string,
-) => {
+): string => {
   let askChannelID;
 
   // If there's a sixth word, then it's a channel name
@@ -191,6 +192,7 @@ export const getChannelIDFromEventText = (
     ) ||
     params.length === nameIndex
   ) {
+    // TODO: Once multi-team is supported, this should be removed
     // Take default
     askChannelID = defaultID;
     logger.debug(`Using default channel ID ${askChannelID}.`);
@@ -204,59 +206,57 @@ export const getChannelIDFromEventText = (
 
 export const scheduleAskChannelsCrons = (
   slackClient: any,
-  crons: string[],
-  channelIds: string[],
-  channelNames: string[],
+  teams: Map<string, Team>,
+  channel_id_attribute: keyof Team,
+  channel_name_attribute: keyof Team,
+  cron_attribute: keyof Team,
   action: string,
   functionToSchedule: any,
 ) => {
-  // Schedule the crons for the ask channels
-  if (crons.length != channelIds.length) {
-    logger.info(
-      `cron (${crons}, ${crons.length}) and channelIds (${channelIds}, ${channelIds.length}) have different lengths, and therefor crons won't be scheduled.`,
-    );
-    return;
-  }
+  // Get all the teams that have a cron set
+  const teamsWithCrons = [...teams.values()].filter(
+    (team: Team) => !!team[channel_id_attribute],
+  );
 
-  // Iterate over the crons and schedule them
-  for (let i = 0; i < crons.length; i++) {
+  teamsWithCrons.forEach((team: Team) => {
     const eventText = {
-      channel: channelIds[i],
+      channel: team.ask_channel_id,
       thread_ts: "",
       scheduled: true,
-      text: `${action} <#${channelIds[i]}|${channelNames[i]}>`,
+      text: `${action} <#${team[channel_id_attribute]}|${team[channel_name_attribute]}>`,
     };
 
     // TODO: SlackWebClient is passed 'by value', and when it does, it is empty. Fix this.
     scheduleCron(
-      !!crons[i],
-      `update on ${channelNames[i]} ${action}`,
-      crons[i],
+      !!team[cron_attribute],
+      `update on ${team[channel_name_attribute]} ${action}`,
+      <string>team[cron_attribute],
       functionToSchedule,
       eventText,
       slackClient,
     );
-  }
+  });
 };
 
+// TODO: This doesn't really check what is configured in cron, but rather the configuration that should have been applied
 export const getRecurringJobInfo = (
   jobName: string,
-  crons: string[],
-  channelIds: string[],
+  teams: Team[],
+  channel_id_attribute: keyof Team,
+  cron_attribute: keyof Team,
 ): string => {
-  if (crons.length == 0) {
+  if (teams.length == 0) {
     return "";
   }
+  // Get all the teams that have a cron set
+  const teamsWithCrons = teams.filter((team: Team) => !!team[cron_attribute]);
 
   let message = "";
-  for (let i = 0; i < crons.length; i++) {
-    // If a schedule is set, add it to the help message
-    if (crons[i]) {
-      message += `\n*A recurring ${jobName} in <#${
-        channelIds[i]
-      }> is scheduled to be sent ${cronstrue.toString(crons[i])}.*`;
-    }
-  }
+  teamsWithCrons.forEach((team: Team) => {
+    message += `\n*A recurring ${jobName} in <#${
+      team[channel_id_attribute]
+    }> is scheduled to be sent ${cronstrue.toString(<string>team[cron_attribute])}.*`;
+  });
 
   return message;
 };

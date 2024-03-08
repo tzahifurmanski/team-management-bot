@@ -1,8 +1,8 @@
 import { BotAction } from "../base_action";
 import {
-  ALLOWED_BOTS_PER_TEAM,
   BOT_SLACK_ID,
   GROUP_ASK_CHANNELS_LIST,
+  TEAMS_LIST,
 } from "../../settings/team_consts";
 import {
   AsksChannelStatsResult,
@@ -47,7 +47,7 @@ export class GroupAskChannelMonthlyStats implements BotAction {
       const messages: any[any] = await getChannelMessages(
         slackClient,
         channelId,
-        ALLOWED_BOTS_PER_TEAM.get(channelId) || [],
+        TEAMS_LIST.get(channelId)?.allowed_bots || [],
         startingDate,
         undefined,
       );

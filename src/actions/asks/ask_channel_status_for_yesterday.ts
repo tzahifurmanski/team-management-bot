@@ -12,17 +12,16 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import {
-  ALLOWED_BOTS_PER_TEAM,
-  ASK_CHANNEL_STATS_CRON,
   scheduledMessageLastSent,
   TEAM_ASK_CHANNEL_ID,
-  TEAM_ASK_CHANNEL_NAME,
+  TEAMS_LIST,
 } from "../../settings/team_consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../settings/server_consts";
 import { removeTimeInfoFromDate } from "../date_utils";
 import { SlackWebClient } from "../../integrations/consts";
+import { getTeamByChannelID } from "../../settings/team_utils";
 
 export class AskChannelStatusForYesterday implements BotAction {
   static DAYS_BACK = 60;
@@ -31,9 +30,10 @@ export class AskChannelStatusForYesterday implements BotAction {
     if (this.isEnabled()) {
       scheduleAskChannelsCrons(
         SlackWebClient,
-        ASK_CHANNEL_STATS_CRON,
-        TEAM_ASK_CHANNEL_ID,
-        TEAM_ASK_CHANNEL_NAME,
+        TEAMS_LIST,
+        "ask_channel_id",
+        "ask_channel_name",
+        "ask_channel_cron",
         "ask channel status for yesterday",
         this.getAskChannelStatsForYesterday,
       );
@@ -46,10 +46,12 @@ export class AskChannelStatusForYesterday implements BotAction {
       AskChannelStatusForYesterday.DAYS_BACK +
       " days.";
 
+    // Get info for all recurring jobs
     helpMessage += getRecurringJobInfo(
       "ask channel post",
-      ASK_CHANNEL_STATS_CRON,
-      TEAM_ASK_CHANNEL_ID,
+      [...TEAMS_LIST.values()],
+      "ask_channel_id",
+      "ask_channel_cron",
     );
 
     return helpMessage;
@@ -88,14 +90,19 @@ export class AskChannelStatusForYesterday implements BotAction {
       slackClient = SlackWebClient;
     }
 
+    // TODO: Extract these two calls to a function and use that
+    // We don't need the channel ID separately
     const askChannelId = getChannelIDFromEventText(
       event.text,
       5,
       TEAM_ASK_CHANNEL_ID[0],
     );
 
-    if (!askChannelId) {
-      logger.info(`Unable to find channel ID. Ask: ${event.text}`);
+    const team = getTeamByChannelID(askChannelId);
+    if (!team) {
+      logger.error(
+        `Unable to find team for channel ID ${askChannelId}. Ask: ${event.text}`,
+      );
       return;
     }
 
@@ -108,7 +115,7 @@ export class AskChannelStatusForYesterday implements BotAction {
           const diff = now.getTime() - lastSent.getTime();
           if (diff < 60 * 1000) {
             logger.info(
-              `Skipping scheduled ask channel status for yesterday for channel ${askChannelId} as it was requested less than a minute ago.`,
+              `Skipping scheduled ask channel status for yesterday for channel ${team.ask_channel_id} as it was requested less than a minute ago.`,
             );
             return;
           }
@@ -118,11 +125,11 @@ export class AskChannelStatusForYesterday implements BotAction {
       // Set now as the last time this was sent
       // TODO: Potential problem - this will show sent even if there was an error and the message was not sent.
       //      Could move it to the end of the function, but then if the time between scheduled requests is short, might not be effective.
-      scheduledMessageLastSent.set(askChannelId, new Date());
+      scheduledMessageLastSent.set(team.ask_channel_id, new Date());
     }
 
     logger.info(
-      `Posting the daily asks channel stats summary for channel ${askChannelId}`,
+      `Posting the daily asks channel stats summary for channel ${team.ask_channel_id}`,
     );
 
     // Set the timeframe range to be yesterday
@@ -139,21 +146,21 @@ export class AskChannelStatusForYesterday implements BotAction {
 
     const messages: any[any] = await getChannelMessages(
       slackClient,
-      askChannelId,
-      ALLOWED_BOTS_PER_TEAM.get(askChannelId) || [],
+      team.ask_channel_id,
+      team.allowed_bots,
       startingDate,
       endingDate,
     );
 
-    const stats: AsksChannelStatsResult = await getStatsForMessages(
-      askChannelId,
+    const stats: AsksChannelStatsResult = getStatsForMessages(
+      team.ask_channel_id,
       messages,
       startingDate.toUTCString(),
       endingDate.toUTCString(),
     );
 
     const yesterdaySummary = `Good morning team:sunny:\nYesterday, ${getStatsMessage(
-      askChannelId,
+      team.ask_channel_id,
       stats,
     )}`;
 
@@ -177,13 +184,13 @@ export class AskChannelStatusForYesterday implements BotAction {
 
     const monthMessages: any[any] = await getChannelMessages(
       slackClient,
-      askChannelId,
-      ALLOWED_BOTS_PER_TEAM.get(askChannelId) || [],
+      team.ask_channel_id,
+      team.allowed_bots,
       beginningOfMonthDate,
       now,
     );
-    const monthStats: AsksChannelStatsResult = await getStatsForMessages(
-      askChannelId,
+    const monthStats: AsksChannelStatsResult = getStatsForMessages(
+      team.ask_channel_id,
       monthMessages,
       beginningOfMonthDate.toUTCString(),
       now.toUTCString(),
@@ -192,7 +199,7 @@ export class AskChannelStatusForYesterday implements BotAction {
       slackClient,
       `${yesterdaySummary}\nIn the last ${
         AskChannelStatusForYesterday.DAYS_BACK
-      } days, ${getStatsMessage(askChannelId, monthStats)}`,
+      } days, ${getStatsMessage(team.ask_channel_id, monthStats)}`,
       event.channel,
       event.thread_ts,
     );
