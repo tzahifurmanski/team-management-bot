@@ -15,7 +15,7 @@ import {
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../settings/server_consts";
 import { getStartingDate } from "../date_utils";
-import { getTeamByChannelID } from "../../settings/team_utils";
+import { findTeamByValue } from "../../settings/team_utils";
 
 export class AskChannelStatusStatsOrSummary implements BotAction {
   getHelpText(): string {
@@ -66,7 +66,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     );
 
     // TODO: Handle a situation of multiple ask channels
-    const team : Team = getTeamByChannelID(TEAM_ASK_CHANNEL_ID[0]);
+    const team = findTeamByValue(TEAM_ASK_CHANNEL_ID[0], "ask_channel_id");
     if (!team) {
       logger.error(
         `Unable to find team for channel ID ${TEAM_ASK_CHANNEL_ID[0]}. Ask: ${event.text}`,

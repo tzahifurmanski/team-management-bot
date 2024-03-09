@@ -6,13 +6,8 @@ import {
 } from "../../integrations/slack/messages";
 import { getTicketsByView, showView } from "../../integrations/zendesk/views";
 import {
-  MONITORED_ZENDESK_FILTER_FIELD_ID,
-  MONITORED_ZENDESK_FILTER_FIELD_VALUES,
   TEAMS_LIST,
-  ZENDESK_MONITORED_VIEW,
   ZENDESK_TICKETS_CHANNEL_ID,
-  ZENDESK_TICKETS_CHANNEL_NAME,
-  ZENDESK_VIEW_AGGREGATED_FIELD_ID,
 } from "../../settings/team_consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../settings/server_consts";
@@ -30,14 +25,14 @@ import {
   ZENDESK_BASE_URL,
   ZENDESK_TOKEN,
 } from "../../integrations/consts";
-import { getTeamByChannelID } from "../../settings/team_utils";
+import { findTeamByValue, isValueInTeams } from "../../settings/team_utils";
 
 export class ZendeskTicketsStatus implements BotAction {
   constructor() {
     if (this.isEnabled()) {
       scheduleAskChannelsCrons(
         SlackWebClient,
-        TEAMS_LIST,
+        Array.from(TEAMS_LIST.values()),
         "zendesk_channel_id",
         "zendesk_channel_name",
         "zendesk_channel_cron",
@@ -53,7 +48,7 @@ export class ZendeskTicketsStatus implements BotAction {
 
     helpMessage += getRecurringJobInfo(
       "zendesk tickets status",
-      [...TEAMS_LIST.values()],
+      Array.from(TEAMS_LIST.values()),
       "zendesk_channel_id",
       "zendesk_channel_cron",
     );
@@ -62,30 +57,35 @@ export class ZendeskTicketsStatus implements BotAction {
   }
 
   isEnabled(): boolean {
-    const isChannelIdPerName =
-      ZENDESK_TICKETS_CHANNEL_ID.length === ZENDESK_TICKETS_CHANNEL_NAME.length;
+    // const isChannelIdPerName =
+    //   ZENDESK_TICKETS_CHANNEL_ID.length === ZENDESK_TICKETS_CHANNEL_NAME.length;
     const isZendeskSetup = !!(ZENDESK_BASE_URL && ZENDESK_TOKEN);
-    const isViewPerChannel =
-      ZENDESK_MONITORED_VIEW.length === ZENDESK_TICKETS_CHANNEL_ID.length;
+    const isZendeskChannel = isValueInTeams("zendesk_channel_id");
+
+    // TODO: These checks need to be when loading the data into teams, not here
+    // const isViewPerChannel =
+    //   ZENDESK_MONITORED_VIEW.length === ZENDESK_TICKETS_CHANNEL_ID.length;
 
     // Check if we got any aggregated keys, or none at all
-    const isAggregateKeyPerView =
-      ZENDESK_VIEW_AGGREGATED_FIELD_ID.length === 0 ||
-      ZENDESK_VIEW_AGGREGATED_FIELD_ID.length === ZENDESK_MONITORED_VIEW.length;
+    // const isAggregateKeyPerView =
+    //   ZENDESK_VIEW_AGGREGATED_FIELD_ID.length === 0 ||
+    //   ZENDESK_VIEW_AGGREGATED_FIELD_ID.length === ZENDESK_MONITORED_VIEW.length;
 
     logger.trace(
       "Conditions:",
-      isChannelIdPerName,
+      // isChannelIdPerName,
       isZendeskSetup,
-      isViewPerChannel,
-      isAggregateKeyPerView,
+      isZendeskChannel,
+      // isViewPerChannel,
+      // isAggregateKeyPerView,
     );
 
     return (
-      isChannelIdPerName &&
+      // isChannelIdPerName &&
       isZendeskSetup &&
-      isViewPerChannel &&
-      isAggregateKeyPerView
+      isZendeskChannel
+      // isViewPerChannel &&
+      // isAggregateKeyPerView
     );
   }
 
@@ -119,7 +119,8 @@ export class ZendeskTicketsStatus implements BotAction {
       ZENDESK_TICKETS_CHANNEL_ID[0],
     );
 
-    const team = getTeamByChannelID(askChannelId);
+    const team = findTeamByValue(askChannelId, "ask_channel_id");
+
     if (!team) {
       logger.error(
         `Unable to find team for channel ID ${askChannelId}. Ask: ${event.text}`,
@@ -132,46 +133,28 @@ export class ZendeskTicketsStatus implements BotAction {
       `Running zendesk tickets status for channel ${team.zendesk_channel_id}`,
     );
 
-    // TODO: Include this in the team config
-    const viewIndex = ZENDESK_TICKETS_CHANNEL_ID.indexOf(
-      team.zendesk_channel_id,
-    );
-    if (viewIndex === -1) {
-      logger.info(
-        `Channel ${team.zendesk_channel_id} was not found in the monitored channels list. Skipping.`,
-      );
-      await sendSlackMessage(
-        slackClient,
-        `Channel <#${team.zendesk_channel_id}> was not found in the monitored channels list. Unable to create a summary.`,
-        event.channel,
-        event.thread_ts ? event.thread_ts : event.ts,
-      );
-
-      return;
-    }
-    const viewID = ZENDESK_MONITORED_VIEW[viewIndex];
     logger.info(
-      `Found view ${viewID} (index ${viewIndex}) for reporting in channel ${askChannelId}.`,
+      `Using view ID ${team.zendesk_monitored_view_id} for reporting in channel ${team.zendesk_channel_id}.`,
     );
 
-    const viewData: any = await showView(viewID);
+    const viewData: any = await showView(team.zendesk_monitored_view_id);
 
-    const tickets: any[] = await getTicketsByView(viewID);
+    const tickets: any[] = await getTicketsByView(team.zendesk_monitored_view_id);
 
     // Check if we need to filter the tickets
     // TODO: This won't work if it's using a regular field (vs custom field)
     let filteredTickets: any[];
     if (
-      MONITORED_ZENDESK_FILTER_FIELD_ID &&
-      MONITORED_ZENDESK_FILTER_FIELD_VALUES.length > 0
+      team.zendesk_field_id &&
+      team.zendesk_field_values.length > 0
     ) {
       filteredTickets = tickets.filter(
         (ticket: any) =>
           !ticket.custom_fields ||
           ticket.custom_fields.filter(
             (field: any) =>
-              field.id.toString() === MONITORED_ZENDESK_FILTER_FIELD_ID &&
-              MONITORED_ZENDESK_FILTER_FIELD_VALUES.includes(field.value),
+              field.id.toString() === team.zendesk_field_id &&
+              team.zendesk_field_values.includes(field.value),
           ).length > 0,
       );
     } else {
@@ -194,10 +177,6 @@ export class ZendeskTicketsStatus implements BotAction {
     if (filteredTickets.length > 0) {
       messageBlocks.push(createDivider());
 
-      const aggregateKeyFieldId =
-        ZENDESK_VIEW_AGGREGATED_FIELD_ID.length > 0
-          ? ZENDESK_VIEW_AGGREGATED_FIELD_ID[viewIndex]
-          : undefined;
 
       const aggregateBuckets = new Map<string, number>();
 
@@ -206,23 +185,23 @@ export class ZendeskTicketsStatus implements BotAction {
         // ========================================================
 
         // TODO: Find a way to get the ID only once
-        if (aggregateKeyFieldId) {
+        if (team.zendesk_aggregated_field_id) {
           // We're in Aggregated mode
           // ========================
 
           logger.debug(
-            `Aggregating by field ID ${aggregateKeyFieldId} (index ${viewIndex})`,
+            `Aggregating by field ID ${team.zendesk_aggregated_field_id}`,
           );
 
           // Look for an aggregation key in the custom fields
           const customFieldsAggKey = item.custom_fields.filter(
-            (field: any) => field.id.toString() === aggregateKeyFieldId,
+            (field: any) => field.id.toString() === team.zendesk_aggregated_field_id,
           );
 
           // Either get the aggregated key value from the default field, or from the custom fields
           let currAggKey;
-          if (item[aggregateKeyFieldId]) {
-            currAggKey = item[aggregateKeyFieldId];
+          if (item[team.zendesk_aggregated_field_id]) {
+            currAggKey = item[team.zendesk_aggregated_field_id];
           } else if (customFieldsAggKey.length > 0) {
             currAggKey = customFieldsAggKey[0].value;
           }
@@ -248,9 +227,9 @@ export class ZendeskTicketsStatus implements BotAction {
       }
 
       // If we're in aggregated mode, create the aggregated message
-      if (aggregateKeyFieldId && aggregateBuckets.size > 0) {
+      if (team.zendesk_aggregated_field_id && aggregateBuckets.size > 0) {
         messageBlocks.push(
-          createAggregateMessage(aggregateBuckets, aggregateKeyFieldId),
+          createAggregateMessage(aggregateBuckets, team.zendesk_aggregated_field_id),
         );
       }
     }

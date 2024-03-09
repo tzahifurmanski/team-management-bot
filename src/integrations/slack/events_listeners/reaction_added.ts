@@ -10,7 +10,7 @@ import {
 import { getUserProfile } from "../users";
 import { getConversationHistory } from "../conversations";
 import { logger, REACTIONS_HANDLED } from "../../../settings/server_consts";
-import { getTeamByChannelID } from "../../../settings/team_utils";
+import { findTeamByValue } from "../../../settings/team_utils";
 
 const reactionAddedCallback = async ({ event, client }: any) => {
   logger.debug("Got a reaction added callback...", JSON.stringify(event));
@@ -21,7 +21,7 @@ const reactionAddedCallback = async ({ event, client }: any) => {
       return;
     }
 
-    const team : Team = getTeamByChannelID(event.item.channel);
+    const team = findTeamByValue(event.item.channel, "ask_channel_id");
     if (!team) {
       logger.error("Could not find team for ask channel", event.item.channel);
 

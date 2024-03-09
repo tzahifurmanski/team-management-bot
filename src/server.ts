@@ -1,6 +1,6 @@
 // Always load consts first
 import { logger, PORT } from "./settings/server_consts";
-import { loadSlackConfig } from "./settings/team_consts";
+import { loadConfig } from "./settings/team_consts";
 
 import { App, ExpressReceiver } from "@slack/bolt";
 import { getBoltLogLevel } from "./utils";
@@ -27,7 +27,7 @@ registerListeners(boltApp, receiver);
     `Server starting at ${new Date().toUTCString()}, version ${version}`,
   );
 
-  const loadResult = await loadSlackConfig(boltApp.client);
+  const loadResult = await loadConfig(boltApp.client);
   if (!loadResult) {
     logger.error("Loading failed!");
     process.exit(0);

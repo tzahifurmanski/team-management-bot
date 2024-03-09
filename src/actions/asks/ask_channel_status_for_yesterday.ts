@@ -21,7 +21,7 @@ import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../settings/server_consts";
 import { removeTimeInfoFromDate } from "../date_utils";
 import { SlackWebClient } from "../../integrations/consts";
-import { getTeamByChannelID } from "../../settings/team_utils";
+import { findTeamByValue, isValueInTeams } from "../../settings/team_utils";
 
 export class AskChannelStatusForYesterday implements BotAction {
   static DAYS_BACK = 60;
@@ -30,7 +30,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     if (this.isEnabled()) {
       scheduleAskChannelsCrons(
         SlackWebClient,
-        TEAMS_LIST,
+        Array.from(TEAMS_LIST.values()),
         "ask_channel_id",
         "ask_channel_name",
         "ask_channel_cron",
@@ -49,7 +49,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     // Get info for all recurring jobs
     helpMessage += getRecurringJobInfo(
       "ask channel post",
-      [...TEAMS_LIST.values()],
+      Array.from(TEAMS_LIST.values()),
       "ask_channel_id",
       "ask_channel_cron",
     );
@@ -58,8 +58,8 @@ export class AskChannelStatusForYesterday implements BotAction {
   }
 
   isEnabled(): boolean {
-    // This action should be available if there is an asks channel to process
-    return TEAM_ASK_CHANNEL_ID.length > 0;
+    // This action should be available if there are any asks channel to process
+    return isValueInTeams("ask_channel_id");
   }
 
   doesMatch(event: any): boolean {
@@ -98,7 +98,7 @@ export class AskChannelStatusForYesterday implements BotAction {
       TEAM_ASK_CHANNEL_ID[0],
     );
 
-    const team = getTeamByChannelID(askChannelId);
+    const team = findTeamByValue(askChannelId, "ask_channel_id");
     if (!team) {
       logger.error(
         `Unable to find team for channel ID ${askChannelId}. Ask: ${event.text}`,

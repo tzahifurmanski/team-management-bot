@@ -193,6 +193,7 @@ export const getChannelIDFromEventText = (
     params.length === nameIndex
   ) {
     // TODO: Once multi-team is supported, this should be removed
+    //  THIS DEPENDS IF I WANNA SUPPROT "ask channel status for yesterday" (without providing a channel name). If so, provide a valid response to the user.
     // Take default
     askChannelID = defaultID;
     logger.debug(`Using default channel ID ${askChannelID}.`);
@@ -206,7 +207,7 @@ export const getChannelIDFromEventText = (
 
 export const scheduleAskChannelsCrons = (
   slackClient: any,
-  teams: Map<string, Team>,
+  teams: Team[],
   channel_id_attribute: keyof Team,
   channel_name_attribute: keyof Team,
   cron_attribute: keyof Team,
@@ -214,7 +215,7 @@ export const scheduleAskChannelsCrons = (
   functionToSchedule: any,
 ) => {
   // Get all the teams that have a cron set
-  const teamsWithCrons = [...teams.values()].filter(
+  const teamsWithCrons = teams.filter(
     (team: Team) => !!team[channel_id_attribute],
   );
 

@@ -7,6 +7,7 @@ import {
 import { logger } from "./server_consts";
 import { handleListParameter } from "../utils";
 import { setSlackWebClient } from "../integrations/consts";
+import { isTeam } from "./team_utils";
 
 // ====================
 // Teams Configurations
@@ -14,28 +15,25 @@ import { setSlackWebClient } from "../integrations/consts";
 
 // Settings for a team
 export interface Team {
+  // Ask channel
   ask_channel_id: string;
   ask_channel_name: string;
   ask_channel_cron: string;
   allowed_bots: string[];
+  // scheduledMessageLastSent: Date;
+
+  // Zendesk Integration
   zendesk_channel_id: string;
   zendesk_channel_name: string;
+  zendesk_monitored_view_id: string;
+  zendesk_aggregated_field_id: string;
+  zendesk_field_id: string;
+  zendesk_field_values: string[];
   zendesk_channel_cron: string;
 }
 
-function isTeam(obj: any): obj is Team {
-  return (
-    "ask_channel_id" in obj &&
-    "ask_channel_name" in obj &&
-    "ask_channel_cron" in obj &&
-    "allowed_bots" in obj &&
-    "zendesk_channel_id" in obj &&
-    "zendesk_channel_name" in obj &&
-    "zendesk_channel_cron" in obj
-  );
-}
 
-export const TEAMS_JSON_LIST: string[] = handleListParameter(
+const TEAMS_JSON_LIST: string[] = handleListParameter(
   process.env.TEAMS_JSON_LIST,
   "",
   "|",
@@ -103,12 +101,12 @@ export let GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
 
 // Zendesk Tickets Status Configurations
 // TODO: Move into the TEAM configuration
-export const ZENDESK_MONITORED_VIEW = handleListParameter(
+const ZENDESK_MONITORED_VIEW = handleListParameter(
   process.env.ZENDESK_MONITORED_VIEW,
 );
 
 // TODO: Move into the TEAM configuration
-export const ZENDESK_VIEW_AGGREGATED_FIELD_ID = handleListParameter(
+const ZENDESK_VIEW_AGGREGATED_FIELD_ID = handleListParameter(
   process.env.ZENDESK_VIEW_AGGREGATED_FIELD_ID,
   "",
   ",",
@@ -121,17 +119,17 @@ export const ZENDESK_TICKETS_CHANNEL_ID: string[] = handleListParameter(
   ",",
   false,
 );
-export const ZENDESK_TICKETS_CHANNEL_NAME: string[] = handleListParameter(
+const ZENDESK_TICKETS_CHANNEL_NAME: string[] = handleListParameter(
   process.env.ZENDESK_TICKETS_CHANNEL_NAME,
   "",
   ",",
   false,
 );
 
-export const MONITORED_ZENDESK_FILTER_FIELD_ID =
+const MONITORED_ZENDESK_FILTER_FIELD_ID =
   process.env.MONITORED_ZENDESK_FILTER_FIELD_ID || "";
 
-export const MONITORED_ZENDESK_FILTER_FIELD_VALUES: string[] =
+const MONITORED_ZENDESK_FILTER_FIELD_VALUES: string[] =
   handleListParameter(
     process.env.MONITORED_ZENDESK_FILTER_FIELD_VALUES,
     "",
@@ -155,10 +153,11 @@ export const MONITORED_CHANNEL_TRIGGER: string =
   process.env.MONITORED_CHANNEL_TRIGGER || "";
 
 // Initialize a maps to keep track of the last time a scheduled message was sent for a specific channel
+// TODO: Include in the team configuration
 export const scheduledMessageLastSent = new Map<string, Date>();
 
 // Resolve the slack dynamic variables
-export const loadSlackConfig = async (slackClient: any) => {
+export const loadConfig = async (slackClient: any) => {
   logger.info("Starting Slack config load...");
   try {
     const botSlackID = await getBotId(slackClient);
@@ -246,6 +245,10 @@ export const loadSlackConfig = async (slackClient: any) => {
         allowed_bots: ALLOWED_BOTS_PER_TEAM.get(channelId) || [],
         zendesk_channel_id: ZENDESK_TICKETS_CHANNEL_ID[index],
         zendesk_channel_name: ZENDESK_TICKETS_CHANNEL_NAME[index],
+        zendesk_monitored_view_id: ZENDESK_MONITORED_VIEW[index],
+        zendesk_aggregated_field_id: ZENDESK_VIEW_AGGREGATED_FIELD_ID[index],
+        zendesk_field_id: MONITORED_ZENDESK_FILTER_FIELD_ID[index] || "",
+        zendesk_field_values: Array.from(MONITORED_ZENDESK_FILTER_FIELD_VALUES[index]) || [],
         zendesk_channel_cron: ZENDESK_TICKETS_STATS_CRON[index],
       };
 
