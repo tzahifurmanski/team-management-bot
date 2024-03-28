@@ -32,7 +32,7 @@ const verifyAskChannelParamsResult = (
   timeMetric: string,
   count: number,
   groupBy: string,
-  // channel_id_slot: number,
+  // channel_id_slot: number,   TODO: Add this back
   error: string,
 ) => {
   expect(result.actionType).toEqual(actionType);

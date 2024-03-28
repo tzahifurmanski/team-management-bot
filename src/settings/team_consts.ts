@@ -84,9 +84,6 @@ export const USER_PROFILE_FIELD_ID_DEPARTMENT =
 export const USER_PROFILE_FIELD_ID_DIVISION =
   process.env.USER_PROFILE_FIELD_ID_DIVISION || "";
 
-// Cron jobs
-// =============
-
 // Responses
 // ==========
 
@@ -104,7 +101,6 @@ const ZENDESK_MONITORED_VIEW = handleListParameter(
   process.env.ZENDESK_MONITORED_VIEW,
 );
 
-// TODO: Move into the TEAM configuration
 const ZENDESK_VIEW_AGGREGATED_FIELD_ID = handleListParameter(
   process.env.ZENDESK_VIEW_AGGREGATED_FIELD_ID,
   "",
@@ -290,7 +286,7 @@ export const loadConfig = async (slackClient: any) => {
 };
 
 // TODO: Move this to a different file? (This is not a team const)
-// These will be resolved by the loadSlackConfig process
+// These will be resolved by the loadConfig function
 export let BOT_SLACK_ID: string;
 export const setBotSlackId = (botId: string) => {
   BOT_SLACK_ID = botId;
