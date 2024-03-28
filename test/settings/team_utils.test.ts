@@ -5,6 +5,7 @@ const team1: Team = {
   ask_channel_id: "1ID",
   ask_channel_name: "Team 1 ASKS",
   ask_channel_cron: "0,30 * * * *",
+  ask_channel_cron_last_sent: new Date(),
   allowed_bots: [],
   zendesk_channel_id: "1ZDID",
   zendesk_channel_name: "ZENDESK CHANNEL NAME for First team",
@@ -20,6 +21,7 @@ const team2: Team = {
   ask_channel_id: "2ID",
   ask_channel_name: "Team 2",
   ask_channel_cron: "0,35 * * * *",
+  ask_channel_cron_last_sent: new Date(),
   allowed_bots: [],
   zendesk_channel_id: "2ZDID",
   zendesk_channel_name: "ZENDESK CHANNEL NAME for Second team",
@@ -34,6 +36,7 @@ const team3: Team = {
   ask_channel_id: "3ID",
   ask_channel_name: "Team 3",
   ask_channel_cron: "0,40 * * * *",
+  ask_channel_cron_last_sent: new Date(),
   allowed_bots: [],
   zendesk_channel_id: "3ZDID",
   zendesk_channel_name: "ZENDESK CHANNEL NAME for Third team",
@@ -98,6 +101,7 @@ describe("isTeam", () => {
       zendesk_field_id: "2352324",
       zendesk_field_values: ["vasdas"],
       zendesk_channel_cron: "ZENDESK_CRON1",
+      ask_channel_cron_last_sent: new Date(),
     };
     const result = isTeam(obj);
     expect(result).toBe(true);
@@ -114,6 +118,7 @@ describe("isTeam", () => {
       zendesk_monitored_view_id: "2353254353421",
       zendesk_aggregated_field_id: "23532543534",
       zendesk_field_id: "2352324",
+      ask_channel_cron_last_sent: new Date(),
       // Missing zendesk_field_values and zendesk_channel_cron properties
     };
     const result = isTeam(obj);

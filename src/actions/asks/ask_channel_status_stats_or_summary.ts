@@ -1,5 +1,5 @@
 import { BotAction } from "../base_action";
-import { AskChannelParams, getAskChannelParameters } from "../utils";
+import { AskChannelParams, getAskChannelParameters, getChannelIDFromEventText } from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -15,31 +15,34 @@ import {
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../settings/server_consts";
 import { getStartingDate } from "../date_utils";
-import { findTeamByValue } from "../../settings/team_utils";
+import { findTeamByValue, isValueInTeams } from "../../settings/team_utils";
+import { sendSlackMessage } from "../../integrations/slack/messages";
 
 export class AskChannelStatusStatsOrSummary implements BotAction {
   getHelpText(): string {
     return (
-      "`ask channel stats` - Get statistics on the requests in your team ask channel.\n" +
-      "• `ask channel status` - Get the status of the requests in your team ask channel.\n" +
-      "• `ask channel summary` - Get the status summary of the requests in your team ask channel.\n" +
+      "`ask channel stats #CHANNEL_NAME` - Get statistics on the requests for the requested team ask channel.\n" +
+      "• `ask channel status #CHANNEL_NAME` - Get the status of the requests for the requested team ask channel.\n" +
+      "• `ask channel summary #CHANNEL_NAME` - Get the status summary of the requests for the requested team ask channel.\n" +
       "For stats, status and summary actions - \n" +
       "1. The default timeframe is for 7 days. You can specify the number of days / weeks / months " +
-      "(For example: `ask channel stats 15 days`, `ask channel status 2 weeks`).\n" +
+      "(For example: `ask channel stats #team-ask-channel 15 days`, `ask channel status #team-ask-channel 2 weeks`).\n" +
       "2. You can aggregate the results by days/weeks/months " +
-      "(For example: `ask channel stats 15 days by days`, `ask channel status 2 weeks by weeks`)."
+      "(For example: `ask channel stats #team-ask-channel 15 days by days`, " +
+      "`ask channel status #team-ask-channel 2 weeks by weeks`)."
     );
   }
 
   isEnabled(): boolean {
-    // This action should be available if there is an asks channel to process
-    return TEAM_ASK_CHANNEL_ID.length > 0;
+    // This action should be available if there are any asks channel to process
+    return isValueInTeams("ask_channel_id");
   }
 
   doesMatch(event: any): boolean {
     return (
       sanitizeCommandInput(event.text).startsWith("ask channel stats") ||
-      sanitizeCommandInput(event.text).startsWith("ask channel status") ||
+      (sanitizeCommandInput(event.text).startsWith("ask channel status") &&
+      !sanitizeCommandInput(event.text).startsWith("ask channel status for yesterday")) ||
       sanitizeCommandInput(event.text).startsWith("ask channel summary")
     );
   }
@@ -54,9 +57,22 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
         `There was an error processing the stats params for ${event.text} command: ${params.error}`,
       );
 
-      throw new Error(
-        `There was an error processing the stats params: ${params.error}`,
-      );
+      if(params.error === "Missing channel ID") {
+        await sendSlackMessage(
+          slackClient,
+          `Please provide an asks channel in the form of \`ask channel status #ask-zigi\`.`,
+          event.channel,
+          event.thread_ts,
+        );
+        return;
+      }
+      else
+      {
+        // TODO: This will override the message about missing channel ID
+        throw new Error(
+          `There was an error processing the stats params: ${params.error}`,
+        );
+      }
     }
 
     const startingDate = getStartingDate(params.timeMetric, params.count);
@@ -65,15 +81,41 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
       `"Date between ${startingDate.toUTCString()} and ${endingDate.toUTCString()}`,
     );
 
-    // TODO: Handle a situation of multiple ask channels
-    const team = findTeamByValue(TEAM_ASK_CHANNEL_ID[0], "ask_channel_id");
+    // Get the channel ID
+    const askChannelId = getChannelIDFromEventText(
+      event.text,
+      5,
+    );
+
+    const team = findTeamByValue(askChannelId, "ask_channel_id");
     if (!team) {
       logger.error(
-        `Unable to find team for channel ID ${TEAM_ASK_CHANNEL_ID[0]}. Ask: ${event.text}`,
+        `Unable to find team for channel ID ${askChannelId}. Ask: ${event.text}`,
       );
+
+      if (!askChannelId) {
+        await sendSlackMessage(
+          slackClient,
+          `Please provide an asks channel in the form of \`ask channel status for yesterday #ask-zigi\`.`,
+          event.channel,
+          event.thread_ts,
+        );
+      }
+      else {
+        await sendSlackMessage(
+          slackClient,
+          "Channels is not set up for monitoring. For setting it up, please contact your administrator.",
+          event.channel,
+          event.thread_ts,
+        );
+      }
+  
       return;
     }
-    
+
+    logger.debug(`Found team for channel ID ${askChannelId}.`);
+
+
     // Get the stats
     const messages: any[any] = await getChannelMessages(
       slackClient,

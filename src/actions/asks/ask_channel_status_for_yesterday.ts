@@ -12,8 +12,6 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import {
-  scheduledMessageLastSent,
-  TEAM_ASK_CHANNEL_ID,
   TEAMS_LIST,
 } from "../../settings/team_consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
@@ -42,7 +40,7 @@ export class AskChannelStatusForYesterday implements BotAction {
 
   getHelpText(): string {
     let helpMessage =
-      "`ask channel status for yesterday` - Get the status of requests in your team ask channel from yesterday and a current status going back for the last " +
+      "`ask channel status for yesterday <#CHANNEL_NAME>` - Get the status of requests for the requested team ask channel from yesterday and a current status going back for the last " +
       AskChannelStatusForYesterday.DAYS_BACK +
       " days.";
 
@@ -90,12 +88,9 @@ export class AskChannelStatusForYesterday implements BotAction {
       slackClient = SlackWebClient;
     }
 
-    // TODO: Extract these two calls to a function and use that
-    // We don't need the channel ID separately
     const askChannelId = getChannelIDFromEventText(
       event.text,
       5,
-      TEAM_ASK_CHANNEL_ID[0],
     );
 
     const team = findTeamByValue(askChannelId, "ask_channel_id");
@@ -103,29 +98,43 @@ export class AskChannelStatusForYesterday implements BotAction {
       logger.error(
         `Unable to find team for channel ID ${askChannelId}. Ask: ${event.text}`,
       );
+
+      if (!askChannelId) {
+        await sendSlackMessage(
+          slackClient,
+          `Please provide an asks channel in the form of \`ask channel status for yesterday #ask-zigi\`.`,
+          event.channel,
+          event.thread_ts,
+        );
+      }
+      else {
+        await sendSlackMessage(
+          slackClient,
+          "Channels is not set up for monitoring. For setting it up, please contact your administrator.",
+          event.channel,
+          event.thread_ts,
+        );
+      }
+  
       return;
     }
 
     // Check if a similar scheduled ask was requested less than a minute ago, and if so, skip
+    // TODO: Remove this once I figure out the problem that causes cron to fire twice
     if (event.scheduled) {
-      if (scheduledMessageLastSent.has(askChannelId)) {
-        const lastSent = scheduledMessageLastSent.get(askChannelId);
-        if (lastSent) {
-          const now = new Date();
-          const diff = now.getTime() - lastSent.getTime();
-          if (diff < 60 * 1000) {
-            logger.info(
-              `Skipping scheduled ask channel status for yesterday for channel ${team.ask_channel_id} as it was requested less than a minute ago.`,
-            );
-            return;
-          }
-        }
+      const now = new Date();
+      const diff = now.getTime() - team.ask_channel_cron_last_sent.getTime();
+      if (diff < 60 * 1000) {
+        logger.info(
+          `Skipping scheduled ask channel status for yesterday for channel #${team.ask_channel_name} as it was requested less than a minute ago.`,
+        );
+        return;
       }
 
       // Set now as the last time this was sent
       // TODO: Potential problem - this will show sent even if there was an error and the message was not sent.
       //      Could move it to the end of the function, but then if the time between scheduled requests is short, might not be effective.
-      scheduledMessageLastSent.set(team.ask_channel_id, new Date());
+      team.ask_channel_cron_last_sent = new Date();
     }
 
     logger.info(

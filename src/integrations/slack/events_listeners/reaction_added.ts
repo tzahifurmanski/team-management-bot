@@ -3,10 +3,6 @@ import {
   countReactions,
   isBotMessage,
 } from "../utils";
-import {
-  Team,
-  TEAM_ASK_CHANNEL_ID,
-} from "../../../settings/team_consts";
 import { getUserProfile } from "../users";
 import { getConversationHistory } from "../conversations";
 import { logger, REACTIONS_HANDLED } from "../../../settings/server_consts";
@@ -25,11 +21,6 @@ const reactionAddedCallback = async ({ event, client }: any) => {
     if (!team) {
       logger.error("Could not find team for ask channel", event.item.channel);
 
-      logger.trace(
-        "Reaction is not in an ask channel, skipping.",
-        `Message channel: ${event.item.channel}`,
-        `Allowed channels: ${JSON.stringify(TEAM_ASK_CHANNEL_ID)}`,
-      );
       return;
     }
     

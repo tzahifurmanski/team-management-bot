@@ -44,7 +44,7 @@ export class ZendeskTicketsStatus implements BotAction {
 
   getHelpText(): string {
     let helpMessage =
-      "`zendesk tickets status` - Provide a summary of the current Zendesk tickets currently active for your team.";
+      "`zendesk tickets status <#CHANNEL_NAME>` - Provide a summary of the current Zendesk tickets currently active for the requested team channel.";
 
     helpMessage += getRecurringJobInfo(
       "zendesk tickets status",
@@ -57,35 +57,18 @@ export class ZendeskTicketsStatus implements BotAction {
   }
 
   isEnabled(): boolean {
-    // const isChannelIdPerName =
-    //   ZENDESK_TICKETS_CHANNEL_ID.length === ZENDESK_TICKETS_CHANNEL_NAME.length;
     const isZendeskSetup = !!(ZENDESK_BASE_URL && ZENDESK_TOKEN);
     const isZendeskChannel = isValueInTeams("zendesk_channel_id");
 
-    // TODO: These checks need to be when loading the data into teams, not here
-    // const isViewPerChannel =
-    //   ZENDESK_MONITORED_VIEW.length === ZENDESK_TICKETS_CHANNEL_ID.length;
-
-    // Check if we got any aggregated keys, or none at all
-    // const isAggregateKeyPerView =
-    //   ZENDESK_VIEW_AGGREGATED_FIELD_ID.length === 0 ||
-    //   ZENDESK_VIEW_AGGREGATED_FIELD_ID.length === ZENDESK_MONITORED_VIEW.length;
-
     logger.trace(
-      "Conditions:",
-      // isChannelIdPerName,
+      "ZendeskTicketsStatus isEnabled Conditions:",
       isZendeskSetup,
       isZendeskChannel,
-      // isViewPerChannel,
-      // isAggregateKeyPerView,
     );
 
     return (
-      // isChannelIdPerName &&
       isZendeskSetup &&
       isZendeskChannel
-      // isViewPerChannel &&
-      // isAggregateKeyPerView
     );
   }
 
@@ -116,7 +99,6 @@ export class ZendeskTicketsStatus implements BotAction {
     const askChannelId = getChannelIDFromEventText(
       event.text,
       3,
-      ZENDESK_TICKETS_CHANNEL_ID[0],
     );
 
     const team = findTeamByValue(askChannelId, "ask_channel_id");
@@ -165,7 +147,7 @@ export class ZendeskTicketsStatus implements BotAction {
 
     // TODO: Make the header dynamic
     // TODO: Add a link to the view
-    const viewLink = `${ZENDESK_BASE_URL}/agent/filters/${viewID}`;
+    const viewLink = `${ZENDESK_BASE_URL}/agent/filters/${team.zendesk_monitored_view_id}`;
     // messageBlocks.push(createSectionBlock("Good morning on-callers :sunny:\nThere are *total of X tier 3 tickets* assigned to you - *Y open, 3 pending customers and 1 closed*."))
     messageBlocks.push(
       createSectionBlock(

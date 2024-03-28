@@ -20,7 +20,7 @@ export interface Team {
   ask_channel_name: string;
   ask_channel_cron: string;
   allowed_bots: string[];
-  // scheduledMessageLastSent: Date;
+  ask_channel_cron_last_sent: Date; // Keep track of the last time a scheduled message was sent
 
   // Zendesk Integration
   zendesk_channel_id: string;
@@ -100,7 +100,6 @@ const GROUP_ASK_CHANNELS: string = process.env.GROUP_ASK_CHANNELS || "";
 export let GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
 
 // Zendesk Tickets Status Configurations
-// TODO: Move into the TEAM configuration
 const ZENDESK_MONITORED_VIEW = handleListParameter(
   process.env.ZENDESK_MONITORED_VIEW,
 );
@@ -152,9 +151,11 @@ export const MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE: string =
 export const MONITORED_CHANNEL_TRIGGER: string =
   process.env.MONITORED_CHANNEL_TRIGGER || "";
 
-// Initialize a maps to keep track of the last time a scheduled message was sent for a specific channel
-// TODO: Include in the team configuration
-export const scheduledMessageLastSent = new Map<string, Date>();
+
+// TODO: TEMP Method
+const getArrayValue = (arr: string[], index: number, detault_value: string): string => {
+  return index < arr.length ? arr[index] : detault_value
+}
 
 // Resolve the slack dynamic variables
 export const loadConfig = async (slackClient: any) => {
@@ -237,6 +238,7 @@ export const loadConfig = async (slackClient: any) => {
     setSlackWebClient(slackClient);
 
     // TODO: Temporarily, add the current settings to a team JSON
+    //  Also, this assumes all arrays are the same length, which is incorrect
     TEAM_ASK_CHANNEL_ID.forEach((channelId, index) => {
       const team = {
         ask_channel_id: channelId,
@@ -248,8 +250,9 @@ export const loadConfig = async (slackClient: any) => {
         zendesk_monitored_view_id: ZENDESK_MONITORED_VIEW[index],
         zendesk_aggregated_field_id: ZENDESK_VIEW_AGGREGATED_FIELD_ID[index],
         zendesk_field_id: MONITORED_ZENDESK_FILTER_FIELD_ID[index] || "",
-        zendesk_field_values: Array.from(MONITORED_ZENDESK_FILTER_FIELD_VALUES[index]) || [],
+        zendesk_field_values: Array.from(getArrayValue(MONITORED_ZENDESK_FILTER_FIELD_VALUES, index, '')),
         zendesk_channel_cron: ZENDESK_TICKETS_STATS_CRON[index],
+        ask_channel_cron_last_sent: new Date(new Date().setDate(new Date().getDate() - 1)), // Initialize date and time which is exactly one day before the current date and time.
       };
 
       TEAMS_LIST.set(channelId, team);

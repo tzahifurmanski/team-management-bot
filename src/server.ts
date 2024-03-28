@@ -8,7 +8,6 @@ import { SLACK_SIGNING_SECRET } from "./integrations/consts";
 
 const { version } = require("../package.json");
 
-const { registerListeners } = require("./listeners");
 
 const receiver = new ExpressReceiver({ signingSecret: SLACK_SIGNING_SECRET });
 
@@ -19,7 +18,6 @@ const boltApp = new App({
   receiver: receiver,
 });
 
-registerListeners(boltApp, receiver);
 
 (async () => {
   // Print server time
@@ -32,6 +30,12 @@ registerListeners(boltApp, receiver);
     logger.error("Loading failed!");
     process.exit(0);
   }
+
+  // Initiatlize the actions after teams loading, as some are enabled based on teams configurations
+  //  This is because some actions (like AskChannelStatusForYesterday) are initialized during construction,
+  //  so they don't wait for the RegisterListeners function
+  const { registerListeners } = require("./listeners");
+  registerListeners(boltApp, receiver);
 
   // Start the app
   await boltApp.start(PORT);
