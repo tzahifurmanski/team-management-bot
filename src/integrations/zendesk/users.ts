@@ -1,5 +1,5 @@
 import { httpGet } from "../utils";
-import { ZENDESK_BASE_URL, ZENDESK_TOKEN } from "../../settings/team_consts";
+import { ZENDESK_BASE_URL, ZENDESK_TOKEN } from "../consts";
 
 export const getUserByID = async (userId: string): Promise<any> => {
   const url = `${ZENDESK_BASE_URL}/api/v2/users/${userId}.json`;

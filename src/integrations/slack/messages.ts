@@ -10,7 +10,7 @@ import { Block, DividerBlock, KnownBlock, MrkdwnElement } from "@slack/types";
 import { BOT_SLACK_ID } from "../../settings/team_consts";
 import { botConfig, logger } from "../../settings/server_consts";
 import { ImageBlock } from "@slack/bolt";
-import { SLACK_USER_FORMAT } from "./consts";
+import { SLACK_USER_FORMAT } from "../consts";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage

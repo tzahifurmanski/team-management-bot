@@ -2,7 +2,7 @@ import { SectionBlock } from "@slack/web-api";
 import { getUserByID } from "../integrations/zendesk/users";
 import { getOrganizationByID } from "../integrations/zendesk/organizations";
 import { createSectionBlock } from "../integrations/slack/messages";
-import { ZENDESK_BASE_URL } from "../settings/team_consts";
+import { ZENDESK_BASE_URL } from "../integrations/consts";
 
 export const createDetailModeBlocks = async (
   item: any,

@@ -7,17 +7,15 @@ import {
   reportMonitoredChannelStatsToSlack,
 } from "../../logic/monitored_channel";
 import {
-  ALLOWED_BOTS_PER_TEAM,
   BOT_SLACK_ID,
-} from "../../settings/team_consts";
-import {
   MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE,
   MONITORED_CHANNEL_CONDITION_MESSAGE_SUCCESS,
   MONITORED_CHANNEL_CONDITION_USERNAME,
   MONITORED_CHANNEL_DAYS_INDEX,
   MONITORED_CHANNEL_ID,
   MONITORED_CHANNEL_TRIGGER,
-} from "../../settings/server_consts";
+  TEAMS_LIST,
+} from "../../settings/team_consts";
 
 export class MonitoredChannelSummaryStats implements BotAction {
   getHelpText(): string {
@@ -51,7 +49,7 @@ export class MonitoredChannelSummaryStats implements BotAction {
     const messages: any[any] = await getChannelMessages(
       slackClient,
       MONITORED_CHANNEL_ID,
-      ALLOWED_BOTS_PER_TEAM.get(MONITORED_CHANNEL_ID) || [],
+      TEAMS_LIST.get(MONITORED_CHANNEL_ID)?.allowed_bots || [],
       startingDate,
       endingDate,
     );

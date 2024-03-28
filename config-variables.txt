@@ -1,34 +1,37 @@
-# Consts
-# ============
+# Env Configurations
+# ==================
 
-// Env Configurations
 NODE_ENV=
 PORT=
 LOG_LEVEL= # Log level to be used for the application logging. Default is 'info', option are 'fatal','error:','warn','info','debug','trace'.
 BOLT_LOG_LEVEL= # Log level to be used for Bolt library logging. Default is 'info', option are 'error', 'warn, 'info', 'debug'.
 
 
-// Bot Configurations
+# Bot Configurations
+# ==================
+
 BOT_NAME= # The name for the bot to use when posting messages. Should be identical to the name of the bot as was set up in the Slack App.
 BOT_IMAGE_URL= # The URL for the image the bot will use, when posting messages. Default will use the Slack app photo.
 BOT_PERSONALITY= # Default is 'generic'.
+USER_SPECIFIC_COMPLIMENTS=# Optional. List of custom compliments for the bot to use, in additional to it's default ones.
 
-# Slack Consts
-# ============
+# BOT Responses
+ENABLE_BOT_RESPONSES= # Should the bot respond to keywords. Values are True/False, default is False. Example keywords are 'help', 'bug', 'folks', ''review', etc
+BOT_RESPONSES_CHANNELS= # Which channels should the bot monitor responses. Default is none. Values are channel IDs.
+DISABLED_RESPONSES= # Optional. List of bot reponses to disable, even if ENABLE_BOT_RESPONSES is enabled.
 
-# User-Specific Tokens Configurations
+
+# Integrations
+# Slack
 SLACK_SIGNING_SECRET=
 BOT_USER_OAUTH_ACCESS_TOKEN=
 
+# Zendesk
+ZENDESK_TOKEN= # The Basic auth token used to connect to Zendesk
+ZENDESK_BASE_URL= # Base URL for your Zendesk instance
 
-// Bot Feature Flags
-ENABLE_ASK_SUMMARY= # Enable the bot to post a 'summary' message after an ask has been marked as solved. Default is false.
-ENABLE_BOT_RESPONSES= # Should the bot respond to keywords. Values are True/False, default is False. Example keywords are 'help', 'bug', 'folks', ''review', etc
 
 
-// Team Configurations
-TEAMS_JSON_LIST=
-TEAM_SPECIFIC_COMPLIMENTS=
 
 // Monitored Channel Configurations
 MONITORED_CHANNEL_ID=
@@ -39,26 +42,41 @@ MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE=
 MONITORED_CHANNEL_TRIGGER=
 
 
-# Features
-# =================
+# Ask Channel Stats - For multiple channels (stats only)
+GROUP_ASK_CHANNELS=
 
-# Ask Channel Status
-ASK_CHANNEL_STATS_CRON= # A separator ('|') separated list of cron expressions for the bot to post in the team ask channel with a current status. For example, '30 08 * * 0-5', which is every day at 8:30 UTC, on Sunday to Friday.
-TEAM_ASK_CHANNEL_ID= # A comma (',') separated list of the Slack IDs for the ask channels for the bot to track.
-TEAM_ASK_CHANNEL_NAME= # A comma (',') separated list of the Slack ask channel names for the bot to track.
-ALLOWED_BOTS= # A separator ('|') separated list of a comma (',') separated lists of bot usernames to include in the asks channel summary.
+
+ENABLE_ASK_SUMMARY= # Enable the bot to post a 'summary' message after an ask has been marked as solved. Default is false.
 
 # Ask Channel Stats - Optional, needed for the reporting feature
 USER_PROFILE_FIELD_ID_TEAM= # The Slack field ID to get the user's team name, for providing additional stats.
 USER_PROFILE_FIELD_ID_DIVISION= # The Slack field ID to get the user's division name, for providing additional stats.
 USER_PROFILE_FIELD_ID_DEPARTMENT= # The Slack field ID to get the user's department name, for providing additional stats.
 
-# Ask Channel Stats - For multiple channels (stats only)
-GROUP_ASK_CHANNELS=
 
-# Zendesk Integration Configurations
-ZENDESK_TOKEN= # The Basic auth token used to connect to Zendesk
-ZENDESK_BASE_URL= # Base URL for your Zendesk instance
+
+# Reactions
+REACTIONS_IN_PROGRESS= # Optional. List of Slack reaction names that will indicate that an ask is in progress.
+REACTIONS_HANDLED= # Optional. List of Slack reaction names that will indicate that an ask has been handled.
+
+# Code Review
+TEAM_CODE_REVIEW_CHANNEL_ID=
+TEAM_CODE_REVIEW_CHANNEL_NAME=
+
+
+
+// Team Configurations
+# ====================
+
+TEAMS_JSON_LIST= # A comma (',') separated list of JSONs that represent a team. Each JSON contains the following fields:
+
+# Features
+
+# Ask Channel Status
+ASK_CHANNEL_STATS_CRON= # A separator ('|') separated list of cron expressions for the bot to post in the team ask channel with a current status. For example, '30 08 * * 0-5', which is every day at 8:30 UTC, on Sunday to Friday.
+TEAM_ASK_CHANNEL_ID= # A comma (',') separated list of the Slack IDs for the ask channels for the bot to track.
+TEAM_ASK_CHANNEL_NAME= # A comma (',') separated list of the Slack ask channel names for the bot to track.
+ALLOWED_BOTS= # A separator ('|') separated list of a comma (',') separated lists of bot usernames to include in the asks channel summary.
 
 # Zendesk Tickets Status Configurations
 ZENDESK_MONITORED_VIEW= # A comma (',') separated list of IDs for the Zendesk views to monitor.
@@ -69,16 +87,3 @@ MONITORED_ZENDESK_FILTER_FIELD_VALUES= # Optional. A list of allowed values for 
 ZENDESK_TICKETS_CHANNEL_ID= # A comma (',') separated list of IDs of the Slack channels to report a status in.
 ZENDESK_TICKETS_CHANNEL_NAME= # A comma (',') separated list of Names of the Slack channels to report a status in.
 ZENDESK_TICKETS_STATS_CRON= # A separator ('|') separated list of cron expressions for the bot to post a status in.
-
-# Reactions
-REACTIONS_IN_PROGRESS= # Optional. List of Slack reaction names that will indicate that an ask is in progress.
-REACTIONS_HANDLED= # Optional. List of Slack reaction names that will indicate that an ask has been handled.
-
-# BOT Responses
-# =============
-BOT_RESPONSES_CHANNELS= # Which channels should the bot monitor responses. Default is none. Values are channel IDs.
-DISABLED_RESPONSES= # Optional. List of bot reponses to disable, even if ENABLE_BOT_RESPONSES is enabled.
-
-# Code Review
-TEAM_CODE_REVIEW_CHANNEL_ID=
-TEAM_CODE_REVIEW_CHANNEL_NAME=

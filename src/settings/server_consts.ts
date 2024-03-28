@@ -119,18 +119,3 @@ export const BOT_RESPONSES_CHANNELS: string[] = handleListParameter(
 export const USER_SPECIFIC_COMPLIMENTS: string[] = handleListParameter(
   process.env.USER_SPECIFIC_COMPLIMENTS,
 );
-
-// TODO: Remove this or move this to the slack consts. This also doesn't support multi teams
-// Monitored Channel Configurations
-export const MONITORED_CHANNEL_ID: string =
-  process.env.MONITORED_CHANNEL_ID || "";
-export const MONITORED_CHANNEL_DAYS_INDEX: string =
-  process.env.MONITORED_CHANNEL_DAYS_INDEX || "";
-export const MONITORED_CHANNEL_CONDITION_USERNAME: string =
-  process.env.MONITORED_CHANNEL_CONDITION_USERNAME || "";
-export const MONITORED_CHANNEL_CONDITION_MESSAGE_SUCCESS: string =
-  process.env.MONITORED_CHANNEL_CONDITION_MESSAGE_SUCCESS || "";
-export const MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE: string =
-  process.env.MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE || "";
-export const MONITORED_CHANNEL_TRIGGER: string =
-  process.env.MONITORED_CHANNEL_TRIGGER || "";
