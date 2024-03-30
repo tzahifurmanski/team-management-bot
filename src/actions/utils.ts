@@ -2,6 +2,7 @@ import cronstrue from "cronstrue";
 import { AsksChannelStatsResult } from "../logic/asks_channel";
 import { sanitizeCommandInput } from "../integrations/slack/utils";
 import { logger } from "../settings/server_consts";
+import { Team } from "../settings/team_consts";
 
 const cron = require("node-cron");
 
@@ -16,6 +17,7 @@ export class AskChannelParams {
     public count: number,
     public timeMetric: string,
     public groupBy: string,
+    public channel_id_slot: number,
     public error?: string,
   ) {}
 }
@@ -28,51 +30,60 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
   let groupBy;
   let timeMetric;
   let count;
+  let channel_id_slot;
 
-  // Verify we got exactly 7 params - 'ask channel stats/status <COUNT> <TIME_PERIOD>' by days/weeks/months
-  if (askArray.length === 7) {
+
+  // Verify we got exactly 8 params - 'ask channel stats/status <#CHANNEL_NAME> <COUNT> <TIME_PERIOD>' by days/weeks/months
+  if (askArray.length === 8) {
     // Get values from params
     actionType = askArray[2];
-    count = askArray[3];
-    timeMetric = askArray[4];
-    groupBy = askArray[6];
+    channel_id_slot = askArray[3];
+    count = askArray[4];
+    timeMetric = askArray[5];
+    groupBy = askArray[7];
   }
-  // Verify we got exactly 5 params - 'ask channel stats/status <COUNT> <TIME_PERIOD>'
-  else if (askArray.length === 5) {
+  // Verify we got exactly 6 params - 'ask channel stats/status <#CHANNEL_NAME> <COUNT> <TIME_PERIOD>'
+  else if (askArray.length === 6) {
     // Get values from params
     actionType = askArray[2];
+    channel_id_slot = askArray[3];
 
-    // Check if we got 'ask channel stats/status by days/weeks/months' format
-    if (askArray[3] === "by") {
+    // Check if we got 'ask channel stats/status <#CHANNEL_NAME> by days/weeks/months' format
+    if (askArray[4] === "by") {
       timeMetric = "days";
       count = 7;
-      groupBy = askArray[4];
+      groupBy = askArray[5];
     } else {
-      count = askArray[3];
-      timeMetric = askArray[4];
+      count = askArray[4];
+      timeMetric = askArray[5];
       groupBy = "";
     }
   }
-  // Check if we got the default version of 'ask channel stats'
-  else if (askArray.length === 3) {
+
+  // Check if we got the default version of 'ask channel stats <#CHANNEL_NAME>'
+  else if (askArray.length === 4) {
     // Use defaults - 7 days
     actionType = askArray[2];
     timeMetric = "days";
     count = 7;
     groupBy = "";
-  } else {
-    return new AskChannelParams("", -1, "", "", "Not all params provided");
+    channel_id_slot = askArray[3];
+  } else if (askArray.length === 3) {
+    return new AskChannelParams("", -1, "", "", -1, "Missing channel ID");
+  }
+  else{
+    return new AskChannelParams("", -1, "", "", -1, "Not all params provided");
   }
 
   // Validate the action type
   if (!["stats", "status", "summary"].includes(actionType)) {
     // Return error
-    return new AskChannelParams("", -1, "", "", "Invalid action type provided");
+    return new AskChannelParams("", -1, "", "", -1, "Invalid action type provided");
   }
 
   // Validate the number of days
   if (Number(count) === undefined || Number(count) < 1) {
-    return new AskChannelParams("", -1, "", "", "Invalid count provided");
+    return new AskChannelParams("", -1, "", "", -1, "Invalid count provided");
   }
 
   // If the user has supplied a singular criteria, change it to plural
@@ -82,7 +93,7 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
 
   if (!["days", "weeks", "months"].includes(timeMetric)) {
     // Return error
-    return new AskChannelParams("", -1, "", "", "Invalid time metric provided");
+    return new AskChannelParams("", -1, "", "", -1, "Invalid time metric provided");
   }
 
   if (groupBy && !["days", "weeks", "months"].includes(groupBy)) {
@@ -92,6 +103,7 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
       -1,
       "",
       "",
+      -1,
       "Invalid group by clause provided",
     );
   }
@@ -101,6 +113,7 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
     Number(count),
     timeMetric,
     groupBy,
+    Number(channel_id_slot),
     "",
   );
 };
@@ -176,87 +189,66 @@ export const extractIDFromChannelString = (channelString: string): string => {
 export const getChannelIDFromEventText = (
   eventText: any,
   nameIndex: number,
-  defaultID: string,
-) => {
-  let askChannelID;
-
-  // If there's a sixth word, then it's a channel name
-  const params = eventText.split(" ");
-
-  // Check if no channel ID was provided
-  if (
-    !(
-      sanitizeCommandInput(eventText).startsWith("ask channel status") ||
-      sanitizeCommandInput(eventText).startsWith("zendesk tickets status")
-    ) ||
-    params.length === nameIndex
-  ) {
-    // Take default
-    askChannelID = defaultID;
-    logger.debug(`Using default channel ID ${askChannelID}.`);
-  } else {
-    askChannelID = extractIDFromChannelString(params[nameIndex]);
-    logger.debug(`Found channel ID ${askChannelID}.`);
-  }
+): string => {
+  const askChannelID = extractIDFromChannelString(eventText.split(" ")[nameIndex]);
+  logger.debug(`Found channel ID ${askChannelID}.`);
 
   return askChannelID;
 };
 
 export const scheduleAskChannelsCrons = (
   slackClient: any,
-  crons: string[],
-  channelIds: string[],
-  channelNames: string[],
+  teams: Team[],
+  channel_id_attribute: keyof Team,
+  channel_name_attribute: keyof Team,
+  cron_attribute: keyof Team,
   action: string,
   functionToSchedule: any,
 ) => {
-  // Schedule the crons for the ask channels
-  if (crons.length != channelIds.length) {
-    logger.info(
-      `cron (${crons}, ${crons.length}) and channelIds (${channelIds}, ${channelIds.length}) have different lengths, and therefor crons won't be scheduled.`,
-    );
-    return;
-  }
+  // Get all the teams that have a cron set
+  const teamsWithCrons = teams.filter(
+    (team: Team) => !!team[channel_id_attribute],
+  );
 
-  // Iterate over the crons and schedule them
-  for (let i = 0; i < crons.length; i++) {
+  teamsWithCrons.forEach((team: Team) => {
     const eventText = {
-      channel: channelIds[i],
+      channel: team.ask_channel_id,
       thread_ts: "",
       scheduled: true,
-      text: `${action} <#${channelIds[i]}|${channelNames[i]}>`,
+      text: `${action} <#${team[channel_id_attribute]}|${team[channel_name_attribute]}>`,
     };
 
     // TODO: SlackWebClient is passed 'by value', and when it does, it is empty. Fix this.
     scheduleCron(
-      !!crons[i],
-      `update on ${channelNames[i]} ${action}`,
-      crons[i],
+      !!team[cron_attribute],
+      `update on ${team[channel_name_attribute]} ${action}`,
+      <string>team[cron_attribute],
       functionToSchedule,
       eventText,
       slackClient,
     );
-  }
+  });
 };
 
+// TODO: This doesn't really check what is configured in cron, but rather the configuration that should have been applied
 export const getRecurringJobInfo = (
   jobName: string,
-  crons: string[],
-  channelIds: string[],
+  teams: Team[],
+  channel_id_attribute: keyof Team,
+  cron_attribute: keyof Team,
 ): string => {
-  if (crons.length == 0) {
+  if (teams.length == 0) {
     return "";
   }
+  // Get all the teams that have a cron set
+  const teamsWithCrons = teams.filter((team: Team) => !!team[cron_attribute]);
 
   let message = "";
-  for (let i = 0; i < crons.length; i++) {
-    // If a schedule is set, add it to the help message
-    if (crons[i]) {
-      message += `\n*A recurring ${jobName} in <#${
-        channelIds[i]
-      }> is scheduled to be sent ${cronstrue.toString(crons[i])}.*`;
-    }
-  }
+  teamsWithCrons.forEach((team: Team) => {
+    message += `\n*A recurring ${jobName} in <#${
+      team[channel_id_attribute]
+    }> is scheduled to be sent ${cronstrue.toString(<string>team[cron_attribute])}.*`;
+  });
 
   return message;
 };

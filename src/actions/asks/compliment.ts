@@ -8,10 +8,10 @@ import {
   USER_SPECIFIC_COMPLIMENTS,
 } from "../../settings/server_consts";
 
-const {
-  sendSlackMessage,
+import {
   getUserIDInText,
-} = require("../../integrations/slack/messages");
+  sendSlackMessage,
+} from "../../integrations/slack/messages";
 
 // Use a predefined compliments pool and anything that is team specific
 const COMPLIMENTS = botConfig.ACTION_COMPLIMENT_POOL.concat(

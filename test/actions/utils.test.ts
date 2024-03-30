@@ -32,33 +32,35 @@ const verifyAskChannelParamsResult = (
   timeMetric: string,
   count: number,
   groupBy: string,
+  // channel_id_slot: number,   TODO: Add this back
   error: string,
 ) => {
   expect(result.actionType).toEqual(actionType);
   expect(result.timeMetric).toEqual(timeMetric);
   expect(result.count).toEqual(count);
   expect(result.groupBy).toEqual(groupBy);
+  // expect(result.channel_id_slot).toEqual(channel_id_slot); TODO: Add this back
   expect(result.error).toEqual(error);
 };
 
 describe("getAskChannelStatsParameters", () => {
 
-  test("default stats ask  - Valid, Default", async () => {
-    let ask = "ask channel stats";
+  test("default stats ask - Valid, Default", async () => {
+    let ask = "ask channel stats <#test-channel>";
 
     let result: AskChannelParams = getAskChannelParameters(ask);
 
     // Check that we got the default - 7 days
     verifyAskChannelParamsResult(result, "stats", "days", 7, "", "");
 
-    ask = "ask channel status";
+    ask = "ask channel status <#test-channel>";
 
     result = getAskChannelParameters(ask);
 
     // Check that we got the default - 7 days
     verifyAskChannelParamsResult(result, "status", "days", 7, "", "");
 
-    ask = "ask channel summary";
+    ask = "ask channel summary <#test-channel>";
 
     result = getAskChannelParameters(ask);
 
@@ -67,19 +69,19 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("one days", async () => {
-    let ask = "ask channel stats 1 days";
+    let ask = "ask channel stats <#test-channel> 1 days";
 
     let result: AskChannelParams = getAskChannelParameters(ask);
 
     verifyAskChannelParamsResult(result, "stats", "days", 1, "", "");
 
-    ask = "ask channel status 1 day";
+    ask = "ask channel status <#test-channel> 1 day";
 
     result = getAskChannelParameters(ask);
 
     verifyAskChannelParamsResult(result, "status", "days", 1, "", "");
 
-    ask = "ask channel summary 1 day";
+    ask = "ask channel summary <#test-channel> 1 day";
 
     result = getAskChannelParameters(ask);
 
@@ -87,7 +89,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("multiple days stats", async () => {
-    const ask = "ask channel stats 5 days";
+    const ask = "ask channel stats <#test-channel> 5 days";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -95,7 +97,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("multiple days stats - group by", async () => {
-    const ask = "ask channel stats 5 days by days";
+    const ask = "ask channel stats <#test-channel> 5 days by days";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -103,7 +105,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("multiple days, more than a month stats", async () => {
-    const ask = "ask channel stats 45 days";
+    const ask = "ask channel stats <#test-channel> 45 days";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -111,7 +113,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("one weeks stats", async () => {
-    const ask = "ask channel stats 1 weeks";
+    const ask = "ask channel stats <#test-channel> 1 weeks";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -119,7 +121,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("one week status", async () => {
-    const ask = "ask channel status 1 week";
+    const ask = "ask channel status <#test-channel> 1 week";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -127,7 +129,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("one week summary", async () => {
-    const ask = "ask channel summary 1 week";
+    const ask = "ask channel summary <#test-channel> 1 week";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -135,7 +137,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("multiple weeks stats", async () => {
-    const ask = "ask channel stats 5 weeks";
+    const ask = "ask channel stats <#test-channel> 5 weeks";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -143,7 +145,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("one month status", async () => {
-    const ask = "ask channel status 1 month";
+    const ask = "ask channel status <#test-channel> 1 month";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -151,7 +153,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("one month summary", async () => {
-    const ask = "ask channel summary 1 month";
+    const ask = "ask channel summary <#test-channel> 1 month";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -159,7 +161,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("multiple weeks stats - by weeks", async () => {
-    const ask = "ask channel stats 5 weeks by weeks";
+    const ask = "ask channel stats <#test-channel> 5 weeks by weeks";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -167,7 +169,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("one months stats", async () => {
-    const ask = "ask channel stats 1 months";
+    const ask = "ask channel stats <#test-channel> 1 months";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -175,7 +177,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("multiple months stats", async () => {
-    const ask = "ask channel stats 2 months";
+    const ask = "ask channel stats <#test-channel> 2 months";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -183,7 +185,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("multiple months stats - group by", async () => {
-    const ask = "ask channel stats 2 months by months";
+    const ask = "ask channel stats <#test-channel> 2 months by months";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
 
@@ -191,7 +193,7 @@ describe("getAskChannelStatsParameters", () => {
   });
   
   test("invalid action type metric", async () => {
-    const ask = "ask channel statszig 5 days";
+    const ask = "ask channel statszig <#test-channel> 5 days";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
     expect(result.actionType).toEqual("");
@@ -201,7 +203,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("invalid time metric", async () => {
-    const ask = "ask channel stats 5 zigis";
+    const ask = "ask channel stats <#test-channel> 5 zigis";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
     expect(result.actionType).toEqual("");
@@ -211,7 +213,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("missing time metric", async () => {
-    const ask = "ask channel stats 8";
+    const ask = "ask channel stats <#test-channel> 8";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
     expect(result.actionType).toEqual("");
@@ -221,7 +223,7 @@ describe("getAskChannelStatsParameters", () => {
   });
 
   test("invalid days", async () => {
-    const ask = "ask channel stats -5 days";
+    const ask = "ask channel stats <#test-channel> -5 days";
 
     const result: AskChannelParams = getAskChannelParameters(ask);
     expect(result.actionType).toEqual("");
@@ -256,34 +258,17 @@ describe("getChannelNameFromSlackChannelString", () => {
 
 
 describe("getChannelIDFromEventText", () => {
-  it("should return the default channel ID from the event text", () => {
-    expect(getChannelIDFromEventText("ask channel status", 3, "12345")).toBe(
-      "12345",
-    );
-    expect(
-      getChannelIDFromEventText("zendesk tickets status", 3, "12345"),
-    ).toBe("12345");
-
-    expect(getChannelIDFromEventText("zigi belo bibi 33223", 3, "12345")).toBe(
-      "12345",
-    );
-
-    expect(getChannelIDFromEventText("", 3, "12345")).toBe("12345");
-  });
-
   it("should return the user-supplied channel ID from the event text", () => {
     expect(
       getChannelIDFromEventText(
         "ask channel status <#C0422HDF13N|tzahi_bot_test>",
         3,
-        "12345",
       ),
     ).toBe("C0422HDF13N");
     expect(
       getChannelIDFromEventText(
         "zendesk tickets status <#C0422HDF13N|tzahi_bot_test>",
         3,
-        "12345",
       ),
     ).toBe("C0422HDF13N");
   });
