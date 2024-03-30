@@ -1,4 +1,4 @@
-import { BOT_SLACK_ID } from "../../settings/team_consts";
+import { BOT_SLACK_ID } from "../../settings/server_consts";
 import { BotAction } from "../base_action";
 import { getRandomFromArray } from "../utils";
 

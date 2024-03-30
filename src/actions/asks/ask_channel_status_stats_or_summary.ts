@@ -8,10 +8,6 @@ import {
   reportChartToSlack,
   reportStatsToSlack,
 } from "../../logic/asks_channel";
-import {
-  TEAM_ASK_CHANNEL_ID,
-  Team,
-} from "../../settings/team_consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../settings/server_consts";
 import { getStartingDate } from "../date_utils";
@@ -84,7 +80,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     // Get the channel ID
     const askChannelId = getChannelIDFromEventText(
       event.text,
-      5,
+      params.channel_id_slot,
     );
 
     const team = findTeamByValue(askChannelId, "ask_channel_id");
@@ -130,6 +126,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
       // Total
       await this.processTotalRequest(
         slackClient,
+        team.ask_channel_id,
         params,
         startingDate,
         endingDate,
@@ -139,6 +136,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     } else {
       await this.processGroupByRequest(
         slackClient,
+        team.ask_channel_id,
         params,
         startingDate,
         endingDate,
@@ -150,6 +148,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
 
   async processTotalRequest(
     slackClient: any,
+    channel_id: string,
     params: AskChannelParams,
     startingDate: any,
     endingDate: any,
@@ -158,7 +157,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
   ) {
     logger.debug("Handling a total request..");
     const stats: AsksChannelStatsResult = await getStatsForMessages(
-      TEAM_ASK_CHANNEL_ID[0],
+      channel_id,
       messages,
       startingDate.toUTCString(),
       endingDate.toUTCString(),
@@ -195,6 +194,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
 
   async processGroupByRequest(
     slackClient: any,
+    channel_id: string,
     params: AskChannelParams,
     startingDate: any,
     endingDate: any,
@@ -205,7 +205,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     const statsArray: AsksChannelStatsResult[] = await getStatsBuckets(
       messages,
       params.groupBy,
-      TEAM_ASK_CHANNEL_ID[0],
+      channel_id,
     );
 
     // TODO: Add a counter to how many bulk we had.

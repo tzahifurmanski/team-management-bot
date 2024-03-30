@@ -7,8 +7,7 @@ import {
 } from "@slack/web-api";
 
 import { Block, DividerBlock, KnownBlock, MrkdwnElement } from "@slack/types";
-import { BOT_SLACK_ID } from "../../settings/team_consts";
-import { botConfig, logger } from "../../settings/server_consts";
+import { botConfig, logger, BOT_SLACK_ID } from "../../settings/server_consts";
 import { ImageBlock } from "@slack/bolt";
 import { SLACK_USER_FORMAT } from "../consts";
 

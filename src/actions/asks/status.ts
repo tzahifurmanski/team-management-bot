@@ -1,5 +1,5 @@
 import { BotAction } from "../base_action";
-import { BOT_SLACK_ID } from "../../settings/team_consts";
+import { BOT_SLACK_ID } from "../../settings/server_consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");

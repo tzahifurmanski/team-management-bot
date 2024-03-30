@@ -1,5 +1,5 @@
 // Return the team that has the given channel ID. If no team has the given channel ID, return the first team in the list. If there are no teams, return an empty object.
-import { Team, TEAMS_LIST } from "./team_consts";
+import { Team, getTeamsList } from "./team_consts";
 
 export function isTeam(obj: any): obj is Team {
   return (
@@ -18,12 +18,12 @@ export function isTeam(obj: any): obj is Team {
 }
 
 // This receives a key and says if we have at least one team that for this key has a value that is not null
-export const isValueInTeams = (value: keyof Team, teams_list=TEAMS_LIST): boolean => {
+export const isValueInTeams = (value: keyof Team, teams_list=getTeamsList()): boolean => {
   return Array.from(teams_list.values()).some((team) => team[value]);
 }
 
 // This receives a value and a key and returns the first team that has this value for this key
 // TODO: if there's more than 1 element, only the first returns. Think if that's a problem
-export const findTeamByValue = (value: string, key: keyof Team, teams_list=TEAMS_LIST): Team | undefined => {
+export const findTeamByValue = (value: string, key: keyof Team, teams_list=getTeamsList()): Team | undefined => {
   return Array.from(teams_list.values()).find((team) => team[key] === value);
 }

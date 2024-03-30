@@ -14,7 +14,8 @@ const team1: Team = {
   zendesk_field_id: "2352324",
   zendesk_field_values: ["vasdas"],
   zendesk_channel_cron: "ZENDESK_CRON1",
-
+  code_review_channel_id : "",
+  code_review_channel_name: "",
 };
 
 const team2: Team = {
@@ -30,6 +31,8 @@ const team2: Team = {
   zendesk_field_id: "2352324",
   zendesk_field_values: ["vasdas"],
   zendesk_channel_cron: "ZENDESK_CRON2",
+  code_review_channel_id : "",
+  code_review_channel_name: "",
 };
 
 const team3: Team = {
@@ -45,6 +48,8 @@ const team3: Team = {
   zendesk_field_id: "2352324",
   zendesk_field_values: ["vasdas"],
   zendesk_channel_cron: "ZENDESK_CRON3",
+  code_review_channel_id : "",
+  code_review_channel_name: "",
 };
 
 const teamsList: Map<string, Team> = new Map([

@@ -12,7 +12,7 @@ import {
   reportStatsToSlack,
 } from "../../logic/asks_channel";
 import {
-  TEAMS_LIST,
+  getTeamsList,
 } from "../../settings/team_consts";
 import { sendSlackMessage } from "../../integrations/slack/messages";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
@@ -28,7 +28,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     if (this.isEnabled()) {
       scheduleAskChannelsCrons(
         SlackWebClient,
-        Array.from(TEAMS_LIST.values()),
+        Array.from(getTeamsList().values()),
         "ask_channel_id",
         "ask_channel_name",
         "ask_channel_cron",
@@ -47,7 +47,7 @@ export class AskChannelStatusForYesterday implements BotAction {
     // Get info for all recurring jobs
     helpMessage += getRecurringJobInfo(
       "ask channel post",
-      Array.from(TEAMS_LIST.values()),
+      Array.from(getTeamsList().values()),
       "ask_channel_id",
       "ask_channel_cron",
     );
