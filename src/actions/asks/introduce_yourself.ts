@@ -1,6 +1,5 @@
 import { BotAction } from "../base_action";
-import { BOT_NAME, botConfig } from "../../settings/server_consts";
-import { BOT_SLACK_ID } from "../../settings/team_consts";
+import { BOT_NAME, BOT_SLACK_ID, botConfig } from "../../settings/server_consts";
 import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday";
 import { Help } from "./help";
 

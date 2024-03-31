@@ -7,7 +7,6 @@ import {
 import { getTicketsByView, showView } from "../../integrations/zendesk/views";
 import {
   TEAMS_LIST,
-  ZENDESK_TICKETS_CHANNEL_ID,
 } from "../../settings/team_consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../settings/server_consts";

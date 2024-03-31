@@ -1,7 +1,7 @@
 import { getRandomFromArray } from "../utils";
 import { BotAction } from "../base_action";
 import { botConfig } from "../../settings/server_consts";
-import { TEAM_CODE_REVIEW_CHANNEL_ID } from "../../settings/team_consts";
+import { isValueInTeams } from "../../settings/team_utils";
 
 const { sendSlackMessage } = require("../../integrations/slack/messages");
 
@@ -16,10 +16,13 @@ export class ReviewRequestResponse implements BotAction {
 
   isEnabled(): boolean {
     // Only if code reviews channel vars are defined, Load the code review actions
-    return !!TEAM_CODE_REVIEW_CHANNEL_ID;
+    return isValueInTeams("code_review_channel_id");
   }
 
   doesMatch(event: any): boolean {
+    // TODO: Does this needs to check for the review channel?
+
+    
     return (
       // TODO: Improve these conditions
       event.text.toLowerCase().includes("https://github.com/snyk") &&

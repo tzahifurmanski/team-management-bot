@@ -67,6 +67,13 @@ if (BOT_NAME) {
   logger.info(`Set up "${botConfig.BOT_NAME}" as the bot name.`);
 }
 
+
+// These will be resolved by the loadConfig function
+export let BOT_SLACK_ID: string;
+export const setBotSlackId = (botId: string) => {
+  BOT_SLACK_ID = botId;
+};
+
 // If we got a bot image, override the default:
 const BOT_IMAGE_URL = process.env.BOT_IMAGE_URL || "";
 if (BOT_IMAGE_URL) {

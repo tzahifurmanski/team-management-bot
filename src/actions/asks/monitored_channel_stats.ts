@@ -7,7 +7,6 @@ import {
   reportMonitoredChannelStatsToSlack,
 } from "../../logic/monitored_channel";
 import {
-  BOT_SLACK_ID,
   MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE,
   MONITORED_CHANNEL_CONDITION_MESSAGE_SUCCESS,
   MONITORED_CHANNEL_CONDITION_USERNAME,
@@ -16,6 +15,7 @@ import {
   MONITORED_CHANNEL_TRIGGER,
   TEAMS_LIST,
 } from "../../settings/team_consts";
+import { BOT_SLACK_ID } from "../../settings/server_consts";
 
 export class MonitoredChannelSummaryStats implements BotAction {
   getHelpText(): string {

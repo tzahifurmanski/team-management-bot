@@ -2,7 +2,7 @@ import {
   isBotAllowed,
   shouldMessageBeSkipped,
 } from "../../../src/integrations/slack/conversations";
-import { setBotSlackId } from "../../../src/settings/team_consts";
+import { setBotSlackId } from "../../../src/settings/server_consts";
 
 describe("isBotAllowed", () => {
   test("Empty list - disallowed", () => {
