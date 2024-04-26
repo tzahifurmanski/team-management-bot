@@ -40,7 +40,7 @@ export class AskChannelStatusForYesterday implements BotAction {
 
   getHelpText(): string {
     let helpMessage =
-      "`ask channel status for yesterday <#CHANNEL_NAME>` - Get the status of requests for the requested team ask channel from yesterday and a current status going back for the last " +
+      "`ask channel status for yesterday #CHANNEL_NAME` - Get the status of requests for the requested team ask channel from yesterday and a current status going back for the last " +
       AskChannelStatusForYesterday.DAYS_BACK +
       " days.";
 
@@ -110,7 +110,7 @@ export class AskChannelStatusForYesterday implements BotAction {
       else {
         await sendSlackMessage(
           slackClient,
-          "Channels is not set up for monitoring. For setting it up, please contact your administrator.",
+          `Channel is not set up for monitoring. For setting it up, please contact your administrator.`,
           event.channel,
           event.thread_ts,
         );

@@ -48,6 +48,8 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     const params: AskChannelParams = getAskChannelParameters(
       sanitizeCommandInput(event.text),
     );
+    logger.trace(`Got the following params: ${JSON.stringify(params)}`);
+
     if (params.error) {
       logger.error(
         `There was an error processing the stats params for ${event.text} command: ${params.error}`,
@@ -100,7 +102,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
       else {
         await sendSlackMessage(
           slackClient,
-          "Channels is not set up for monitoring. For setting it up, please contact your administrator.",
+          `Channel is not set up for monitoring. For setting it up, please contact your administrator.`,
           event.channel,
           event.thread_ts,
         );

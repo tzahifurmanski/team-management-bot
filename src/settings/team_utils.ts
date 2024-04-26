@@ -27,3 +27,8 @@ export const isValueInTeams = (value: keyof Team, teams_list=getTeamsList()): bo
 export const findTeamByValue = (value: string, key: keyof Team, teams_list=getTeamsList()): Team | undefined => {
   return Array.from(teams_list.values()).find((team) => team[key] === value);
 }
+
+// TODO: Handle a case of an empty teams array / index out of bounds and add UT
+export const getTeamByIndex = (teams_list=getTeamsList(), index=0): Team => {
+  return Array.from(teams_list.values())[index];
+}
