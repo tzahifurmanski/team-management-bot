@@ -1,6 +1,5 @@
 import cronstrue from "cronstrue";
 import { AsksChannelStatsResult } from "../logic/asks_channel";
-import { sanitizeCommandInput } from "../integrations/slack/utils";
 import { logger } from "../settings/server_consts";
 import { Team } from "../settings/team_consts";
 
@@ -26,6 +25,8 @@ export class AskChannelParams {
 export const getAskChannelParameters = (ask: string): AskChannelParams => {
   // Check that we got enough params
   const askArray = ask.split(" ");
+  logger.trace(`askArray: ${askArray}`);
+  
   let actionType;
   let groupBy;
   let timeMetric;
@@ -37,7 +38,7 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
   if (askArray.length === 8) {
     // Get values from params
     actionType = askArray[2];
-    channel_id_slot = askArray[3];
+    channel_id_slot = 3;
     count = askArray[4];
     timeMetric = askArray[5];
     groupBy = askArray[7];
@@ -46,7 +47,7 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
   else if (askArray.length === 6) {
     // Get values from params
     actionType = askArray[2];
-    channel_id_slot = askArray[3];
+    channel_id_slot = 3;
 
     // Check if we got 'ask channel stats/status <#CHANNEL_NAME> by days/weeks/months' format
     if (askArray[4] === "by") {
@@ -67,7 +68,7 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
     timeMetric = "days";
     count = 7;
     groupBy = "";
-    channel_id_slot = askArray[3];
+    channel_id_slot = 3;
   } else if (askArray.length === 3) {
     return new AskChannelParams("", -1, "", "", -1, "Missing channel ID");
   }
