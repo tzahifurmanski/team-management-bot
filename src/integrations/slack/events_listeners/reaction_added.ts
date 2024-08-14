@@ -19,11 +19,13 @@ const reactionAddedCallback = async ({ event, client }: any) => {
 
     const team = findTeamByValue(event.item.channel, "ask_channel_id");
     if (!team) {
-      logger.error("Could not find team for ask channel", event.item.channel);
+      logger.error(
+        `Unable to find team for channel ID ${event.item.channel}. Ask: ${event.text}`
+      );
 
       return;
     }
-    
+
     // TODO: Maybe unneeded - Could it be that the bot is adding emojis?
     if (isBotMessage(event)) {
       logger.debug("Got a message from bot, skipping.");
@@ -38,7 +40,7 @@ const reactionAddedCallback = async ({ event, client }: any) => {
       event.item.ts,
       event.item.ts,
       1,
-      true,
+      true
     );
     if (messages.length == 0) {
       // Cant find original message,
