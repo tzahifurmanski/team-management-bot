@@ -74,6 +74,8 @@ export class AskChannelStatusForYesterday implements BotAction {
     event: any,
     slackClient: any,
   ): Promise<void> {
+    try
+    {
     logger.trace(`Entering 'getAskChannelStatsForYesterday' function.`);
 
     if (event.scheduled) {
@@ -223,5 +225,22 @@ export class AskChannelStatusForYesterday implements BotAction {
       true,
       false,
     );
+
+    logger.info(
+      `Successfully posted the daily asks channel stats summary for channel ${team.ask_channel_id}.`,
+    );
+
+    if (event.scheduled) {
+      logger.info(
+        "Concluded a scheduled ask channel stats for yesterday action.",
+      );
+    }
+
+  }
+  catch(E: any) {
+    logger.error(
+      `Had an error while executing getAskChannelStatsForYesterday with the following event ${JSON.stringify(event)}.\n\n - ${E}!`,
+    );
+  }
   }
 }
