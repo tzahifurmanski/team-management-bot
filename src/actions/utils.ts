@@ -26,13 +26,12 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
   // Check that we got enough params
   const askArray = ask.split(" ");
   logger.trace(`askArray: ${askArray}`);
-  
+
   let actionType;
   let groupBy;
   let timeMetric;
   let count;
   let channel_id_slot;
-
 
   // Verify we got exactly 8 params - 'ask channel stats/status <#CHANNEL_NAME> <COUNT> <TIME_PERIOD>' by days/weeks/months
   if (askArray.length === 8) {
@@ -71,15 +70,21 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
     channel_id_slot = 3;
   } else if (askArray.length === 3) {
     return new AskChannelParams("", -1, "", "", -1, "Missing channel ID");
-  }
-  else{
+  } else {
     return new AskChannelParams("", -1, "", "", -1, "Not all params provided");
   }
 
   // Validate the action type
   if (!["stats", "status", "summary"].includes(actionType)) {
     // Return error
-    return new AskChannelParams("", -1, "", "", -1, "Invalid action type provided");
+    return new AskChannelParams(
+      "",
+      -1,
+      "",
+      "",
+      -1,
+      "Invalid action type provided",
+    );
   }
 
   // Validate the number of days
@@ -94,7 +99,14 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
 
   if (!["days", "weeks", "months"].includes(timeMetric)) {
     // Return error
-    return new AskChannelParams("", -1, "", "", -1, "Invalid time metric provided");
+    return new AskChannelParams(
+      "",
+      -1,
+      "",
+      "",
+      -1,
+      "Invalid time metric provided",
+    );
   }
 
   if (groupBy && !["days", "weeks", "months"].includes(groupBy)) {
@@ -191,7 +203,9 @@ export const getChannelIDFromEventText = (
   eventText: any,
   nameIndex: number,
 ): string => {
-  const askChannelID = extractIDFromChannelString(eventText.split(" ")[nameIndex]);
+  const askChannelID = extractIDFromChannelString(
+    eventText.split(" ")[nameIndex],
+  );
   logger.debug(`Found channel ID ${askChannelID}.`);
 
   return askChannelID;

@@ -14,7 +14,7 @@ const team1: Team = {
   zendesk_field_id: "2352324",
   zendesk_field_values: ["vasdas"],
   zendesk_channel_cron: "ZENDESK_CRON1",
-  code_review_channel_id : "",
+  code_review_channel_id: "",
   code_review_channel_name: "",
 };
 
@@ -31,7 +31,7 @@ const team2: Team = {
   zendesk_field_id: "2352324",
   zendesk_field_values: ["vasdas"],
   zendesk_channel_cron: "ZENDESK_CRON2",
-  code_review_channel_id : "",
+  code_review_channel_id: "",
   code_review_channel_name: "",
 };
 
@@ -48,7 +48,7 @@ const team3: Team = {
   zendesk_field_id: "2352324",
   zendesk_field_values: ["vasdas"],
   zendesk_channel_cron: "ZENDESK_CRON3",
-  code_review_channel_id : "",
+  code_review_channel_id: "",
   code_review_channel_name: "",
 };
 
@@ -64,14 +64,21 @@ describe("findTeamByValue", () => {
     expect(result).toEqual(team1);
   });
 
-
   test("Should return the team with matching value for key 'ask_channel_cron'", () => {
-    const result = findTeamByValue("0,35 * * * *", "ask_channel_cron", teamsList);
+    const result = findTeamByValue(
+      "0,35 * * * *",
+      "ask_channel_cron",
+      teamsList,
+    );
     expect(result).toEqual(team2);
   });
 
   test("Should return the team with matching value for key 'zendesk_channel_cron'", () => {
-    const result = findTeamByValue("ZENDESK_CRON1", "zendesk_channel_cron", teamsList);
+    const result = findTeamByValue(
+      "ZENDESK_CRON1",
+      "zendesk_channel_cron",
+      teamsList,
+    );
     expect(result).toEqual(team1);
   });
 
@@ -80,9 +87,12 @@ describe("findTeamByValue", () => {
     expect(result).toEqual(team3);
   });
 
-
   test("Should return the team with matching value for key 'zendesk_channel_name'", () => {
-    const result = findTeamByValue("ZENDESK CHANNEL NAME for Third team", "zendesk_channel_name", teamsList);
+    const result = findTeamByValue(
+      "ZENDESK CHANNEL NAME for Third team",
+      "zendesk_channel_name",
+      teamsList,
+    );
     expect(result).toEqual(team3);
   });
 

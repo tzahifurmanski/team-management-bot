@@ -1,4 +1,4 @@
-const healthcheck = async ({req, res}: any) => {
+const healthcheck = async ({ req, res }: any) => {
   res.sendStatus(200);
 };
 

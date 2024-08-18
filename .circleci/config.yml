@@ -7,7 +7,7 @@ jobs:
   test:
     executor:
       name: node/default
-      tag: '14.19.3'
+      tag: "14.19.3"
     steps:
       - checkout
       - node/install-packages

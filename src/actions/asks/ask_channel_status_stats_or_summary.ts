@@ -1,5 +1,9 @@
 import { BotAction } from "../base_action";
-import { AskChannelParams, getAskChannelParameters, getChannelIDFromEventText } from "../utils";
+import {
+  AskChannelParams,
+  getAskChannelParameters,
+  getChannelIDFromEventText,
+} from "../utils";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -38,7 +42,9 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
     return (
       sanitizeCommandInput(event.text).startsWith("ask channel stats") ||
       (sanitizeCommandInput(event.text).startsWith("ask channel status") &&
-      !sanitizeCommandInput(event.text).startsWith("ask channel status for yesterday")) ||
+        !sanitizeCommandInput(event.text).startsWith(
+          "ask channel status for yesterday",
+        )) ||
       sanitizeCommandInput(event.text).startsWith("ask channel summary")
     );
   }
@@ -55,7 +61,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
         `There was an error processing the stats params for ${event.text} command: ${params.error}`,
       );
 
-      if(params.error === "Missing channel ID") {
+      if (params.error === "Missing channel ID") {
         await sendSlackMessage(
           slackClient,
           `Please provide an asks channel in the form of \`ask channel status #ask-zigi\`.`,
@@ -63,9 +69,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
           event.thread_ts,
         );
         return;
-      }
-      else
-      {
+      } else {
         // TODO: This will override the message about missing channel ID
         throw new Error(
           `There was an error processing the stats params: ${params.error}`,
@@ -98,8 +102,7 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
           event.channel,
           event.thread_ts,
         );
-      }
-      else {
+      } else {
         await sendSlackMessage(
           slackClient,
           `Channel is not set up for monitoring. For setting it up, please contact your administrator.`,
@@ -107,12 +110,11 @@ export class AskChannelStatusStatsOrSummary implements BotAction {
           event.thread_ts,
         );
       }
-  
+
       return;
     }
 
     logger.debug(`Found team for channel ID ${askChannelId}.`);
-
 
     // Get the stats
     const messages: any[any] = await getChannelMessages(

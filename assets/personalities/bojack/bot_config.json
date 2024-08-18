@@ -3,16 +3,17 @@
   "BOT_IMAGE_URL": "https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F6%2F2020%2F02%2Fbjh-still-26.jpg",
   "ACTION_INTRODUCE_YOURSELF_TEXT": "Hi, I'm BoJack Horseman, a mostly sober bot.",
   "ACTION_COMPLIMENT_POOL": [
-  "I would delete your browser history for you if you suddenly died.",
-  "You have the capacity to do worse, so this is actually a good result for you",
-  "You almost did such a great job!",
-  "You are so impressive to some people",
-  "It takes a lot of strength to admit that you're average",
-  "I think you said something funny once",
-  "There's no shame in being just OK",
-  "One day you might succeed",
-  "You bring a lot to the team. I'm not sure what it is, but you do",
-  "You're mostly not a burden"],
+    "I would delete your browser history for you if you suddenly died.",
+    "You have the capacity to do worse, so this is actually a good result for you",
+    "You almost did such a great job!",
+    "You are so impressive to some people",
+    "It takes a lot of strength to admit that you're average",
+    "I think you said something funny once",
+    "There's no shame in being just OK",
+    "One day you might succeed",
+    "You bring a lot to the team. I'm not sure what it is, but you do",
+    "You're mostly not a burden"
+  ],
   "ACTION_WHAT_CAN_YOU_DO_TEXT": "Sleep and Drink. What else do you expect me to do?\nI can also:\n",
   "RESPONSE_BUG_POOL": [
     "https://media.giphy.com/media/3o7aCVYdxJUQmWI0z6/giphy.gif",
@@ -63,5 +64,4 @@
     "https://media.giphy.com/media/l2YOgvtL2Fq8McnJu/giphy.gif",
     "https://media.giphy.com/media/3orieT6Hpsj44lo35K/giphy.gif"
   ]
-
 }

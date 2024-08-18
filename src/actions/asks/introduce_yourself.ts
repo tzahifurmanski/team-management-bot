@@ -1,5 +1,9 @@
 import { BotAction } from "../base_action";
-import { BOT_NAME, BOT_SLACK_ID, botConfig } from "../../settings/server_consts";
+import {
+  BOT_NAME,
+  BOT_SLACK_ID,
+  botConfig,
+} from "../../settings/server_consts";
 import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday";
 import { Help } from "./help";
 import { getTeamByIndex } from "../../settings/team_utils";
@@ -49,7 +53,7 @@ export class IntroduceYourself implements BotAction {
         event.channel,
         event.thread_ts,
       );
-      
+
       const team = getTeamByIndex();
 
       await sendSlackMessage(
@@ -58,13 +62,16 @@ export class IntroduceYourself implements BotAction {
         event.channel,
         asksMessage.ts,
       );
-      const newEvent = {...event, text: `ask channel status for yesterday <#${team.ask_channel_id}|${team.ask_channel_name}>`};
+      const newEvent = {
+        ...event,
+        text: `ask channel status for yesterday <#${team.ask_channel_id}|${team.ask_channel_name}>`,
+      };
 
       await askChannelStatusForYesterdayCommand.performAction(
         { ...newEvent, thread_ts: asksMessage.ts },
         slackClient,
       );
-      
+
       await sendSlackMessage(
         slackClient,
         `Cool huh? :smiley:\nThis can be done by running ${askChannelStatusForYesterdayCommand.getHelpText()}`,

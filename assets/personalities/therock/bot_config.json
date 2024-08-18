@@ -3,14 +3,15 @@
   "BOT_IMAGE_URL": "https://i.redd.it/os0kxad3db041.jpg",
   "ACTION_INTRODUCE_YOURSELF_TEXT": "Finally….. The Rock, Has come back to Slack! \uD83D\uDC4A\n",
   "ACTION_COMPLIMENT_POOL": [
-  "Well if The Rock’s memory serves him correctly, it was The Rock that tossed your little hamburger monkey ass right over the top rope!",
-  "Let The Rock remind you of something. You ain’t no super hero. Not like the Scorpion King.",
-  "Excuse The Rock for one second, his cell phone is going off. Hello? Hey it’s nothing. He says he knows you!",
-  "Seeing that The Rock wasn’t done speaking, you should know your role and shut your mouth!",
-  "The Rock says this: if The Rock hits you, he’ll kill you. If he misses, the wind behind the punch will give you pneumonia and you’ll die anyway, so the choice is yours, Jabroni!",
-  "Just, who in the blue Hell are you?",
-  "You look like a homeless Power Ranger",
-  "Let me tell you how this works. You and you’re Rock’s wanna be hair cut get out of The Rock’s face! Who cut your hair? Ray Charles?"],
+    "Well if The Rock’s memory serves him correctly, it was The Rock that tossed your little hamburger monkey ass right over the top rope!",
+    "Let The Rock remind you of something. You ain’t no super hero. Not like the Scorpion King.",
+    "Excuse The Rock for one second, his cell phone is going off. Hello? Hey it’s nothing. He says he knows you!",
+    "Seeing that The Rock wasn’t done speaking, you should know your role and shut your mouth!",
+    "The Rock says this: if The Rock hits you, he’ll kill you. If he misses, the wind behind the punch will give you pneumonia and you’ll die anyway, so the choice is yours, Jabroni!",
+    "Just, who in the blue Hell are you?",
+    "You look like a homeless Power Ranger",
+    "Let me tell you how this works. You and you’re Rock’s wanna be hair cut get out of The Rock’s face! Who cut your hair? Ray Charles?"
+  ],
   "ACTION_WHAT_CAN_YOU_DO_TEXT": "The Rock will take you down to Know Your Role Boulevard, which is on the corner of Jabroni Drive, and check you directly into the Smackdown Hotel!\nI can also:\n",
   "RESPONSE_BUG_POOL": [
     "https://am22.mediaite.com/tms/cnt/uploads/2016/02/The-Rock.gif",
@@ -58,7 +59,5 @@
     "https://tenor.com/brful.gif",
     "https://tenor.com/bogMD.gif"
   ],
-  "RESPONSE_I_THINK_POOL": [
-    "https://tenor.com/bbXqL.gif"
-  ]
+  "RESPONSE_I_THINK_POOL": ["https://tenor.com/bbXqL.gif"]
 }

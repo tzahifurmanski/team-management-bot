@@ -74,7 +74,6 @@ describe("handleListParameter", () => {
   // TODO: Add more tests for the other (param) scenarios
 });
 
-
 describe("getBoltLogLevel", () => {
   test("Should return ERROR for logLevel 'error'", () => {
     const logLevel = "error";

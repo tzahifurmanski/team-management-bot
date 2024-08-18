@@ -1,5 +1,5 @@
-const receivers = require('./endpoints_listeners');
+const receivers = require("./endpoints_listeners");
 
-module.exports.registerReceivers = (receiver : any) => {
+module.exports.registerReceivers = (receiver: any) => {
   receivers.register(receiver);
 };
