@@ -41,7 +41,8 @@
     "dev-start": "tsc && node dist/server.js",
     "debug": "tsc-watch --project tsconfig.json --onSuccess 'node dist/server.js'",
     "test": "cross-env NODE_ENV=test ENV_FILE=.tests_env jest --testTimeout=10000",
-    "coverage": "cross-env NODE_ENV=test ENV_FILE=.tests_env jest --testTimeout=10000 --collectCoverage=true"
+    "coverage": "cross-env NODE_ENV=test ENV_FILE=.tests_env jest --testTimeout=10000 --collectCoverage=true",
+    "prettier:check:ci": "./node_modules/.bin/prettier --check ."
   },
   "engines": {
     "node": "^16 || ^18",
