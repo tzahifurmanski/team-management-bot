@@ -21,7 +21,7 @@ export class MeaningOfLife implements BotAction {
       slackClient,
       `42`,
       event.channel,
-      event.thread_ts ? event.thread_ts : event.ts
+      event.thread_ts ? event.thread_ts : event.ts,
     );
   }
 }

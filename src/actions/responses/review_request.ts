@@ -22,7 +22,6 @@ export class ReviewRequestResponse implements BotAction {
   doesMatch(event: any): boolean {
     // TODO: Does this needs to check for the review channel?
 
-    
     return (
       // TODO: Improve these conditions
       event.text.toLowerCase().includes("https://github.com/snyk") &&

@@ -7,12 +7,16 @@ jobs:
   test:
     executor:
       name: node/default
-      tag: '14.19.3'
+      tag: "14.19.3"
     steps:
       - checkout
       - node/install-packages
       - run:
+          name: "Run Coverage"
           command: npm run coverage
+      - run:
+          name: "Run Prettier"
+          command: npm run prettier:check:ci
       - store_artifacts:
           path: coverage
       - codecov/upload

@@ -5,9 +5,7 @@ import {
   sendSlackMessage,
 } from "../../integrations/slack/messages";
 import { getTicketsByView, showView } from "../../integrations/zendesk/views";
-import {
-  TEAMS_LIST,
-} from "../../settings/team_consts";
+import { TEAMS_LIST } from "../../settings/team_consts";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { logger } from "../../settings/server_consts";
 import {
@@ -65,10 +63,7 @@ export class ZendeskTicketsStatus implements BotAction {
       isZendeskChannel,
     );
 
-    return (
-      isZendeskSetup &&
-      isZendeskChannel
-    );
+    return isZendeskSetup && isZendeskChannel;
   }
 
   doesMatch(event: any): boolean {
@@ -95,10 +90,7 @@ export class ZendeskTicketsStatus implements BotAction {
       slackClient = SlackWebClient;
     }
 
-    const askChannelId = getChannelIDFromEventText(
-      event.text,
-      3,
-    );
+    const askChannelId = getChannelIDFromEventText(event.text, 3);
 
     const team = findTeamByValue(askChannelId, "ask_channel_id");
 
@@ -120,15 +112,14 @@ export class ZendeskTicketsStatus implements BotAction {
 
     const viewData: any = await showView(team.zendesk_monitored_view_id);
 
-    const tickets: any[] = await getTicketsByView(team.zendesk_monitored_view_id);
+    const tickets: any[] = await getTicketsByView(
+      team.zendesk_monitored_view_id,
+    );
 
     // Check if we need to filter the tickets
     // TODO: This won't work if it's using a regular field (vs custom field)
     let filteredTickets: any[];
-    if (
-      team.zendesk_field_id &&
-      team.zendesk_field_values.length > 0
-    ) {
+    if (team.zendesk_field_id && team.zendesk_field_values.length > 0) {
       filteredTickets = tickets.filter(
         (ticket: any) =>
           !ticket.custom_fields ||
@@ -158,7 +149,6 @@ export class ZendeskTicketsStatus implements BotAction {
     if (filteredTickets.length > 0) {
       messageBlocks.push(createDivider());
 
-
       const aggregateBuckets = new Map<string, number>();
 
       for (const item of filteredTickets) {
@@ -176,7 +166,8 @@ export class ZendeskTicketsStatus implements BotAction {
 
           // Look for an aggregation key in the custom fields
           const customFieldsAggKey = item.custom_fields.filter(
-            (field: any) => field.id.toString() === team.zendesk_aggregated_field_id,
+            (field: any) =>
+              field.id.toString() === team.zendesk_aggregated_field_id,
           );
 
           // Either get the aggregated key value from the default field, or from the custom fields
@@ -210,7 +201,10 @@ export class ZendeskTicketsStatus implements BotAction {
       // If we're in aggregated mode, create the aggregated message
       if (team.zendesk_aggregated_field_id && aggregateBuckets.size > 0) {
         messageBlocks.push(
-          createAggregateMessage(aggregateBuckets, team.zendesk_aggregated_field_id),
+          createAggregateMessage(
+            aggregateBuckets,
+            team.zendesk_aggregated_field_id,
+          ),
         );
       }
     }

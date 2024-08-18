@@ -8,13 +8,12 @@ import { Profile } from "@slack/web-api/dist/response/UsersProfileGetResponse";
 
 export const getUserProfile = async (
   slackClient: any,
-  user: string
+  user: string,
 ): Promise<Profile | undefined> => {
   const options: UsersProfileGetArguments = { user };
 
   // This can also return response.user with the bot username
-  const response: UsersProfileGetResponse = await slackClient.users.profile.get(
-    options
-  );
+  const response: UsersProfileGetResponse =
+    await slackClient.users.profile.get(options);
   return response?.profile;
 };

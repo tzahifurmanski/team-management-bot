@@ -36,15 +36,12 @@ export interface Team {
   code_review_channel_name: string;
 }
 
-
 // A teams list with the ask channel id as the key
 export const TEAMS_LIST = new Map<string, Team>();
 
-export const getTeamsList= () : Map<string, Team> => {
+export const getTeamsList = (): Map<string, Team> => {
   return TEAMS_LIST;
-}
-
-
+};
 
 // TODO: Move this
 // User profile field ids
@@ -61,9 +58,6 @@ export const USER_PROFILE_FIELD_ID_DIVISION =
 const GROUP_ASK_CHANNELS: string = process.env.GROUP_ASK_CHANNELS || "";
 export let GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
 
-
-
-
 // TODO: This also doesn't support multi teams
 // Monitored Channel Configurations
 export const MONITORED_CHANNEL_ID: string =
@@ -78,8 +72,6 @@ export const MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE: string =
   process.env.MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE || "";
 export const MONITORED_CHANNEL_TRIGGER: string =
   process.env.MONITORED_CHANNEL_TRIGGER || "";
-
-
 
 // This function loads the config from the environment variables.
 // It also:
@@ -100,7 +92,7 @@ export const loadConfig = async (slackClient: any) => {
     );
     const TEAM_ASK_CHANNEL_NAME: string[] = handleListParameter(
       process.env.TEAM_ASK_CHANNEL_NAME,
-    );    
+    );
 
     let TEAM_CODE_REVIEW_CHANNEL_ID: string[] = handleListParameter(
       process.env.TEAM_CODE_REVIEW_CHANNEL_ID,
@@ -108,14 +100,14 @@ export const loadConfig = async (slackClient: any) => {
       ",",
       false,
     );
-    
+
     const TEAM_CODE_REVIEW_CHANNEL_NAME: string[] = handleListParameter(
       process.env.TEAM_CODE_REVIEW_CHANNEL_NAME,
       "",
       ",",
       false,
     );
-    
+
     const ALLOWED_BOTS: string[] = handleListParameter(
       process.env.ALLOWED_BOTS,
       "",
@@ -123,7 +115,6 @@ export const loadConfig = async (slackClient: any) => {
       false,
     );
 
-  
     // Zendesk Tickets Status Configurations
     const ZENDESK_MONITORED_VIEW = handleListParameter(
       process.env.ZENDESK_MONITORED_VIEW,
@@ -136,14 +127,13 @@ export const loadConfig = async (slackClient: any) => {
       false,
     );
 
-    const MONITORED_ZENDESK_FILTER_FIELD_VALUES: string[] =
-    handleListParameter(
+    const MONITORED_ZENDESK_FILTER_FIELD_VALUES: string[] = handleListParameter(
       process.env.MONITORED_ZENDESK_FILTER_FIELD_VALUES,
       "",
       "|",
       false,
     );
-                                                                                                         
+
     const ZENDESK_VIEW_AGGREGATED_FIELD_ID = handleListParameter(
       process.env.ZENDESK_VIEW_AGGREGATED_FIELD_ID,
       "",
@@ -163,8 +153,6 @@ export const loadConfig = async (slackClient: any) => {
       ",",
       false,
     );
-
-
 
     if (TEAM_ASK_CHANNEL_ID.length === 0) {
       // If there are no channel ids, resolve them by names
@@ -254,7 +242,7 @@ export const loadConfig = async (slackClient: any) => {
     // TODO: Temporarily, add the current settings to a team JSON
     //  Also, this assumes all arrays are the same length, which is incorrect
     TEAM_ASK_CHANNEL_ID.forEach((channelId, index) => {
-      const team : Team = {
+      const team: Team = {
         ask_channel_id: channelId,
         ask_channel_name: TEAM_ASK_CHANNEL_NAME[index],
         ask_channel_cron: ASK_CHANNEL_STATS_CRON[index],
@@ -264,14 +252,19 @@ export const loadConfig = async (slackClient: any) => {
         zendesk_monitored_view_id: ZENDESK_MONITORED_VIEW[index],
         zendesk_aggregated_field_id: ZENDESK_VIEW_AGGREGATED_FIELD_ID[index],
         zendesk_field_id: MONITORED_ZENDESK_FILTER_FIELD_ID[index] || "",
-        zendesk_field_values: (index < MONITORED_ZENDESK_FILTER_FIELD_VALUES.length ? MONITORED_ZENDESK_FILTER_FIELD_VALUES[index] : '').split(","),
+        zendesk_field_values: (index <
+        MONITORED_ZENDESK_FILTER_FIELD_VALUES.length
+          ? MONITORED_ZENDESK_FILTER_FIELD_VALUES[index]
+          : ""
+        ).split(","),
         zendesk_channel_cron: ZENDESK_TICKETS_STATS_CRON[index],
-        ask_channel_cron_last_sent: new Date(new Date().setDate(new Date().getDate() - 1)), // Initialize date and time which is exactly one day before the current date and time.
+        ask_channel_cron_last_sent: new Date(
+          new Date().setDate(new Date().getDate() - 1),
+        ), // Initialize date and time which is exactly one day before the current date and time.
 
-        code_review_channel_id : TEAM_CODE_REVIEW_CHANNEL_ID[index] || "",
-        code_review_channel_name : TEAM_CODE_REVIEW_CHANNEL_NAME[index] || "",
+        code_review_channel_id: TEAM_CODE_REVIEW_CHANNEL_ID[index] || "",
+        code_review_channel_name: TEAM_CODE_REVIEW_CHANNEL_NAME[index] || "",
       };
-    
 
       TEAMS_LIST.set(channelId, team);
     });

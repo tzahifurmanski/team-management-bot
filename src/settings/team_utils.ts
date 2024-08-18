@@ -18,17 +18,27 @@ export function isTeam(obj: any): obj is Team {
 }
 
 // This receives a key and says if we have at least one team that for this key has a value that is not null
-export const isValueInTeams = (value: keyof Team, teams_list=getTeamsList()): boolean => {
+export const isValueInTeams = (
+  value: keyof Team,
+  teams_list = getTeamsList(),
+): boolean => {
   return Array.from(teams_list.values()).some((team) => team[value]);
-}
+};
 
 // This receives a value and a key and returns the first team that has this value for this key
 // TODO: if there's more than 1 element, only the first returns. Think if that's a problem
-export const findTeamByValue = (value: string, key: keyof Team, teams_list=getTeamsList()): Team | undefined => {
+export const findTeamByValue = (
+  value: string,
+  key: keyof Team,
+  teams_list = getTeamsList(),
+): Team | undefined => {
   return Array.from(teams_list.values()).find((team) => team[key] === value);
-}
+};
 
 // TODO: Handle a case of an empty teams array / index out of bounds and add UT
-export const getTeamByIndex = (teams_list=getTeamsList(), index=0): Team => {
+export const getTeamByIndex = (
+  teams_list = getTeamsList(),
+  index = 0,
+): Team => {
   return Array.from(teams_list.values())[index];
-}
+};

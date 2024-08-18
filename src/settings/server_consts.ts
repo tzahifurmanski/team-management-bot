@@ -67,7 +67,6 @@ if (BOT_NAME) {
   logger.info(`Set up "${botConfig.BOT_NAME}" as the bot name.`);
 }
 
-
 // These will be resolved by the loadConfig function
 export let BOT_SLACK_ID: string;
 export const setBotSlackId = (botId: string) => {

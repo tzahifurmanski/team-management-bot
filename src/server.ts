@@ -8,7 +8,6 @@ import { SLACK_SIGNING_SECRET } from "./integrations/consts";
 
 const { version } = require("../package.json");
 
-
 const receiver = new ExpressReceiver({ signingSecret: SLACK_SIGNING_SECRET });
 
 const boltApp = new App({
@@ -17,7 +16,6 @@ const boltApp = new App({
   logLevel: getBoltLogLevel(process.env.BOLT_LOG_LEVEL),
   receiver: receiver,
 });
-
 
 (async () => {
   // Print server time
