@@ -59,8 +59,11 @@ export class AskChannelStatusForYesterday implements BotAction {
   }
 
   doesMatch(event: any): boolean {
-    return sanitizeCommandInput(event.text).startsWith(
-      "ask channel status for yesterday",
+    const sanitizedCommand = sanitizeCommandInput(event.text);
+
+    return (
+      sanitizedCommand.startsWith("ask channel status for yesterday") &&
+      sanitizedCommand.split(" ").length >= 6
     );
   }
 
