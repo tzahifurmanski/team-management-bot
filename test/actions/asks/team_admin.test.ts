@@ -182,6 +182,25 @@ describe("TeamAdmin", () => {
     expect(secondDetailCall).toContain("*Team #6: test-ask-6*");
   });
 
+  test("no teams to list", async () => {
+    // Mock authorization check to succeed
+    (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+    // Set event text
+    mockEvent.text = "team list";
+
+    // Call performAction
+    await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+    // Check that summary message was sent
+    expect(sendSlackMessage).toHaveBeenCalledWith(
+      mockSlackClient,
+      expect.stringContaining("No teams are currently configured."),
+      mockEvent.channel,
+      mockEvent.thread_ts,
+    );
+  });
+
   test("chunkArray should correctly divide teams", () => {
     // Create test data
     const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -191,5 +210,36 @@ describe("TeamAdmin", () => {
 
     // Verify chunking
     expect(chunkedArray).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]);
+  });
+
+  test("getHelpText returns expected help description", () => {
+    const helpText = teamAdmin.getHelpText();
+    expect(helpText).toContain("team admin");
+    expect(helpText).toContain("Admin commands");
+    expect(helpText).toContain("restricted to authorized admins");
+  });
+
+  test("should show help information when 'team help' is used", async () => {
+    // Set event text
+    mockEvent.text = "team help";
+
+    // Call performAction
+    await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+    // Check help message was sent
+    expect(sendSlackMessage).toHaveBeenCalledTimes(1);
+    expect(sendSlackMessage).toHaveBeenCalledWith(
+      mockSlackClient,
+      expect.any(String),
+      mockEvent.channel,
+      mockEvent.thread_ts,
+    );
+
+    // Get the help message content
+    const helpMessage = (sendSlackMessage as jest.Mock).mock.calls[0][1];
+
+    // Verify help content includes essential sections
+    expect(helpMessage).toContain("Team Administration Commands");
+    expect(helpMessage).toContain("team list");
   });
 });
