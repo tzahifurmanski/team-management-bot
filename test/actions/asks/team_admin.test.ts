@@ -78,7 +78,7 @@ describe("TeamAdmin", () => {
     expect(teamAdmin.doesMatch({ text: "team list" })).toBe(true);
     expect(teamAdmin.doesMatch({ text: "team add" })).toBe(true);
     expect(teamAdmin.doesMatch({ text: "team remove" })).toBe(true);
-    expect(teamAdmin.doesMatch({ text: "teams" })).toBe(false);
+    expect(teamAdmin.doesMatch({ text: "teams list" })).toBe(false);
     expect(teamAdmin.doesMatch({ text: "help" })).toBe(false);
   });
 
@@ -126,27 +126,29 @@ describe("TeamAdmin", () => {
     );
   });
 
-  test("should list teams", async () => {
+  test("should list teams in the new format", async () => {
     // Mock authorization check to succeed
     (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
 
-    // Add a test team
-    TEAMS_LIST.set("C12345", {
-      ask_channel_id: "C12345",
-      ask_channel_name: "test-ask",
-      ask_channel_cron: "0 9 * * 1-5",
-      ask_channel_cron_last_sent: new Date(),
-      allowed_bots: ["TestBot"],
-      zendesk_channel_id: "C67890",
-      zendesk_channel_name: "test-zendesk",
-      zendesk_monitored_view_id: "123456",
-      zendesk_aggregated_field_id: "",
-      zendesk_field_id: "",
-      zendesk_field_values: [],
-      zendesk_channel_cron: "",
-      code_review_channel_id: "",
-      code_review_channel_name: "",
-    });
+    // Add test teams (adding 6 to test chunking)
+    for (let i = 1; i <= 6; i++) {
+      TEAMS_LIST.set(`C1234${i}`, {
+        ask_channel_id: `C1234${i}`,
+        ask_channel_name: `test-ask-${i}`,
+        ask_channel_cron: i % 2 === 0 ? "0 9 * * 1-5" : "",
+        ask_channel_cron_last_sent: new Date(),
+        allowed_bots: i % 3 === 0 ? ["TestBot"] : [],
+        zendesk_channel_id: i % 2 === 0 ? `C6789${i}` : "",
+        zendesk_channel_name: i % 2 === 0 ? `test-zendesk-${i}` : "",
+        zendesk_monitored_view_id: i % 2 === 0 ? "123456" : "",
+        zendesk_aggregated_field_id: "",
+        zendesk_field_id: "",
+        zendesk_field_values: [],
+        zendesk_channel_cron: "",
+        code_review_channel_id: "",
+        code_review_channel_name: "",
+      });
+    }
 
     // Set event text
     mockEvent.text = "team list";
@@ -154,56 +156,40 @@ describe("TeamAdmin", () => {
     // Call performAction
     await teamAdmin.performAction(mockEvent, mockSlackClient);
 
-    // Check list message was sent
+    // Check that summary message was sent
     expect(sendSlackMessage).toHaveBeenCalledWith(
       mockSlackClient,
-      expect.stringContaining("Configured Teams"),
+      expect.stringContaining("Team Configuration Summary"),
       mockEvent.channel,
       mockEvent.thread_ts
     );
+
+    // Check that summary contains the table header
+    const summaryCall = (sendSlackMessage as jest.Mock).mock.calls[0][1];
+    expect(summaryCall).toContain("| # | Team Name | Ask Channel |");
+
+    // Check that detail messages were sent - should be 2 chunks of 5 teams
+    expect(sendSlackMessage).toHaveBeenCalledTimes(3); // Summary + 2 detail messages
+
+    // Check first detail message
+    const firstDetailCall = (sendSlackMessage as jest.Mock).mock.calls[1][1];
+    expect(firstDetailCall).toContain("Detailed Team Information (1-5)");
+    expect(firstDetailCall).toContain("*Team #1: test-ask-1*");
+
+    // Check second detail message
+    const secondDetailCall = (sendSlackMessage as jest.Mock).mock.calls[2][1];
+    expect(secondDetailCall).toContain("Detailed Team Information (6-6)");
+    expect(secondDetailCall).toContain("*Team #6: test-ask-6*");
   });
 
-//   test("should handle confirmation request for team removal", async () => {
-//     // Mock authorization check to succeed
-//     (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+  test("chunkArray should correctly divide teams", () => {
+    // Create test data
+    const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-//     // Mock confirmation request
-//     (adminAuthService.requestConfirmation as jest.Mock).mockReturnValue(
-//       "abc123"
-//     );
+    // Access private method using type assertion
+    const chunkedArray = (teamAdmin as any).chunkArray(testArray, 3);
 
-//     // Add a test team
-//     TEAMS_LIST.set("C12345", {
-//       ask_channel_id: "C12345",
-//       ask_channel_name: "test-ask",
-//       ask_channel_cron: "0 9 * * 1-5",
-//       ask_channel_cron_last_sent: new Date(),
-//       allowed_bots: ["TestBot"],
-//       zendesk_channel_id: "",
-//       zendesk_channel_name: "",
-//       zendesk_monitored_view_id: "",
-//       zendesk_aggregated_field_id: "",
-//       zendesk_field_id: "",
-//       zendesk_field_values: [],
-//       zendesk_channel_cron: "",
-//       code_review_channel_id: "",
-//       code_review_channel_name: "",
-//     });
-
-//     // Set event text
-//     mockEvent.text = "team remove <#C12345|test-ask>";
-
-//     // Call performAction
-//     await teamAdmin.performAction(mockEvent, mockSlackClient);
-
-//     // Check confirmation message was sent
-//     expect(sendSlackMessage).toHaveBeenCalledWith(
-//       mockSlackClient,
-//       expect.stringContaining("Are you sure you want to remove"),
-//       mockEvent.channel,
-//       mockEvent.thread_ts
-//     );
-//   });
-
-//   // Additional tests for other functionality...
-// });
+    // Verify chunking
+    expect(chunkedArray).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]);
+  });
+});

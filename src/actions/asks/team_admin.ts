@@ -5,22 +5,8 @@ import { sendSlackMessage } from "../../integrations/slack/messages";
 import { sanitizeCommandInput } from "../../integrations/slack/utils";
 import { adminAuthService } from "../../services/AdminAuthorizationService";
 import { TEAMS_LIST } from "../../settings/team_consts";
-import {
-  extractIDFromChannelString,
-  extractNameFromChannelString,
-} from "../utils";
-import { SlackWebClient } from "../../integrations/consts";
-
-// Store pending confirmation requests
-// interface ConfirmationRequest {
-//   action: string;
-//   actionArgs: any;
-//   expiryTime: number;
-// }
 
 export class TeamAdmin implements BotAction {
-  //   private pendingConfirmations: Map<string, ConfirmationRequest> = new Map();
-
   getHelpText(): string {
     return "`team admin` - Admin commands for managing teams (restricted to authorized admins)";
   }
@@ -30,23 +16,12 @@ export class TeamAdmin implements BotAction {
   }
 
   doesMatch(event: any): boolean {
-    return sanitizeCommandInput(event.text).startsWith("team");
+    return sanitizeCommandInput(event.text).startsWith("team ");
   }
 
   async performAction(event: any, slackClient: any): Promise<void> {
     const command = sanitizeCommandInput(event.text);
 
-    // // Check if this is a confirmation
-    // if (command.startsWith("confirm")) {
-    //   await this.handleConfirmation(
-    //     command.substring("confirm".length).trim(),
-    //     event,
-    //     slackClient
-    //   );
-    //   return;
-    // }
-
-    // For all other commands, check authorization
     if (!adminAuthService.isAuthorized(event.user, command)) {
       await sendSlackMessage(
         slackClient,

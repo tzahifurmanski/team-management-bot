@@ -85,54 +85,5 @@ describe("AdminAuthorizationService", () => {
     expect(authService.isAuthorized("U12345", "help")).toBe(true);
     expect(authService.isAuthorized("U67890", "status")).toBe(true);
     expect(authService.isAuthorized("U99999", "help")).toBe(true);
-//   });
-
-//   test("should support confirmation flow", () => {
-//     // Set up environment
-//     process.env.ADMIN_USER_IDS = "U12345,U67890";
-//     process.env.ADMIN_COMMANDS = "team,admin,config";
-//     process.env.ADMIN_REQUIRE_CONFIRMATION = "true";
-
-//     const authService = new AdminAuthorizationService();
-
-//     // Request confirmation
-//     const token = authService.requestConfirmation("U12345", "delete team");
-
-//     // Confirmation should succeed for same user
-//     expect(authService.confirmAction(token, "U12345")).toBe(true);
-
-//     // Token should be consumed
-//     expect(authService.confirmAction(token, "U12345")).toBe(false);
-//   });
-
-//   test("should reject confirmation from wrong user", () => {
-//     // Set up environment
-//     process.env.ADMIN_USER_IDS = "U12345,U67890";
-//     process.env.ADMIN_COMMANDS = "team,admin,config";
-//     process.env.ADMIN_REQUIRE_CONFIRMATION = "true";
-
-//     const authService = new AdminAuthorizationService();
-
-//     // Request confirmation
-//     const token = authService.requestConfirmation("U12345", "delete team");
-
-//     // Confirmation should fail for different user
-//     expect(authService.confirmAction(token, "U67890")).toBe(false);
-//   });
-
-//   test("should bypass confirmation if disabled", () => {
-//     // Set up environment
-//     process.env.ADMIN_USER_IDS = "U12345,U67890";
-//     process.env.ADMIN_COMMANDS = "team,admin,config";
-//     process.env.ADMIN_REQUIRE_CONFIRMATION = "false";
-
-//     const authService = new AdminAuthorizationService();
-
-//     // Request confirmation (should return special token)
-//     const token = authService.requestConfirmation("U12345", "delete team");
-//     expect(token).toBe("no-confirmation-required");
-
-//     // Confirmation should succeed without checking token
-//     expect(authService.confirmAction("any-token", "U12345")).toBe(true);
-//   });
-// });
+  });
+});
