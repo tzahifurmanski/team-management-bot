@@ -27,7 +27,7 @@ export class TeamAdmin implements BotAction {
         slackClient,
         "Sorry, you're not authorized to perform admin commands. Please contact a bot administrator if you need assistance.",
         event.channel,
-        event.thread_ts
+        event.thread_ts,
       );
       return;
     }
@@ -62,14 +62,14 @@ export class TeamAdmin implements BotAction {
           slackClient,
           "No teams are currently configured.",
           event.channel,
-          event.thread_ts
+          event.thread_ts,
         );
         return;
       }
 
       // Convert teams to array for processing
       const teamsArray = Array.from(TEAMS_LIST.entries()).map(
-        ([channelId, team]) => team
+        ([channelId, team]) => team,
       );
 
       // Create summary message
@@ -78,7 +78,7 @@ export class TeamAdmin implements BotAction {
         slackClient,
         summaryMessage,
         event.channel,
-        event.thread_ts
+        event.thread_ts,
       );
 
       // Create detailed team listings - split into multiple messages to avoid formatting issues
@@ -88,13 +88,13 @@ export class TeamAdmin implements BotAction {
       for (const chunk of teamChunks) {
         const detailMessage = this.createDetailedTeamMessage(
           chunk,
-          teamsArray.indexOf(chunk[0])
+          teamsArray.indexOf(chunk[0]),
         );
         await sendSlackMessage(
           slackClient,
           detailMessage,
           event.channel,
-          event.thread_ts
+          event.thread_ts,
         );
       }
     } catch (error) {
@@ -103,7 +103,7 @@ export class TeamAdmin implements BotAction {
         slackClient,
         "An error occurred while listing teams. Please check the logs for details.",
         event.channel,
-        event.thread_ts
+        event.thread_ts,
       );
     }
   }
@@ -139,7 +139,7 @@ export class TeamAdmin implements BotAction {
    */
   private createDetailedTeamMessage(
     teamChunk: any[],
-    startIndex: number
+    startIndex: number,
   ): string {
     let message = `*Detailed Team Information (${startIndex + 1}-${startIndex + teamChunk.length})*\n\n`;
 
@@ -207,7 +207,7 @@ export class TeamAdmin implements BotAction {
       slackClient,
       helpText,
       event.channel,
-      event.thread_ts
+      event.thread_ts,
     );
   }
 }

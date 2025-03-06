@@ -87,3 +87,12 @@ MONITORED_ZENDESK_FILTER_FIELD_VALUES= # Optional. A list of allowed values for 
 ZENDESK_TICKETS_CHANNEL_ID= # A comma (',') separated list of IDs of the Slack channels to report a status in.
 ZENDESK_TICKETS_CHANNEL_NAME= # A comma (',') separated list of Names of the Slack channels to report a status in.
 ZENDESK_TICKETS_STATS_CRON= # A separator ('|') separated list of cron expressions for the bot to post a status in.
+
+
+
+# Admin Authorization
+====================
+ADMIN_USER_IDS=U12345678,U87654321  # Comma-separated list of Slack user IDs who are admins
+ADMIN_COMMANDS=team                 # Commands that require admin authorization
+ADMIN_LOG_ACTIONS=true              # Whether to log admin actions (recommended for security)
+ADMIN_REQUIRE_CONFIRMATION=true     # Require confirmation for destructive operations

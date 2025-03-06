@@ -95,7 +95,7 @@ describe("TeamAdmin", () => {
     // Check authorization was called
     expect(adminAuthService.isAuthorized).toHaveBeenCalledWith(
       "U12345",
-      "team list"
+      "team list",
     );
 
     // Check error message was sent
@@ -103,7 +103,7 @@ describe("TeamAdmin", () => {
       mockSlackClient,
       expect.stringContaining("not authorized"),
       mockEvent.channel,
-      mockEvent.thread_ts
+      mockEvent.thread_ts,
     );
   });
 
@@ -122,7 +122,7 @@ describe("TeamAdmin", () => {
       mockSlackClient,
       expect.stringContaining("Team Administration Commands"),
       mockEvent.channel,
-      mockEvent.thread_ts
+      mockEvent.thread_ts,
     );
   });
 
@@ -161,7 +161,7 @@ describe("TeamAdmin", () => {
       mockSlackClient,
       expect.stringContaining("Team Configuration Summary"),
       mockEvent.channel,
-      mockEvent.thread_ts
+      mockEvent.thread_ts,
     );
 
     // Check that summary contains the table header

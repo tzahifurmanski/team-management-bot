@@ -28,7 +28,7 @@ export class AdminAuthorizationService {
 
     // Load admin commands
     this.adminCommands = handleListParameter(
-      process.env.ADMIN_COMMANDS || "team"
+      process.env.ADMIN_COMMANDS || "team",
     );
 
     // Parse boolean values safely
@@ -57,7 +57,7 @@ export class AdminAuthorizationService {
   public isAdminCommand(command: string): boolean {
     // Check if any admin command is a prefix of the given command
     return this.adminCommands.some((adminCommand) =>
-      command.startsWith(adminCommand)
+      command.startsWith(adminCommand),
     );
   }
 
@@ -79,7 +79,7 @@ export class AdminAuthorizationService {
     // Log the authorization check if enabled
     if (this.logActions) {
       logger.info(
-        `Admin authorization check: User ${userId} ${isAdmin ? "allowed" : "denied"} for command "${command}"`
+        `Admin authorization check: User ${userId} ${isAdmin ? "allowed" : "denied"} for command "${command}"`,
       );
     }
 
