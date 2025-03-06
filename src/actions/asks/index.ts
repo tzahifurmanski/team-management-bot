@@ -10,6 +10,7 @@ import { ZendeskTicketsStatus } from "./zendesk_tickets_status";
 import { Help } from "./help";
 import { Status } from "./status";
 import { logger } from "../../settings/server_consts";
+import { TeamAdmin } from "./team_admin";
 
 const helpCommand = new Help();
 const ACTIONS_LIST: BotAction[] = [
@@ -21,6 +22,7 @@ const ACTIONS_LIST: BotAction[] = [
   new Compliment(),
   new MeaningOfLife(),
   new Status(),
+  new TeamAdmin(),
   helpCommand,
   new IntroduceYourself(helpCommand),
 ];
