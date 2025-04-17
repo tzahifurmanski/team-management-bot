@@ -3,6 +3,7 @@ import { TeamAdmin } from "../../../src/actions/asks/team_admin";
 import { adminAuthService } from "../../../src/services/AdminAuthorizationService";
 import { TEAMS_LIST } from "../../../src/settings/team_consts";
 import { sendSlackMessage } from "../../../src/integrations/slack/messages";
+import { TeamService } from "../../../src/services/TeamService";
 
 // Mock dependencies
 jest.mock("../../../src/services/AdminAuthorizationService", () => ({
@@ -36,6 +37,14 @@ jest.mock("../../../src/actions/utils", () => ({
     const match = input.match(/<#[A-Z0-9]+\|(.+)>/);
     return match ? match[1] : null;
   }),
+}));
+
+jest.mock("../../../src/services/TeamService", () => ({
+  TeamService: {
+    createTeam: jest.fn(),
+    updateTeam: jest.fn(),
+    deleteTeam: jest.fn(),
+  },
 }));
 
 describe("TeamAdmin", () => {
@@ -95,7 +104,7 @@ describe("TeamAdmin", () => {
     // Check authorization was called
     expect(adminAuthService.isAuthorized).toHaveBeenCalledWith(
       "U12345",
-      "team list",
+      "team list"
     );
 
     // Check error message was sent
@@ -103,7 +112,7 @@ describe("TeamAdmin", () => {
       mockSlackClient,
       expect.stringContaining("not authorized"),
       mockEvent.channel,
-      mockEvent.thread_ts,
+      mockEvent.thread_ts
     );
   });
 
@@ -122,7 +131,7 @@ describe("TeamAdmin", () => {
       mockSlackClient,
       expect.stringContaining("Team Administration Commands"),
       mockEvent.channel,
-      mockEvent.thread_ts,
+      mockEvent.thread_ts
     );
   });
 
@@ -161,7 +170,7 @@ describe("TeamAdmin", () => {
       mockSlackClient,
       expect.stringContaining("Team Configuration Summary"),
       mockEvent.channel,
-      mockEvent.thread_ts,
+      mockEvent.thread_ts
     );
 
     // Check that summary contains the table header
@@ -197,7 +206,7 @@ describe("TeamAdmin", () => {
       mockSlackClient,
       expect.stringContaining("No teams are currently configured."),
       mockEvent.channel,
-      mockEvent.thread_ts,
+      mockEvent.thread_ts
     );
   });
 
@@ -232,7 +241,7 @@ describe("TeamAdmin", () => {
       mockSlackClient,
       expect.any(String),
       mockEvent.channel,
-      mockEvent.thread_ts,
+      mockEvent.thread_ts
     );
 
     // Get the help message content
@@ -241,5 +250,492 @@ describe("TeamAdmin", () => {
     // Verify help content includes essential sections
     expect(helpMessage).toContain("Team Administration Commands");
     expect(helpMessage).toContain("team list");
+  });
+
+  describe("addTeam", () => {
+    test("should add a new team successfully", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+      (TeamService.createTeam as jest.Mock).mockResolvedValue(true);
+
+      // Set event text
+      mockEvent.text = "team add <#C12345|test-channel> 0 9 * * 1-5";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check that TeamService.createTeam was called
+      expect(TeamService.createTeam).toHaveBeenCalled();
+
+      // Check success message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Successfully added team"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle invalid channel format", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+      // Set event text
+      mockEvent.text = "team add invalid-channel";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Please provide a valid Slack channel"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle existing team", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+      // Add a team to TEAMS_LIST
+      TEAMS_LIST.set("C12345", {
+        ask_channel_id: "C12345",
+        ask_channel_name: "test-channel",
+        ask_channel_cron: "",
+        ask_channel_cron_last_sent: null,
+        allowed_bots: [],
+        zendesk_channel_id: "",
+        zendesk_channel_name: "",
+        zendesk_monitored_view_id: "",
+        zendesk_aggregated_field_id: "",
+        zendesk_field_id: "",
+        zendesk_field_values: [],
+        zendesk_channel_cron: "",
+        code_review_channel_id: "",
+        code_review_channel_name: "",
+      });
+
+      // Set event text
+      mockEvent.text = "team add <#C12345|test-channel>";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("already exists"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle TeamService failure", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+      (TeamService.createTeam as jest.Mock).mockResolvedValue(false);
+
+      // Set event text
+      mockEvent.text = "team add <#C12345|test-channel>";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Failed to add team"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle missing channel information", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+      // Set event text
+      mockEvent.text = "team add";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Please provide channel information"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle general error", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+      (TeamService.createTeam as jest.Mock).mockRejectedValue(
+        new Error("Some error")
+      );
+
+      // Set event text
+      mockEvent.text = "team add <#C12345|test-channel>";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("An error occurred while adding the team"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+  });
+
+  describe("editTeam", () => {
+    beforeEach(() => {
+      // Add a team to TEAMS_LIST for testing
+      TEAMS_LIST.set("C12345", {
+        ask_channel_id: "C12345",
+        ask_channel_name: "test-channel",
+        ask_channel_cron: "",
+        ask_channel_cron_last_sent: new Date(),
+        allowed_bots: [],
+        zendesk_channel_id: "",
+        zendesk_channel_name: "",
+        zendesk_monitored_view_id: "",
+        zendesk_aggregated_field_id: "",
+        zendesk_field_id: "",
+        zendesk_field_values: [],
+        zendesk_channel_cron: "",
+        code_review_channel_id: "",
+        code_review_channel_name: "",
+      });
+    });
+
+    test("should edit a team successfully", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+      (TeamService.updateTeam as jest.Mock).mockResolvedValue(true);
+
+      // Set event text
+      mockEvent.text =
+        "team edit <#C12345|test-channel> ask_channel_cron 0 9 * * 1-5";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check that TeamService.updateTeam was called
+      expect(TeamService.updateTeam).toHaveBeenCalled();
+
+      // Check success message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Successfully updated team"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle invalid channel format", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+      // Set event text
+      mockEvent.text = "team edit invalid-channel ask_channel_cron 0 9 * * 1-5";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Please provide a valid Slack channel"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle non-existing team", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+      // Set event text
+      mockEvent.text =
+        "team edit <#C99999|non-existing-channel> ask_channel_cron 0 9 * * 1-5";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("No team found for channel"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle invalid property", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+      // Set event text
+      mockEvent.text =
+        "team edit <#C12345|test-channel> invalid_property some_value";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Invalid property"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle TeamService failure", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+      (TeamService.updateTeam as jest.Mock).mockResolvedValue(false);
+
+      // Set event text
+      mockEvent.text =
+        "team edit <#C12345|test-channel> ask_channel_cron 0 9 * * 1-5";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Failed to update team"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle missing arguments", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+      // Set event text
+      mockEvent.text = "team edit <#C12345|test-channel>";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining(
+          "Please provide: `team edit #channel-name property value`"
+        ),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle general error", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+      (TeamService.updateTeam as jest.Mock).mockRejectedValue(
+        new Error("Some error")
+      );
+
+      // Set event text
+      mockEvent.text =
+        "team edit <#C12345|test-channel> ask_channel_cron 0 9 * * 1-5";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("An error occurred while updating the team"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle array properties", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+      (TeamService.updateTeam as jest.Mock).mockResolvedValue(true);
+
+      // Set event text
+      mockEvent.text =
+        "team edit <#C12345|test-channel> allowed_bots Bot1,Bot2";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check that TeamService.updateTeam was called with correct data
+      expect(TeamService.updateTeam).toHaveBeenCalledWith("C12345", {
+        allowed_bots: ["Bot1", "Bot2"],
+      });
+
+      // Check success message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Successfully updated team"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+  });
+
+  describe("deleteTeam", () => {
+    beforeEach(() => {
+      // Add a team to TEAMS_LIST for testing
+      TEAMS_LIST.set("C12345", {
+        ask_channel_id: "C12345",
+        ask_channel_name: "test-channel",
+        ask_channel_cron: "",
+        ask_channel_cron_last_sent: new Date(),
+        allowed_bots: [],
+        zendesk_channel_id: "",
+        zendesk_channel_name: "",
+        zendesk_monitored_view_id: "",
+        zendesk_aggregated_field_id: "",
+        zendesk_field_id: "",
+        zendesk_field_values: [],
+        zendesk_channel_cron: "",
+        code_review_channel_id: "",
+        code_review_channel_name: "",
+      });
+    });
+
+    test("should delete a team successfully", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+      (TeamService.deleteTeam as jest.Mock).mockResolvedValue(true);
+
+      // Set event text
+      mockEvent.text = "team delete <#C12345|test-channel>";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check that TeamService.deleteTeam was called
+      expect(TeamService.deleteTeam).toHaveBeenCalled();
+
+      // Check success message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Successfully deleted team"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+
+      // Check that the team was removed from TEAMS_LIST
+      expect(TEAMS_LIST.has("C12345")).toBe(false);
+    });
+
+    test("should handle invalid channel format", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+      // Set event text
+      mockEvent.text = "team delete invalid-channel";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Please provide a valid Slack channel"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle non-existing team", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+      // Set event text
+      mockEvent.text = "team delete <#C99999|non-existing-channel>";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("No team found for channel"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle TeamService failure", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+      (TeamService.deleteTeam as jest.Mock).mockResolvedValue(false);
+
+      // Set event text
+      mockEvent.text = "team delete <#C12345|test-channel>";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Failed to delete team"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle missing arguments", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+
+      // Set event text
+      mockEvent.text = "team delete";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining(
+          "Please provide a channel: `team delete #channel-name`"
+        ),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
+
+    test("should handle general error", async () => {
+      // Mock authorization check to succeed
+      (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+      (TeamService.deleteTeam as jest.Mock).mockRejectedValue(
+        new Error("Some error")
+      );
+
+      // Set event text
+      mockEvent.text = "team delete <#C12345|test-channel>";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("An error occurred while deleting the team"),
+        mockEvent.channel,
+        mockEvent.thread_ts
+      );
+    });
   });
 });

@@ -17,6 +17,10 @@
     "cronstrue": "2.50.0",
     "dotenv": "16.4.5",
     "node-cron": "3.0.3",
+    "pg": "^8.13.3",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "=0.3.20",
+    "typeorm-naming-strategies": "^4.1.0",
     "winston": "^3.14.2"
   },
   "devDependencies": {
@@ -32,6 +36,7 @@
     "prettier": "^3.3.3",
     "supertest": "7.0.0",
     "ts-jest": "29.2.4",
+    "ts-node": "^10.9.2",
     "tsc-watch": "6.2.0",
     "typescript": "^5.5.4"
   },
@@ -44,7 +49,13 @@
     "coverage": "cross-env NODE_ENV=test ENV_FILE=.tests_env jest --testTimeout=10000 --collectCoverage=true",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "prettier:check:ci": "./node_modules/.bin/prettier --check ."
+    "prettier:check:ci": "./node_modules/.bin/prettier --check .",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:run": "npm run typeorm -- migration:run -d src/database/connection.ts",
+    "migration:show": "npm run typeorm -- migration:show -d src/database/connection.ts",
+    "migration:generate": "npm run typeorm -- migration:generate -d src/database/connection.ts -n",
+    "migration:create": "npm run typeorm -- migration:create src/migrations",
+    "migration:revert": "npm run typeorm -- migration:revert -d src/database/connection.ts"
   },
   "engines": {
     "node": "^16 || ^18",

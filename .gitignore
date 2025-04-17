@@ -42,10 +42,6 @@ bower_components
 
 # IDE - VSCode
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 
 # misc
 .sass-cache
@@ -91,3 +87,5 @@ lerna-debug.log
 # System Files
 .DS_Store
 Thumbs.db
+.vscode/launch.json
+.vscode/settings.json

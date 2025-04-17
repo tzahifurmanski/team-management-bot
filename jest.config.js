@@ -1,4 +1,3 @@
-// jest.config.js - Updated for CI/CD performance
 module.exports = {
   moduleFileExtensions: ["ts", "js"],
   transform: {
