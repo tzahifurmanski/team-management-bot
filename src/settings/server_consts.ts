@@ -8,6 +8,7 @@ if (process.env.NODE_ENV !== "production") {
     // If there is a custom env file, use it
     console.log("Loading a custom env file...");
     require("dotenv").config({ path: process.env.ENV_FILE });
+    console.log(`Loaded ${process.env.ENV_FILE} file.`);
   } else {
     console.log("Loading default env file...");
     require("dotenv").config();
@@ -50,7 +51,7 @@ const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "generic";
 
 // Load the configuration specific to the selected bot personality
 export const botConfig = require(
-  `../../assets/personalities/${BOT_PERSONALITY}/bot_config.json`,
+  `../../assets/personalities/${BOT_PERSONALITY}/bot_config.json`
 );
 
 // If we got a bot name, override the default:
@@ -61,7 +62,7 @@ if (BOT_NAME) {
   botConfig.ACTION_INTRODUCE_YOURSELF_TEXT =
     botConfig.ACTION_INTRODUCE_YOURSELF_TEXT.replace(
       BOT_NAME_PLACEHOLDER,
-      BOT_NAME,
+      BOT_NAME
     );
 
   logger.debug(`Set up "${botConfig.BOT_NAME}" as the bot name.`);
@@ -85,13 +86,13 @@ import { handleListParameter } from "../utils";
 export const REACTIONS_IN_PROGRESS: string[] = handleListParameter(
   process.env.REACTIONS_IN_PROGRESS,
   "in-progress,spinner",
-  ",",
+  ","
 );
 
 export const REACTIONS_HANDLED: string[] = handleListParameter(
   process.env.REACTIONS_HANDLED,
   "white_check_mark,heavy_check_mark,green_tick",
-  ",",
+  ","
 );
 
 // =================================================
@@ -115,13 +116,13 @@ export const ENABLE_BOT_RESPONSES =
 
 // Bot responses
 export const DISABLED_RESPONSES: string[] = handleListParameter(
-  process.env.DISABLED_RESPONSES,
+  process.env.DISABLED_RESPONSES
 );
 export const BOT_RESPONSES_CHANNELS: string[] = handleListParameter(
-  process.env.BOT_RESPONSES_CHANNELS,
+  process.env.BOT_RESPONSES_CHANNELS
 );
 
 // Compliments
 export const USER_SPECIFIC_COMPLIMENTS: string[] = handleListParameter(
-  process.env.USER_SPECIFIC_COMPLIMENTS,
+  process.env.USER_SPECIFIC_COMPLIMENTS
 );
