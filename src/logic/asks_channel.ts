@@ -1,31 +1,31 @@
-import { getConversationHistory } from "../integrations/slack/conversations";
-import { USER_PROFILE_FIELD_ID_TEAM } from "../settings/team_consts";
+import { getConversationHistory } from "../integrations/slack/conversations.js";
+import { USER_PROFILE_FIELD_ID_TEAM } from "../settings/team_consts.js";
 import {
   createDivider,
   createImageBlock,
   createSectionBlock,
   getMessagePermalink,
   sendSlackMessage,
-} from "../integrations/slack/messages";
+} from "../integrations/slack/messages.js";
 import {
   removeTimeInfoFromDate,
   setDateToSunday,
   toDateTime,
-} from "../actions/date_utils";
+} from "../actions/date_utils.js";
 import { SectionBlock } from "@slack/web-api";
-import { getUserProfile } from "../integrations/slack/users";
-import { getValueFromProfile } from "../integrations/slack/utils";
+import { getUserProfile } from "../integrations/slack/users.js";
+import { getValueFromProfile } from "../integrations/slack/utils.js";
 import { Block } from "@slack/types";
 import {
   AsksChannelReportResult,
   createReport,
   createReportSection,
-} from "./ask_channel_reporting";
+} from "./ask_channel_reporting.js";
 import {
   logger,
   REACTIONS_HANDLED,
   REACTIONS_IN_PROGRESS,
-} from "../settings/server_consts";
+} from "../settings/server_consts.js";
 
 export interface AsksChannelStatsResult {
   startDateInUTC: string;

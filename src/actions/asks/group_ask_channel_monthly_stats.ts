@@ -1,15 +1,15 @@
-import { BotAction } from "../base_action";
+import { BotAction } from "../base_action.js";
 import {
   GROUP_ASK_CHANNELS_LIST,
   getTeamsList,
-} from "../../settings/team_consts";
+} from "../../settings/team_consts.js";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
   getStatsBuckets,
   reportStatsToSlack,
-} from "../../logic/asks_channel";
-import { logger, BOT_SLACK_ID } from "../../settings/server_consts";
+} from "../../logic/asks_channel.js";
+import { logger, BOT_SLACK_ID } from "../../settings/server_consts.js";
 
 export class GroupAskChannelMonthlyStats implements BotAction {
   getHelpText(): string {

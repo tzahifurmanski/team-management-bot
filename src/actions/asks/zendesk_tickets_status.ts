@@ -1,28 +1,31 @@
-import { BotAction } from "../base_action";
+import { BotAction } from "../base_action.js";
 import {
   createDivider,
   createSectionBlock,
   sendSlackMessage,
-} from "../../integrations/slack/messages";
-import { getTicketsByView, showView } from "../../integrations/zendesk/views";
-import { TEAMS_LIST } from "../../settings/team_consts";
-import { sanitizeCommandInput } from "../../integrations/slack/utils";
-import { logger } from "../../settings/server_consts";
+} from "../../integrations/slack/messages.js";
+import {
+  getTicketsByView,
+  showView,
+} from "../../integrations/zendesk/views.js";
+import { TEAMS_LIST } from "../../settings/team_consts.js";
+import { sanitizeCommandInput } from "../../integrations/slack/utils.js";
+import { logger } from "../../settings/server_consts.js";
 import {
   getChannelIDFromEventText,
   getRecurringJobInfo,
   scheduleAskChannelsCrons,
-} from "../utils";
+} from "../utils.js";
 import {
   createAggregateMessage,
   createDetailModeBlocks,
-} from "../../logic/zendesk_tickets_utils";
+} from "../../logic/zendesk_tickets_utils.js";
 import {
   SlackWebClient,
   ZENDESK_BASE_URL,
   ZENDESK_TOKEN,
-} from "../../integrations/consts";
-import { findTeamByValue, isValueInTeams } from "../../settings/team_utils";
+} from "../../integrations/consts.js";
+import { findTeamByValue, isValueInTeams } from "../../settings/team_utils.js";
 
 export class ZendeskTicketsStatus implements BotAction {
   constructor() {

@@ -2,13 +2,13 @@ import {
   convertSecondsToTimeString,
   countReactions,
   isBotMessage,
-} from "../utils";
-import { getUserProfile } from "../users";
-import { getConversationHistory } from "../conversations";
-import { logger, REACTIONS_HANDLED } from "../../../settings/server_consts";
-import { findTeamByValue } from "../../../settings/team_utils";
+} from "../utils.js";
+import { getUserProfile } from "../users.js";
+import { getConversationHistory } from "../conversations.js";
+import { logger, REACTIONS_HANDLED } from "../../../settings/server_consts.js";
+import { findTeamByValue } from "../../../settings/team_utils.js";
 
-const reactionAddedCallback = async ({ event, client }: any) => {
+export const reactionAddedCallback = async ({ event, client }: any) => {
   logger.debug("Got a reaction added callback...", JSON.stringify(event));
 
   try {
@@ -78,5 +78,3 @@ const reactionAddedCallback = async ({ event, client }: any) => {
     logger.error(error);
   }
 };
-
-module.exports = { reactionAddedCallback };

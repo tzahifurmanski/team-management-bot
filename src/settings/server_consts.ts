@@ -2,20 +2,22 @@
 //          Env Configurations
 // =================================================
 
+import dotenv from "dotenv";
+
 // Load the .env file config for debug
 if (process.env.NODE_ENV !== "production") {
   if (typeof process.env.ENV_FILE !== "undefined") {
     // If there is a custom env file, use it
     console.log("Loading a custom env file...");
-    require("dotenv").config({ path: process.env.ENV_FILE });
+    dotenv.config({ path: process.env.ENV_FILE });
   } else {
     console.log("Loading default env file...");
-    require("dotenv").config();
+    dotenv.config();
   }
 }
 
 // Initialize logger
-const winston = require("winston");
+import * as winston from "winston";
 
 const logLevels = {
   fatal: 0,
@@ -25,16 +27,20 @@ const logLevels = {
   debug: 4,
   trace: 5,
 };
+// This creates a type that has all properties of winston.Logger
+// AND adds methods for each key in your logLevels object.
+type CustomLogger = winston.Logger &
+  Record<keyof typeof logLevels, winston.LeveledLogMethod>;
 
 const { combine, timestamp, json, errors } = winston.format;
 
-export const logger = winston.createLogger({
+export const logger: CustomLogger = winston.createLogger({
   levels: logLevels,
   level: process.env.LOG_LEVEL || "info",
   format: combine(errors({ stack: true }), timestamp(), json()),
 
   transports: [new winston.transports.Console()],
-});
+}) as CustomLogger;
 
 logger.info(`Logger is set up with ${logger.level} level.`);
 
@@ -49,9 +55,14 @@ export const PORT = process.env.PORT || 3000;
 const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "generic";
 
 // Load the configuration specific to the selected bot personality
-export const botConfig = require(
-  `../../assets/personalities/${BOT_PERSONALITY}/bot_config.json`,
-);
+export const botConfig = (
+  await import(
+    `../../assets/personalities/${BOT_PERSONALITY}/bot_config.json`,
+    {
+      with: { type: "json" },
+    }
+  )
+).default;
 
 // If we got a bot name, override the default:
 const BOT_NAME_PLACEHOLDER = "<BOT_NAME>";
@@ -79,7 +90,7 @@ if (BOT_IMAGE_URL) {
   botConfig.BOT_IMAGE_URL = BOT_IMAGE_URL;
 }
 
-import { handleListParameter } from "../utils";
+import { handleListParameter } from "../utils.js";
 
 // Reactions parameters
 export const REACTIONS_IN_PROGRESS: string[] = handleListParameter(

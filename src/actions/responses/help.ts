@@ -1,8 +1,7 @@
-import { getRandomFromArray } from "../utils";
-import { BotAction } from "../base_action";
-import { botConfig } from "../../settings/server_consts";
-
-const { sendSlackMessage } = require("../../integrations/slack/messages");
+import { getRandomFromArray } from "../utils.js";
+import { BotAction } from "../base_action.js";
+import { botConfig } from "../../settings/server_consts.js";
+import { sendSlackMessage } from "../../integrations/slack/messages.js";
 
 const GIFS = botConfig.RESPONSE_HELP_POOL;
 

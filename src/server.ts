@@ -1,12 +1,13 @@
 // Always load consts first
-import { logger, PORT } from "./settings/server_consts";
-import { loadConfig } from "./settings/team_consts";
+import { logger, PORT } from "./settings/server_consts.js";
+import { loadConfig } from "./settings/team_consts.js";
 
-import { App, ExpressReceiver } from "@slack/bolt";
-import { getBoltLogLevel } from "./utils";
-import { SLACK_SIGNING_SECRET } from "./integrations/consts";
+import bolt from "@slack/bolt";
+const { App, ExpressReceiver } = bolt;
 
-const { version } = require("../package.json");
+import { getBoltLogLevel } from "./utils.js";
+import { SLACK_SIGNING_SECRET } from "./integrations/consts.js";
+import pkg from "../package.json" with { type: "json" };
 
 const receiver = new ExpressReceiver({ signingSecret: SLACK_SIGNING_SECRET });
 
@@ -20,7 +21,7 @@ const boltApp = new App({
 (async () => {
   // Print server time
   logger.info(
-    `Server starting at ${new Date().toUTCString()}, version ${version}`,
+    `Server starting at ${new Date().toUTCString()}, version ${pkg.version}`,
   );
 
   const loadResult = await loadConfig(boltApp.client);
@@ -32,7 +33,8 @@ const boltApp = new App({
   // Initiatlize the actions after teams loading, as some are enabled based on teams configurations
   //  This is because some actions (like AskChannelStatusForYesterday) are initialized during construction,
   //  so they don't wait for the RegisterListeners function
-  const { registerListeners } = require("./listeners");
+
+  const { registerListeners } = await import("./listeners/index.js");
   registerListeners(boltApp, receiver);
 
   // Start the app

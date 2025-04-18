@@ -1,15 +1,15 @@
-import { BotAction } from "../base_action";
-import { ReviewRequestResponse } from "./review_request";
-import { BugResponse } from "./bug";
-import { FolksResponse } from "./folks";
-import { MergeResponse } from "./merge";
-import { HelpResponse } from "./help";
-import { IThinkResponse } from "./i_think";
+import { BotAction } from "../base_action.js";
+import { ReviewRequestResponse } from "./review_request.js";
+import { BugResponse } from "./bug.js";
+import { FolksResponse } from "./folks.js";
+import { MergeResponse } from "./merge.js";
+import { HelpResponse } from "./help.js";
+import { IThinkResponse } from "./i_think.js";
 import {
   DISABLED_RESPONSES,
   ENABLE_BOT_RESPONSES,
   logger,
-} from "../../settings/server_consts";
+} from "../../settings/server_consts.js";
 
 const ACTIONS_LIST: BotAction[] = [
   new BugResponse(),

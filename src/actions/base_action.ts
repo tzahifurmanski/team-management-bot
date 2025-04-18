@@ -1,5 +1,5 @@
-import { logger } from "../settings/server_consts";
-import { sendSlackMessage } from "../integrations/slack/messages";
+import { logger } from "../settings/server_consts.js";
+import { sendSlackMessage } from "../integrations/slack/messages.js";
 
 export interface BotAction {
   performAction(event: any, slackClient: any): Promise<void>;

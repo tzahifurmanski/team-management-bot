@@ -2,13 +2,13 @@ import {
   UsersProfileGetArguments,
   UsersProfileGetResponse,
 } from "@slack/web-api";
-import { Profile } from "@slack/web-api/dist/types/response/UsersProfileGetResponse";
+import { Profile } from "@slack/web-api/dist/types/response/UsersProfileGetResponse.js";
 
 // TODO: Implement a cache here, so we won't need to query everytime
 
 export const getUserProfile = async (
   slackClient: any,
-  user: string
+  user: string,
 ): Promise<Profile | undefined> => {
   const options: UsersProfileGetArguments = { user };
 

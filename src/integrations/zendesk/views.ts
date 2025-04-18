@@ -1,6 +1,6 @@
-import { httpGet } from "../utils";
-import { ZENDESK_BASE_URL, ZENDESK_TOKEN } from "../consts";
-import { logger } from "../../settings/server_consts";
+import { httpGet } from "../utils.js";
+import { ZENDESK_BASE_URL, ZENDESK_TOKEN } from "../consts.js";
+import { logger } from "../../settings/server_consts.js";
 
 export const getTicketsByView = async (
   zendeskViewID: string,

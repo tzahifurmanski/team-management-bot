@@ -1,6 +1,5 @@
-import { BotAction } from "../base_action";
-
-const { sendSlackMessage } = require("../../integrations/slack/messages");
+import { BotAction } from "../base_action.js";
+import { sendSlackMessage } from "../../integrations/slack/messages.js";
 
 export class MeaningOfLife implements BotAction {
   getHelpText(): string {
