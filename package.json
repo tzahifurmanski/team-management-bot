@@ -1,7 +1,7 @@
 {
   "name": "team-management-bot",
   "author": "Tzahi Furmanski <tzahi.fur@gmail.com> (https://github.com/tzahifurmanski/)",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "repository": "https://github.com/tzahifurmanski/team-management-bot",
   "description": "A slack bot for engineering teams",
   "main": "dist/app.js",
@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@types/jest": "29.5.12",
-    "@types/node": "^20.0.0 || ^22.0.0",
+    "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "8.1.0",
     "@typescript-eslint/parser": "8.1.0",
     "cross-env": "7.0.3",
@@ -47,7 +47,7 @@
     "prettier:check:ci": "./node_modules/.bin/prettier --check ."
   },
   "engines": {
-    "node": "^20 || ^22",
-    "npm": "^9 || ^10"
+    "node": "^22",
+    "npm": "^10"
   }
 }
