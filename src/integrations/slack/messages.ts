@@ -3,12 +3,17 @@ import {
   ChatGetPermalinkArguments,
   ChatPostMessageArguments,
   ChatPostMessageResponse,
-  SectionBlock,
 } from "@slack/web-api";
 
-import { Block, DividerBlock, KnownBlock, MrkdwnElement } from "@slack/types";
+import {
+  Block,
+  DividerBlock,
+  KnownBlock,
+  MrkdwnElement,
+  ImageBlock,
+  SectionBlock,
+} from "@slack/types";
 import { botConfig, logger, BOT_SLACK_ID } from "../../settings/server_consts";
-import { ImageBlock } from "@slack/bolt";
 import { SLACK_USER_FORMAT } from "../consts";
 
 // Post a message to the channel, and await the result.
@@ -19,13 +24,14 @@ export const sendSlackMessage = async (
   channel: string,
   threadTS = "",
   blocks: (KnownBlock | Block)[] = [],
-  disableUnfurl = false,
+  disableUnfurl = false
 ): Promise<ChatPostMessageResponse> => {
   const options: ChatPostMessageArguments = {
     text,
     channel,
     username: botConfig.BOT_NAME,
     icon_url: botConfig.BOT_IMAGE_URL,
+    blocks: [],
   };
 
   // If we've been asked to disable unfurling
@@ -51,7 +57,7 @@ export const sendSlackMessage = async (
       options.blocks = blocks.slice(i, i + chunk);
       result = await slackClient.chat.postMessage(options);
       logger.info(
-        `Successfully send message ${result.ts} in conversation ${channel}`,
+        `Successfully send message ${result.ts} in conversation ${channel}`
       );
     }
   }
@@ -59,7 +65,7 @@ export const sendSlackMessage = async (
   else {
     result = await slackClient.chat.postMessage(options);
     logger.info(
-      `Successfully send message ${result.ts} in conversation ${channel}`,
+      `Successfully send message ${result.ts} in conversation ${channel}`
     );
   }
 
@@ -71,7 +77,7 @@ export const sendSlackMessage = async (
 export const createSectionBlock = (
   text?: string,
   fields?: any[],
-  accessory?: Button,
+  accessory?: Button
 ): SectionBlock => {
   // TODO: This currently only supports SectionBlock. Make it more dynamic?
   const section: SectionBlock = {
@@ -105,7 +111,7 @@ export const createDivider = (): DividerBlock => ({
 export const createImageBlock = (
   alt_text: string,
   image_url: string,
-  title?: string,
+  title?: string
 ): ImageBlock => {
   const section: ImageBlock = {
     type: "image",
@@ -140,7 +146,7 @@ export const getUserIDInText = (text: string) => {
 export const getMessagePermalink = async (
   slackClient: any,
   channelId: string,
-  messageTS: string,
+  messageTS: string
 ): Promise<string> => {
   const options: ChatGetPermalinkArguments = {
     channel: channelId,
