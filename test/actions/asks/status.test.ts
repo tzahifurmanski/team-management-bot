@@ -1,5 +1,5 @@
-import { Status } from "../../../src/actions/asks/status";
-import { BOT_SLACK_ID } from "../../../src/settings/server_consts";
+import { Status } from "../../../src/actions/asks/status.js";
+import { BOT_SLACK_ID } from "../../../src/settings/server_consts.js";
 
 const testedClass: Status = new Status();
 

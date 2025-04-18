@@ -13,8 +13,12 @@ import {
   ImageBlock,
   SectionBlock,
 } from "@slack/types";
-import { botConfig, logger, BOT_SLACK_ID } from "../../settings/server_consts";
-import { SLACK_USER_FORMAT } from "../consts";
+import {
+  botConfig,
+  logger,
+  BOT_SLACK_ID,
+} from "../../settings/server_consts.js";
+import { SLACK_USER_FORMAT } from "../consts.js";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
@@ -24,7 +28,7 @@ export const sendSlackMessage = async (
   channel: string,
   threadTS = "",
   blocks: (KnownBlock | Block)[] = [],
-  disableUnfurl = false
+  disableUnfurl = false,
 ): Promise<ChatPostMessageResponse> => {
   const options: ChatPostMessageArguments = {
     text,
@@ -57,7 +61,7 @@ export const sendSlackMessage = async (
       options.blocks = blocks.slice(i, i + chunk);
       result = await slackClient.chat.postMessage(options);
       logger.info(
-        `Successfully send message ${result.ts} in conversation ${channel}`
+        `Successfully send message ${result.ts} in conversation ${channel}`,
       );
     }
   }
@@ -65,7 +69,7 @@ export const sendSlackMessage = async (
   else {
     result = await slackClient.chat.postMessage(options);
     logger.info(
-      `Successfully send message ${result.ts} in conversation ${channel}`
+      `Successfully send message ${result.ts} in conversation ${channel}`,
     );
   }
 
@@ -77,7 +81,7 @@ export const sendSlackMessage = async (
 export const createSectionBlock = (
   text?: string,
   fields?: any[],
-  accessory?: Button
+  accessory?: Button,
 ): SectionBlock => {
   // TODO: This currently only supports SectionBlock. Make it more dynamic?
   const section: SectionBlock = {
@@ -111,7 +115,7 @@ export const createDivider = (): DividerBlock => ({
 export const createImageBlock = (
   alt_text: string,
   image_url: string,
-  title?: string
+  title?: string,
 ): ImageBlock => {
   const section: ImageBlock = {
     type: "image",
@@ -146,7 +150,7 @@ export const getUserIDInText = (text: string) => {
 export const getMessagePermalink = async (
   slackClient: any,
   channelId: string,
-  messageTS: string
+  messageTS: string,
 ): Promise<string> => {
   const options: ChatGetPermalinkArguments = {
     channel: channelId,

@@ -1,5 +1,5 @@
 // Return the team that has the given channel ID. If no team has the given channel ID, return the first team in the list. If there are no teams, return an empty object.
-import { Team, getTeamsList } from "./team_consts";
+import { Team, getTeamsList } from "./team_consts.js";
 
 export function isTeam(obj: any): obj is Team {
   return (

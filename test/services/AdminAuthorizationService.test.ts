@@ -1,4 +1,11 @@
-// test/services/AdminAuthorizationService.test.ts - Optimized version
+import {
+  describe,
+  test,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 import { AdminAuthorizationService } from "../../src/services/AdminAuthorizationService";
 
 describe("AdminAuthorizationService", () => {

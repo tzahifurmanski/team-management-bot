@@ -1,5 +1,9 @@
 // Remove the name of the bot, in case it was mentioned
-import { botConfig, logger, BOT_SLACK_ID } from "../../settings/server_consts";
+import {
+  botConfig,
+  logger,
+  BOT_SLACK_ID,
+} from "../../settings/server_consts.js";
 
 export const sanitizeCommandInput = (text: string): string => {
   return text.replace(`<@${BOT_SLACK_ID}> `, "").trim();
