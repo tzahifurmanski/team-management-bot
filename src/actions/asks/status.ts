@@ -1,9 +1,8 @@
-import { BotAction } from "../base_action";
-import { BOT_SLACK_ID } from "../../settings/server_consts";
-import { sanitizeCommandInput } from "../../integrations/slack/utils";
-
-const { sendSlackMessage } = require("../../integrations/slack/messages");
-const { version } = require("../../../package.json");
+import { BotAction } from "../base_action.js";
+import { BOT_SLACK_ID } from "../../settings/server_consts.js";
+import { sanitizeCommandInput } from "../../integrations/slack/utils.js";
+import { sendSlackMessage } from "../../integrations/slack/messages.js";
+import pkg from "../../../package.json" with { type: "json" };
 
 export class Status implements BotAction {
   getHelpText(): string {
@@ -22,7 +21,7 @@ export class Status implements BotAction {
   async performAction(event: any, slackClient: any): Promise<void> {
     await sendSlackMessage(
       slackClient,
-      `Bot <@${BOT_SLACK_ID}> (ID *${BOT_SLACK_ID}*), version ${version}.`,
+      `Bot <@${BOT_SLACK_ID}> (ID *${BOT_SLACK_ID}*), version ${pkg.version}.`,
       event.channel,
       event.thread_ts,
     );

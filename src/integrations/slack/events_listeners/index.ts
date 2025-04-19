@@ -1,10 +1,9 @@
-import { ENABLE_ASK_SUMMARY, logger } from "../../../settings/server_consts";
+import { ENABLE_ASK_SUMMARY, logger } from "../../../settings/server_consts.js";
+import { messageCallback } from "./message.js";
+import { appMentionCallback } from "./app_mention.js";
+import { reactionAddedCallback } from "./reaction_added.js";
 
-const { messageCallback } = require("./message");
-const { appMentionCallback } = require("./app_mention");
-const { reactionAddedCallback } = require("./reaction_added");
-
-module.exports.register = (app: any) => {
+export const register = (app: any) => {
   logger.info("Setting up events...");
 
   app.event("message", messageCallback);

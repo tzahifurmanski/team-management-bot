@@ -1,9 +1,9 @@
-import { BotAction } from "../base_action";
+import { BotAction } from "../base_action.js";
 import {
   AskChannelParams,
   getAskChannelParameters,
   getChannelIDFromEventText,
-} from "../utils";
+} from "../utils.js";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
@@ -11,12 +11,12 @@ import {
   getStatsForMessages,
   reportChartToSlack,
   reportStatsToSlack,
-} from "../../logic/asks_channel";
-import { sanitizeCommandInput } from "../../integrations/slack/utils";
-import { logger } from "../../settings/server_consts";
-import { getStartingDate } from "../date_utils";
-import { findTeamByValue, isValueInTeams } from "../../settings/team_utils";
-import { sendSlackMessage } from "../../integrations/slack/messages";
+} from "../../logic/asks_channel.js";
+import { sanitizeCommandInput } from "../../integrations/slack/utils.js";
+import { logger } from "../../settings/server_consts.js";
+import { getStartingDate } from "../date_utils.js";
+import { findTeamByValue, isValueInTeams } from "../../settings/team_utils.js";
+import { sendSlackMessage } from "../../integrations/slack/messages.js";
 
 export class AskChannelStatusStatsOrSummary implements BotAction {
   getHelpText(): string {

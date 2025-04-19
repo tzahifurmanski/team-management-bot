@@ -1,7 +1,7 @@
-import { BotAction } from "../base_action";
-import { sendSlackMessage } from "../../integrations/slack/messages";
-import { botConfig } from "../../settings/server_consts";
-import { sanitizeCommandInput } from "../../integrations/slack/utils";
+import { BotAction } from "../base_action.js";
+import { sendSlackMessage } from "../../integrations/slack/messages.js";
+import { botConfig } from "../../settings/server_consts.js";
+import { sanitizeCommandInput } from "../../integrations/slack/utils.js";
 
 export class Help implements BotAction {
   actionsList: BotAction[] = [];

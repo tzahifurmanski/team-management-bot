@@ -3,13 +3,22 @@ import {
   ChatGetPermalinkArguments,
   ChatPostMessageArguments,
   ChatPostMessageResponse,
-  SectionBlock,
 } from "@slack/web-api";
 
-import { Block, DividerBlock, KnownBlock, MrkdwnElement } from "@slack/types";
-import { botConfig, logger, BOT_SLACK_ID } from "../../settings/server_consts";
-import { ImageBlock } from "@slack/bolt";
-import { SLACK_USER_FORMAT } from "../consts";
+import {
+  Block,
+  DividerBlock,
+  KnownBlock,
+  MrkdwnElement,
+  ImageBlock,
+  SectionBlock,
+} from "@slack/types";
+import {
+  botConfig,
+  logger,
+  BOT_SLACK_ID,
+} from "../../settings/server_consts.js";
+import { SLACK_USER_FORMAT } from "../consts.js";
 
 // Post a message to the channel, and await the result.
 // Find more arguments and details of the response: https://api.slack.com/methods/chat.postMessage
@@ -26,6 +35,7 @@ export const sendSlackMessage = async (
     channel,
     username: botConfig.BOT_NAME,
     icon_url: botConfig.BOT_IMAGE_URL,
+    blocks: [],
   };
 
   // If we've been asked to disable unfurling

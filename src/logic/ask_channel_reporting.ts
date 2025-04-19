@@ -1,13 +1,16 @@
 import { SectionBlock } from "@slack/web-api";
-import { createSectionBlock, createText } from "../integrations/slack/messages";
-import { getUserProfile } from "../integrations/slack/users";
-import { getValueFromProfile } from "../integrations/slack/utils";
+import {
+  createSectionBlock,
+  createText,
+} from "../integrations/slack/messages.js";
+import { getUserProfile } from "../integrations/slack/users.js";
+import { getValueFromProfile } from "../integrations/slack/utils.js";
 import {
   USER_PROFILE_FIELD_ID_DEPARTMENT,
   USER_PROFILE_FIELD_ID_DIVISION,
   USER_PROFILE_FIELD_ID_TEAM,
-} from "../settings/team_consts";
-import { logger } from "../settings/server_consts";
+} from "../settings/team_consts.js";
+import { logger } from "../settings/server_consts.js";
 
 export interface AsksChannelReportResult {
   statsByTeam: Map<string, number>;

@@ -1,17 +1,17 @@
-import { BOT_SLACK_ID } from "../../settings/server_consts";
-import { BotAction } from "../base_action";
-import { getRandomFromArray } from "../utils";
+import { BOT_SLACK_ID } from "../../settings/server_consts.js";
+import { BotAction } from "../base_action.js";
+import { getRandomFromArray } from "../utils.js";
 
 import {
   botConfig,
   logger,
   USER_SPECIFIC_COMPLIMENTS,
-} from "../../settings/server_consts";
+} from "../../settings/server_consts.js";
 
 import {
   getUserIDInText,
   sendSlackMessage,
-} from "../../integrations/slack/messages";
+} from "../../integrations/slack/messages.js";
 
 // Use a predefined compliments pool and anything that is team specific
 const COMPLIMENTS = botConfig.ACTION_COMPLIMENT_POOL.concat(

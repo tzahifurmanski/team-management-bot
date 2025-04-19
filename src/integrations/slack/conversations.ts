@@ -3,8 +3,8 @@ import {
   ConversationsHistoryResponse,
   ConversationsListArguments,
 } from "@slack/web-api";
-import { isBotMessage } from "./utils";
-import { logger, BOT_SLACK_ID } from "../../settings/server_consts";
+import { isBotMessage } from "./utils.js";
+import { logger, BOT_SLACK_ID } from "../../settings/server_consts.js";
 
 // This is a util function that is able to look for the ID of a conversation / channel by name
 export const getConversationId = async (

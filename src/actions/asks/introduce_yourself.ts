@@ -1,14 +1,13 @@
-import { BotAction } from "../base_action";
+import { BotAction } from "../base_action.js";
 import {
   BOT_NAME,
   BOT_SLACK_ID,
   botConfig,
-} from "../../settings/server_consts";
-import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday";
-import { Help } from "./help";
-import { getTeamByIndex } from "../../settings/team_utils";
-
-const { sendSlackMessage } = require("../../integrations/slack/messages");
+} from "../../settings/server_consts.js";
+import { AskChannelStatusForYesterday } from "./ask_channel_status_for_yesterday.js";
+import { Help } from "./help.js";
+import { getTeamByIndex } from "../../settings/team_utils.js";
+import { sendSlackMessage } from "../../integrations/slack/messages.js";
 
 export class IntroduceYourself implements BotAction {
   private helpCommand: Help;

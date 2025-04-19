@@ -1,9 +1,8 @@
-import { getRandomFromArray } from "../utils";
-import { BotAction } from "../base_action";
-import { botConfig } from "../../settings/server_consts";
-import { isValueInTeams } from "../../settings/team_utils";
-
-const { sendSlackMessage } = require("../../integrations/slack/messages");
+import { getRandomFromArray } from "../utils.js";
+import { BotAction } from "../base_action.js";
+import { botConfig } from "../../settings/server_consts.js";
+import { isValueInTeams } from "../../settings/team_utils.js";
+import { sendSlackMessage } from "../../integrations/slack/messages.js";
 
 const GIFS = botConfig.RESPONSE_REVIEW_REQUEST_POOL;
 

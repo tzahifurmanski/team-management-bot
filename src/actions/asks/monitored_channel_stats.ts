@@ -1,11 +1,11 @@
-import { BotAction } from "../base_action";
-import { removeTimeInfoFromDate } from "../date_utils";
-import { getChannelMessages } from "../../logic/asks_channel";
+import { BotAction } from "../base_action.js";
+import { removeTimeInfoFromDate } from "../date_utils.js";
+import { getChannelMessages } from "../../logic/asks_channel.js";
 import {
   getMonitoredChannelStatsForMessages,
   MonitoredChannelStatsResult,
   reportMonitoredChannelStatsToSlack,
-} from "../../logic/monitored_channel";
+} from "../../logic/monitored_channel.js";
 import {
   MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE,
   MONITORED_CHANNEL_CONDITION_MESSAGE_SUCCESS,
@@ -14,8 +14,8 @@ import {
   MONITORED_CHANNEL_ID,
   MONITORED_CHANNEL_TRIGGER,
   TEAMS_LIST,
-} from "../../settings/team_consts";
-import { BOT_SLACK_ID } from "../../settings/server_consts";
+} from "../../settings/team_consts.js";
+import { BOT_SLACK_ID } from "../../settings/server_consts.js";
 
 export class MonitoredChannelSummaryStats implements BotAction {
   getHelpText(): string {

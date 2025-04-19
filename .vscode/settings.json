@@ -1,1 +1,4 @@
-{}
+{
+  "files.autoSave": "onFocusChange",
+  "files.hotExit": "onExit"
+}

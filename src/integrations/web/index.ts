@@ -1,5 +1,4 @@
-const receivers = require("./endpoints_listeners");
-
-module.exports.registerReceivers = (receiver: any) => {
+import * as receivers from "./endpoints_listeners/index.js";
+export const registerReceivers = (receiver: any) => {
   receivers.register(receiver);
 };

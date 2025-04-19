@@ -11,7 +11,10 @@
       "program": "${workspaceFolder}/node_modules/.bin/jest",
       "args": ["--runInBand"],
       "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "ENV_FILE": "${workspaceFolder}/.tests_env"
+      }
     },
     {
       "type": "node",
@@ -22,6 +25,9 @@
       "console": "integratedTerminal",
       "windows": {
         "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      },
+      "env": {
+        "ENV_FILE": "${workspaceFolder}/.tests_env"
       }
     }
   ]

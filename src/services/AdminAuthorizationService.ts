@@ -1,6 +1,6 @@
 // src/services/AdminAuthorizationService.ts
-import { logger } from "../settings/server_consts";
-import { handleListParameter } from "../utils";
+import { logger } from "../settings/server_consts.js";
+import { handleListParameter } from "../utils.js";
 
 /**
  * Service for checking if users are authorized to perform admin actions
