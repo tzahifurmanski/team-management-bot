@@ -1,8 +1,8 @@
-import { handleDirectEvent } from "../events";
-import { isBotMessage } from "../utils";
-import { logger } from "../../../settings/server_consts";
+import { handleDirectEvent } from "../events.js";
+import { isBotMessage } from "../utils.js";
+import { logger } from "../../../settings/server_consts.js";
 
-const appMentionCallback = async ({ event, client }: any) => {
+export const appMentionCallback = async ({ event, client }: any) => {
   if (isBotMessage(event)) {
     logger.info("Got a message from bot, ignoring...");
     return;
@@ -18,5 +18,3 @@ const appMentionCallback = async ({ event, client }: any) => {
     logger.error(error);
   }
 };
-
-module.exports = { appMentionCallback };

@@ -3,11 +3,11 @@
 import {
   getBotId,
   getConversationId,
-} from "../integrations/slack/conversations";
-import { BOT_SLACK_ID, logger, setBotSlackId } from "./server_consts";
-import { handleListParameter } from "../utils";
-import { setSlackWebClient } from "../integrations/consts";
-import { isTeam } from "./team_utils";
+} from "../integrations/slack/conversations.js";
+import { BOT_SLACK_ID, logger, setBotSlackId } from "./server_consts.js";
+import { handleListParameter } from "../utils.js";
+import { setSlackWebClient } from "../integrations/consts.js";
+import { isTeam } from "./team_utils.js";
 
 // ====================
 // Teams Configurations
@@ -93,8 +93,7 @@ export const loadConfig = async (slackClient: any) => {
     const TEAM_ASK_CHANNEL_NAME: string[] = handleListParameter(
       process.env.TEAM_ASK_CHANNEL_NAME,
     );
-
-    let TEAM_CODE_REVIEW_CHANNEL_ID: string[] = handleListParameter(
+    const TEAM_CODE_REVIEW_CHANNEL_ID: string[] = handleListParameter(
       process.env.TEAM_CODE_REVIEW_CHANNEL_ID,
       "",
       ",",
@@ -214,7 +213,7 @@ export const loadConfig = async (slackClient: any) => {
     });
 
     // Load ALLOWED_BOTS per team
-    let ALLOWED_BOTS_PER_TEAM = new Map<string, string[]>();
+    const ALLOWED_BOTS_PER_TEAM = new Map<string, string[]>();
     ALLOWED_BOTS.forEach((teamBotConfiguration: string, index) => {
       ALLOWED_BOTS_PER_TEAM.set(
         TEAM_ASK_CHANNEL_ID[index],

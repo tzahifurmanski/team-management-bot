@@ -2,7 +2,7 @@ import {
   UsersProfileGetArguments,
   UsersProfileGetResponse,
 } from "@slack/web-api";
-import { Profile } from "@slack/web-api/dist/response/UsersProfileGetResponse";
+import { Profile } from "@slack/web-api/dist/types/response/UsersProfileGetResponse.js";
 
 // TODO: Implement a cache here, so we won't need to query everytime
 

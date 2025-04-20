@@ -1,8 +1,8 @@
-import { isBotMessage } from "../utils";
-import { handleChannelEvent, handleDirectEvent } from "../events";
-import { logger } from "../../../settings/server_consts";
+import { isBotMessage } from "../utils.js";
+import { handleChannelEvent, handleDirectEvent } from "../events.js";
+import { logger } from "../../../settings/server_consts.js";
 
-const messageCallback = async ({ event, client }: any) => {
+export const messageCallback = async ({ event, client }: any) => {
   try {
     // Ignore messages that the bot post in the conversation
     if (isBotMessage(event)) {
@@ -28,5 +28,3 @@ const messageCallback = async ({ event, client }: any) => {
     logger.error(error);
   }
 };
-
-module.exports = { messageCallback };

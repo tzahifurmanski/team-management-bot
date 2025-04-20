@@ -1,11 +1,11 @@
-import { runActions } from "../../actions/base_action";
-import { ASKS_ACTIONS } from "../../actions/asks";
-import { RESPONSE_ACTIONS } from "../../actions/responses";
+import { runActions } from "../../actions/base_action.js";
+import { ASKS_ACTIONS } from "../../actions/asks/index.js";
+import { RESPONSE_ACTIONS } from "../../actions/responses/index.js";
 import {
   BOT_RESPONSES_CHANNELS,
   logger,
   BOT_SLACK_ID,
-} from "../../settings/server_consts";
+} from "../../settings/server_consts.js";
 
 // This method handles events that are posted directly inside a channel
 export const handleChannelEvent = async (event: any, client: any) => {

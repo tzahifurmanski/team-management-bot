@@ -1,23 +1,23 @@
-import { BotAction } from "../base_action";
+import { BotAction } from "../base_action.js";
 import {
   getChannelIDFromEventText,
   getRecurringJobInfo,
   getStatsMessage,
   scheduleAskChannelsCrons,
-} from "../utils";
+} from "../utils.js";
 import {
   AsksChannelStatsResult,
   getChannelMessages,
   getStatsForMessages,
   reportStatsToSlack,
-} from "../../logic/asks_channel";
-import { getTeamsList } from "../../settings/team_consts";
-import { sendSlackMessage } from "../../integrations/slack/messages";
-import { sanitizeCommandInput } from "../../integrations/slack/utils";
-import { logger } from "../../settings/server_consts";
-import { removeTimeInfoFromDate } from "../date_utils";
-import { SlackWebClient } from "../../integrations/consts";
-import { findTeamByValue, isValueInTeams } from "../../settings/team_utils";
+} from "../../logic/asks_channel.js";
+import { getTeamsList } from "../../settings/team_consts.js";
+import { sendSlackMessage } from "../../integrations/slack/messages.js";
+import { sanitizeCommandInput } from "../../integrations/slack/utils.js";
+import { logger } from "../../settings/server_consts.js";
+import { removeTimeInfoFromDate } from "../date_utils.js";
+import { SlackWebClient } from "../../integrations/consts.js";
+import { findTeamByValue, isValueInTeams } from "../../settings/team_utils.js";
 
 export class AskChannelStatusForYesterday implements BotAction {
   static DAYS_BACK = 60;

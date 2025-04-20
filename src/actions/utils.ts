@@ -1,9 +1,8 @@
 import cronstrue from "cronstrue";
-import { AsksChannelStatsResult } from "../logic/asks_channel";
-import { logger } from "../settings/server_consts";
-import { Team } from "../settings/team_consts";
-
-const cron = require("node-cron");
+import { AsksChannelStatsResult } from "../logic/asks_channel.js";
+import { logger } from "../settings/server_consts.js";
+import { Team } from "../settings/team_consts.js";
+import cron from "node-cron";
 
 export const getRandomFromArray = (array: any[]) => {
   const random = Math.floor(Math.random() * array.length);
@@ -88,7 +87,7 @@ export const getAskChannelParameters = (ask: string): AskChannelParams => {
   }
 
   // Validate the number of days
-  if (Number(count) === undefined || Number(count) < 1) {
+  if (isNaN(Number(count)) || Number(count) < 1) {
     return new AskChannelParams("", -1, "", "", -1, "Invalid count provided");
   }
 

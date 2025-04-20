@@ -1,5 +1,5 @@
-import { httpGet } from "../utils";
-import { ZENDESK_BASE_URL, ZENDESK_TOKEN } from "../../integrations/consts";
+import { httpGet } from "../utils.js";
+import { ZENDESK_BASE_URL, ZENDESK_TOKEN } from "../../integrations/consts.js";
 
 export const getOrganizationByID = async (
   organizationId: string,

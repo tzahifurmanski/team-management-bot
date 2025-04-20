@@ -1,7 +1,7 @@
-import { BotAction } from "../base_action";
-import { sendSlackMessage } from "../../integrations/slack/messages";
-import { getRandomFromArray } from "../utils";
-import { botConfig } from "../../settings/server_consts";
+import { BotAction } from "../base_action.js";
+import { sendSlackMessage } from "../../integrations/slack/messages.js";
+import { getRandomFromArray } from "../utils.js";
+import { botConfig } from "../../settings/server_consts.js";
 
 const GIFS: string[] = botConfig.RESPONSE_FOLKS_POOL;
 

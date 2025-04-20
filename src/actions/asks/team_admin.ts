@@ -1,10 +1,10 @@
 // src/actions/asks/team_admin.ts
-import { BotAction } from "../base_action";
-import { logger } from "../../settings/server_consts";
-import { sendSlackMessage } from "../../integrations/slack/messages";
-import { sanitizeCommandInput } from "../../integrations/slack/utils";
-import { adminAuthService } from "../../services/AdminAuthorizationService";
-import { TEAMS_LIST } from "../../settings/team_consts";
+import { BotAction } from "../base_action.js";
+import { logger } from "../../settings/server_consts.js";
+import { sendSlackMessage } from "../../integrations/slack/messages.js";
+import { sanitizeCommandInput } from "../../integrations/slack/utils.js";
+import { adminAuthService } from "../../services/AdminAuthorizationService.js";
+import { TEAMS_LIST } from "../../settings/team_consts.js";
 
 export class TeamAdmin implements BotAction {
   getHelpText(): string {
@@ -69,9 +69,8 @@ export class TeamAdmin implements BotAction {
 
       // Convert teams to array for processing
       const teamsArray = Array.from(TEAMS_LIST.entries()).map(
-        ([channelId, team]) => team,
+        ([, team]) => team,
       );
-
       // Create summary message
       const summaryMessage = this.createSummaryMessage(teamsArray);
       await sendSlackMessage(
