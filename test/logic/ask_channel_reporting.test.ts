@@ -22,7 +22,7 @@ jest.unstable_mockModule("../../src/integrations/slack/utils", () => ({
   }),
 }));
 
-export interface MockedUser {
+interface MockedUser {
   id: string;
   team: string;
   division: string;

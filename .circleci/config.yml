@@ -16,7 +16,7 @@ jobs:
           command: npm run coverage
       - run:
           name: "Run Prettier"
-          command: npm run prettier:check:ci
+          command: npm run format:check
       - store_artifacts:
           path: coverage
       - codecov/upload
