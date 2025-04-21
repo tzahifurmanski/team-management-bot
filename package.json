@@ -51,6 +51,7 @@
     "dev-start": "tsc && node dist/server.js",
     "debug": "tsc-watch --project tsconfig.json --onSuccess 'node dist/server.js'",
     "test": "cross-env NODE_ENV=test ENV_FILE=.tests_env node --experimental-vm-modules node_modules/jest/bin/jest.js --testTimeout=30000",
+    "test-one": "cross-env NODE_ENV=test ENV_FILE=.tests_env node --experimental-vm-modules node_modules/jest/bin/jest.js --testTimeout=30000 --",
     "coverage": "cross-env NODE_ENV=test ENV_FILE=.tests_env node --experimental-vm-modules node_modules/jest/bin/jest.js --testTimeout=30000 --collectCoverage=true",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\" && npx eslint . --fix",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
