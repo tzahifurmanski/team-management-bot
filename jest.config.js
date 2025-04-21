@@ -14,7 +14,6 @@ export default {
       {
         tsconfig: "./test/tsconfig.test.json",
         useESM: true,
-        babelConfig: true, // Also ensure it's set here if configuring per-transform
       },
     ],
   },
