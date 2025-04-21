@@ -6,37 +6,33 @@ import {
   afterEach,
   it,
 } from "@jest/globals";
-// import { mocked } from "jest-mock"; // Import mocked for type safety
 
-const mockConversationsFactory = () => ({
+jest.unstable_mockModule("../../src/integrations/slack/conversations", () => ({
   getBotId: jest.fn(),
-});
+  getConversationId: jest.fn(),
+}));
 
-// --- Use unstable_mockModule BEFORE any imports that depend on it ---
-jest.unstable_mockModule(
-  "../../src/integrations/slack/conversations",
-  mockConversationsFactory,
-);
+jest.unstable_mockModule("../../src/settings/server_consts", () => ({
+  setBotSlackId: jest.fn(),
+  BOT_SLACK_ID: "",
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+    trace: jest.fn(),
+    warning: jest.fn(),
+  },
+}));
 
-// --- Now, dynamically import the modules AFTER mocking ---
 // Declare variables to hold the imported modules/functions
 let loadConfig: typeof import("../../src/settings/team_consts").loadConfig;
 let getTeamsList: typeof import("../../src/settings/team_consts").getTeamsList;
-let getBotIdMock: jest.Mock; // Variable to hold the mock function reference
-
-// import { getBotId } from "../../src/integrations/slack/conversations";
-
-// jest.mock("../../src/integrations/slack/conversations", () => ({
-//   getBotId: jest.fn(),
-// }));
-
-// import { loadConfig, getTeamsList } from "../../src/settings/team_consts";
-
-import * as sconsts from "../../src/settings/server_consts";
+let getBotIdMock: jest.Mock;
+let getConversationIdMock: jest.Mock;
+let setBotSlackIdMock: jest.Mock;
 
 describe("loadConfig", () => {
   let originalEnv: NodeJS.ProcessEnv;
-
   let slackClient: any;
 
   beforeEach(async () => {
@@ -45,20 +41,21 @@ describe("loadConfig", () => {
 
     slackClient = {}; // Mock the slackClient object
 
-    // Reset mocks defined via unstable_mockModule needs dynamic import to get the mock reference again
-    // Option 1: Re-import the mocked module to get the fresh mock reference
+    // Get the mock references
     const mockedConversations = await import(
       "../../src/integrations/slack/conversations"
     );
+    getBotIdMock = mockedConversations.getBotId as jest.Mock;
+    getConversationIdMock = mockedConversations.getConversationId as jest.Mock;
+    getBotIdMock.mockClear();
+    getConversationIdMock.mockClear();
 
-    getBotIdMock = mockedConversations.getBotId as jest.Mock; // Cast to jest.Mock
-    getBotIdMock.mockClear(); // Clear history/calls
+    // Get the server_consts mock reference
+    const serverConsts = await import("../../src/settings/server_consts");
+    setBotSlackIdMock = serverConsts.setBotSlackId as jest.Mock;
+    setBotSlackIdMock.mockClear();
 
-    // Option 2 (Simpler if you only need to clear): Use jest.resetModules() if appropriate
-    // jest.resetModules(); // Resets the entire module cache - use with caution
-
-    // Dynamically import the module under test inside beforeEach
-    // to ensure it gets the mocked dependency
+    // Dynamically import the module under test
     const teamConstsModule = await import("../../src/settings/team_consts");
     loadConfig = teamConstsModule.loadConfig;
     getTeamsList = teamConstsModule.getTeamsList;
@@ -69,15 +66,18 @@ describe("loadConfig", () => {
     process.env = originalEnv;
   });
 
-  it.skip("should load the Slack config successfully", async () => {
+  it("should load the Slack config successfully", async () => {
     // Mock the necessary functions and variables
-    // (logger as jest.Mock);
-    // (BOT_SLACK_ID as jest.Mock).mockReturnValue('botSlackID'
     getBotIdMock.mockReturnValue("botSlackID");
-
-    // const setBotSlackIdMock = (setBotSlackId as jest.Mock);
-    const setBotSlackIdMock = jest.spyOn(sconsts, "setBotSlackId"); //.mockReturnValue({ someObjectProperty: 42 });
-    // const getConversationIdMock = (getConversationId as jest.Mock).mockReturnValue('channelId');
+    getConversationIdMock.mockImplementation((client, name) => {
+      // Return a mock channel ID based on the channel name
+      if (name === "channel1") return "channelid1";
+      if (name === "channel2") return "channelid2";
+      if (name === "codeReviewChannel") return "crchannel_id";
+      if (name === "zendesk1") return "zdchannelid1";
+      if (name === "zendesk2") return "zdchannelid2";
+      return "";
+    });
 
     // Mock the necessary variables
     process.env.TEAM_ASK_CHANNEL_ID = "channelid1,channelid2";
@@ -95,7 +95,6 @@ describe("loadConfig", () => {
     process.env.MONITORED_ZENDESK_FILTER_FIELD_VALUES =
       "value1,value2|value3,value4";
     process.env.ZENDESK_TICKETS_STATS_CRON = "";
-    // process.env.TEAMS_JSON_LIST = '{"ask_channel_id": "channel1"}'; // TODO: Test this? (Is this really needed?)
 
     // Call the function
     const result = await loadConfig(slackClient);

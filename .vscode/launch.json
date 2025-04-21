@@ -8,26 +8,30 @@
       "type": "node",
       "request": "launch",
       "name": "Jest All",
-      "program": "${workspaceFolder}/node_modules/.bin/jest",
-      "args": ["--runInBand"],
+      "runtimeArgs": ["--experimental-vm-modules"],
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+      "args": ["--runInBand", "--testTimeout=30000"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "env": {
-        "ENV_FILE": "${workspaceFolder}/.tests_env"
+        "ENV_FILE": "${workspaceFolder}/.tests_env",
+        "NODE_ENV": "test"
       }
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Jest: current file",
+      "runtimeArgs": ["--experimental-vm-modules"],
       "program": "${workspaceFolder}/node_modules/.bin/jest",
-      "args": ["${fileBasenameNoExtension}", "--config", "jest.config.js"],
+      "args": ["${fileBasenameNoExtension}"],
       "console": "integratedTerminal",
       "windows": {
         "program": "${workspaceFolder}/node_modules/jest/bin/jest"
       },
       "env": {
-        "ENV_FILE": "${workspaceFolder}/.tests_env"
+        "ENV_FILE": "${workspaceFolder}/.tests_env",
+        "NODE_ENV": "test"
       }
     }
   ]

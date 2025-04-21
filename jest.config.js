@@ -7,14 +7,13 @@ export default {
     // (Jest will then automatically look for .ts, .tsx, .d.ts etc.)
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  moduleFileExtensions: ["ts", "js", "json", "node", "cjs", "mjs"],
+  moduleFileExtensions: ["ts", "js", "json", "node"],
   transform: {
     "^.+\\.[tj]sx?$": [
       "ts-jest",
       {
         tsconfig: "./test/tsconfig.test.json",
         useESM: true,
-        babelConfig: true, // Also ensure it's set here if configuring per-transform
       },
     ],
   },
@@ -26,11 +25,9 @@ export default {
 
   // Add these settings to reduce memory usage
   maxWorkers: 2, // Limits parallel test execution
-  maxConcurrency: 5, // Limits async operations
   testTimeout: 30000, // Increases timeout to 30 seconds
   forceExit: true, // Forces Jest to exit after tests complete
   detectOpenHandles: true, // Helps identify resource leaks
-  // Add this to divide tests into smaller batches if needed
   // Silent version for CI
   silent: process.env.CI === "true", // Reduces console output in CI
 };

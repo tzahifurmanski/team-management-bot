@@ -2,12 +2,11 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "module": "NodeNext",
-    "moduleResolution": "NodeNext", // Or Node16
-    "target": "ES2022", // Or ES2020, ESNext
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
     "isolatedModules": true,
-    "rootDir": "test" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+    "rootDir": "test"
   },
-
   "include": ["../src/**/*.ts", "**/*.test.ts"],
   "exclude": ["../node_modules", "../dist"]
 }

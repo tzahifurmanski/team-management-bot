@@ -1,248 +1,302 @@
-// import { describe, test, expect, jest, beforeEach } from "@jest/globals";
-// import { mocked } from "jest-mock"; // Import the mocked utility
+import { describe, test, expect, jest, beforeEach } from "@jest/globals";
+import type { WebClient } from "@slack/web-api";
+import type {
+  ChatPostMessageResponse,
+  ConversationsInfoResponse,
+  ChatDeleteResponse,
+  ChatDeleteScheduledMessageResponse,
+  ChatGetPermalinkResponse,
+  ChatMeMessageResponse,
+  ChatPostEphemeralResponse,
+  ChatScheduleMessageResponse,
+  ChatUnfurlResponse,
+  ChatUpdateResponse,
+} from "@slack/web-api";
+import { TeamAdmin } from "../../../src/actions/asks/team_admin";
 
-// import { TeamAdmin } from "../../../src/actions/asks/team_admin";
-// import { adminAuthService } from "../../../src/services/AdminAuthorizationService";
-// import { TEAMS_LIST } from "../../../src/settings/team_consts";
-// import { sendSlackMessage } from "../../../src/integrations/slack/messages";
+// Define mock types
+type MockedAdminAuthService = {
+  isAuthorized: jest.Mock;
+  requestConfirmation: jest.Mock;
+  confirmAction: jest.Mock;
+};
 
-// // Mock dependencies
-// jest.mock("../../../src/services/AdminAuthorizationService", () => ({
-//   adminAuthService: {
-//     isAuthorized: jest.fn(),
-//     requestConfirmation: jest.fn(),
-//     confirmAction: jest.fn(),
-//   },
-// }));
+type MockedSendSlackMessage = jest.Mock;
 
-// jest.mock("../../../src/integrations/slack/messages", () => ({
-//   sendSlackMessage: jest.fn().mockReturnValue({}),
-// }));
+// Create mock instances
+const mockAdminAuthService: MockedAdminAuthService = {
+  isAuthorized: jest.fn(),
+  requestConfirmation: jest.fn(),
+  confirmAction: jest.fn(),
+};
 
-// jest.mock("../../../src/settings/team_consts", () => ({
-//   TEAMS_LIST: new Map(),
-// }));
+const mockSendSlackMessage: MockedSendSlackMessage = jest.fn();
 
-// jest.mock("../../../src/utils", () => ({
-//   handleListParameter: jest
-//     .fn()
-//     .mockImplementation((input: any) => (input ? input.split(",") : [])),
-// }));
+// Mock dependencies
+jest.unstable_mockModule(
+  "../../../src/services/AdminAuthorizationService",
+  () => ({
+    adminAuthService: mockAdminAuthService,
+  }),
+);
 
-// jest.mock("../../../src/actions/utils", () => ({
-//   extractIDFromChannelString: jest.fn().mockImplementation((input: any) => {
-//     const match = input.match(/<#([A-Z0-9]+)\|.+>/);
-//     return match ? match[1] : null;
-//   }),
-//   extractNameFromChannelString: jest.fn().mockImplementation((input: any) => {
-//     const match = input.match(/<#[A-Z0-9]+\|(.+)>/);
-//     return match ? match[1] : null;
-//   }),
-// }));
+jest.unstable_mockModule("../../../src/integrations/slack/messages", () => ({
+  sendSlackMessage: mockSendSlackMessage,
+}));
 
-// // Wrap the imported service with mocked() for type safety and correct access
-// const mockedAdminAuthService = mocked(adminAuthService);
-// const mockedSendSlackMessage = mocked(sendSlackMessage); // Also good practice for sendSlackMessage
+jest.unstable_mockModule("../../../src/settings/team_consts", () => ({
+  TEAMS_LIST: new Map(),
+}));
+
+jest.unstable_mockModule("../../../src/utils.js", () => ({
+  handleListParameter: jest.fn(
+    (
+      param: string | undefined,
+      defaultValue = "",
+      delimiter: string = ",",
+      removeEmpty = true,
+    ) => {
+      const fieldContent = (param || defaultValue) as string;
+      let result = fieldContent.split(delimiter);
+      if (removeEmpty) {
+        result = result.filter((i) => i);
+      }
+      return result;
+    },
+  ),
+  sanitizeCommandInput: jest.fn((input: string) => input.trim().toLowerCase()),
+}));
+
+jest.unstable_mockModule("../../../src/actions/utils", () => ({
+  extractIDFromChannelString: jest.fn().mockImplementation((input: any) => {
+    const match = input.match(/<#([A-Z0-9]+)\|.+>/);
+    return match ? match[1] : null;
+  }),
+  extractNameFromChannelString: jest.fn().mockImplementation((input: any) => {
+    const match = input.match(/<#[A-Z0-9]+\|(.+)>/);
+    return match ? match[1] : null;
+  }),
+}));
 
 describe("TeamAdmin", () => {
-  //   let teamAdmin: TeamAdmin;
-  //   let mockSlackClient: any;
-  //   let mockEvent: any;
+  let teamAdmin: TeamAdmin;
+  let mockSlackClient: Partial<WebClient>;
+  let mockEvent: any;
+  let TEAMS_LIST: Map<string, any>;
 
-  //   beforeEach(() => {
-  //     // Clear all mocks
-  //     jest.clearAllMocks();
+  beforeEach(async () => {
+    // Clear all mocks
+    jest.clearAllMocks();
 
-  //     // Create instance
-  //     teamAdmin = new TeamAdmin();
+    // Reset mock implementations
+    mockAdminAuthService.isAuthorized.mockReset();
+    mockAdminAuthService.isAuthorized.mockReturnValue(false);
+    mockSendSlackMessage.mockImplementation(async () => ({
+      ok: true,
+      ts: "1234567890.123456",
+    }));
 
-  //     // Create mock Slack client
-  //     mockSlackClient = {
-  //       conversations: {
-  //         info: jest.fn().mockReturnValue({ channel: { name: "test-channel" } }),
-  //       },
-  //     };
+    // Create instance
+    const { TeamAdmin } = await import("../../../src/actions/asks/team_admin");
+    teamAdmin = new TeamAdmin();
 
-  //     // Create mock event
-  //     mockEvent = {
-  //       user: "U12345",
-  //       channel: "C67890",
-  //       thread_ts: "1234567890.123456",
-  //     };
+    // Create mock Slack client with partial implementation
+    mockSlackClient = {
+      chat: {
+        postMessage: jest.fn().mockImplementation(async () => ({
+          ok: true,
+          ts: "1234567890.123456",
+        })) as jest.MockedFunction<() => Promise<ChatPostMessageResponse>>,
+        delete: jest.fn().mockImplementation(async () => ({
+          ok: true,
+        })) as jest.MockedFunction<() => Promise<ChatDeleteResponse>>,
+        deleteScheduledMessage: jest.fn().mockImplementation(async () => ({
+          ok: true,
+        })) as jest.MockedFunction<
+          () => Promise<ChatDeleteScheduledMessageResponse>
+        >,
+        getPermalink: jest.fn().mockImplementation(async () => ({
+          ok: true,
+          permalink: "https://example.com",
+        })) as jest.MockedFunction<() => Promise<ChatGetPermalinkResponse>>,
+        meMessage: jest.fn().mockImplementation(async () => ({
+          ok: true,
+          channel: "C12345",
+        })) as jest.MockedFunction<() => Promise<ChatMeMessageResponse>>,
+        postEphemeral: jest.fn().mockImplementation(async () => ({
+          ok: true,
+          message_ts: "1234567890.123456",
+        })) as jest.MockedFunction<() => Promise<ChatPostEphemeralResponse>>,
+        scheduleMessage: jest.fn().mockImplementation(async () => ({
+          ok: true,
+          scheduled_message_id: "Q1234",
+        })) as jest.MockedFunction<() => Promise<ChatScheduleMessageResponse>>,
+        unfurl: jest.fn().mockImplementation(async () => ({
+          ok: true,
+        })) as jest.MockedFunction<() => Promise<ChatUnfurlResponse>>,
+        update: jest.fn().mockImplementation(async () => ({
+          ok: true,
+          ts: "1234567890.123456",
+        })) as jest.MockedFunction<() => Promise<ChatUpdateResponse>>,
+      },
+      conversations: {
+        info: jest.fn().mockImplementation(async () => ({
+          ok: true,
+          channel: { name: "test-channel" },
+        })) as jest.MockedFunction<() => Promise<ConversationsInfoResponse>>,
+        acceptSharedInvite: jest.fn(),
+        approveSharedInvite: jest.fn(),
+        archive: jest.fn(),
+        close: jest.fn(),
+        create: jest.fn(),
+        history: jest.fn(),
+        invite: jest.fn(),
+        join: jest.fn(),
+        kick: jest.fn(),
+        leave: jest.fn(),
+        list: jest.fn(),
+        members: jest.fn(),
+        open: jest.fn(),
+        rename: jest.fn(),
+        replies: jest.fn(),
+        setPurpose: jest.fn(),
+        setTopic: jest.fn(),
+        unarchive: jest.fn(),
+      },
+    } as unknown as WebClient;
 
-  //     // Reset TEAMS_LIST
-  //     TEAMS_LIST.clear();
-  //   });
+    // Create mock event
+    mockEvent = {
+      user: "U12345",
+      channel: "C67890",
+      thread_ts: "1234567890.123456",
+      text: "",
+    };
 
-  //   test("isEnabled should return true", () => {
-  //     expect(teamAdmin.isEnabled()).toBe(true);
-  //   });
-
-  //   test("doesMatch should match team commands", () => {
-  //     expect(teamAdmin.doesMatch({ text: "team list" })).toBe(true);
-  //     expect(teamAdmin.doesMatch({ text: "team add" })).toBe(true);
-  //     expect(teamAdmin.doesMatch({ text: "team remove" })).toBe(true);
-  //     expect(teamAdmin.doesMatch({ text: "teams list" })).toBe(false);
-  //     expect(teamAdmin.doesMatch({ text: "help" })).toBe(false);
-  //   });
-
-  test.skip("should deny access to unauthorized users", async () => {
-    //     // Mock authorization check to fail
-    //     // (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(false);
-    //     mockedAdminAuthService.isAuthorized.mockReturnValue(false);
-    //     // Set event text
-    //     mockEvent.text = "team list";
-    //     // Call performAction
-    //     await teamAdmin.performAction(mockEvent, mockSlackClient);
-    //     // Check authorization was called
-    //     // expect(adminAuthService.isAuthorized).toHaveBeenCalledWith(
-    //     expect(mockedAdminAuthService.isAuthorized).toHaveBeenCalledWith(
-    //       "U12345",
-    //       "team list",
-    //     );
-    //     // Check error message was sent
-    //     // expect(sendSlackMessage).toHaveBeenCalledWith(
-    //     expect(mockedSendSlackMessage).toHaveBeenCalledWith(
-    //       mockSlackClient,
-    //       expect.stringContaining("not authorized"),
-    //       mockEvent.channel,
-    //       mockEvent.thread_ts,
-    //     );
+    // Get TEAMS_LIST reference and clear it
+    const teamConstsModule = await import("../../../src/settings/team_consts");
+    TEAMS_LIST = teamConstsModule.TEAMS_LIST;
+    TEAMS_LIST.clear();
   });
 
-  //   test.skip("should show help for authorized users", async () => {
-  //     // Mock authorization check to succeed
-  //     (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+  test("isEnabled should return true", () => {
+    expect(teamAdmin.isEnabled()).toBe(true);
+  });
 
-  //     // Set event text
-  //     mockEvent.text = "team help";
+  test("doesMatch should match team commands", () => {
+    expect(teamAdmin.doesMatch({ text: "team list" })).toBe(true);
+    expect(teamAdmin.doesMatch({ text: "team add" })).toBe(true);
+    expect(teamAdmin.doesMatch({ text: "team remove" })).toBe(true);
+    expect(teamAdmin.doesMatch({ text: "teams list" })).toBe(false);
+    expect(teamAdmin.doesMatch({ text: "help" })).toBe(false);
+  });
 
-  //     // Call performAction
-  //     await teamAdmin.performAction(mockEvent, mockSlackClient);
+  test("should deny access to unauthorized users", async () => {
+    // Mock authorization check to fail
+    mockAdminAuthService.isAuthorized.mockReturnValue(false);
 
-  //     // Check help message was sent
-  //     expect(sendSlackMessage).toHaveBeenCalledWith(
-  //       mockSlackClient,
-  //       expect.stringContaining("Team Administration Commands"),
-  //       mockEvent.channel,
-  //       mockEvent.thread_ts,
-  //     );
-  //   });
+    // Set event text
+    mockEvent.text = "team list";
 
-  //   test.skip("should list teams in the new format", async () => {
-  //     // Mock authorization check to succeed
-  //     (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+    // Call performAction
+    await teamAdmin.performAction(mockEvent, mockSlackClient as WebClient);
 
-  //     // Add test teams (adding 6 to test chunking)
-  //     for (let i = 1; i <= 6; i++) {
-  //       TEAMS_LIST.set(`C1234${i}`, {
-  //         ask_channel_id: `C1234${i}`,
-  //         ask_channel_name: `test-ask-${i}`,
-  //         ask_channel_cron: i % 2 === 0 ? "0 9 * * 1-5" : "",
-  //         ask_channel_cron_last_sent: new Date(),
-  //         allowed_bots: i % 3 === 0 ? ["TestBot"] : [],
-  //         zendesk_channel_id: i % 2 === 0 ? `C6789${i}` : "",
-  //         zendesk_channel_name: i % 2 === 0 ? `test-zendesk-${i}` : "",
-  //         zendesk_monitored_view_id: i % 2 === 0 ? "123456" : "",
-  //         zendesk_aggregated_field_id: "",
-  //         zendesk_field_id: "",
-  //         zendesk_field_values: [],
-  //         zendesk_channel_cron: "",
-  //         code_review_channel_id: "",
-  //         code_review_channel_name: "",
-  //       });
-  //     }
+    // Check authorization was called
+    expect(mockAdminAuthService.isAuthorized).toHaveBeenCalledWith(
+      "U12345",
+      "team list",
+    );
 
-  //     // Set event text
-  //     mockEvent.text = "team list";
+    // Check that unauthorized message was sent
+    expect(mockSendSlackMessage).toHaveBeenCalledWith(
+      mockSlackClient,
+      expect.stringContaining("not authorized"),
+      mockEvent.channel,
+      mockEvent.thread_ts,
+    );
+  });
 
-  //     // Call performAction
-  //     await teamAdmin.performAction(mockEvent, mockSlackClient);
+  test("should allow access to authorized users", async () => {
+    // Mock authorization check to succeed
+    mockAdminAuthService.isAuthorized.mockReturnValue(true);
 
-  //     // Check that summary message was sent
-  //     expect(sendSlackMessage).toHaveBeenCalledWith(
-  //       mockSlackClient,
-  //       expect.stringContaining("Team Configuration Summary"),
-  //       mockEvent.channel,
-  //       mockEvent.thread_ts,
-  //     );
+    // Add some test teams
+    for (let i = 1; i <= 6; i++) {
+      TEAMS_LIST.set(`test-ask-${i}`, {
+        name: `test-ask-${i}`,
+        ask_channel_id: `C${i}`,
+        ask_channel_name: `test-ask-channel-${i}`,
+        ask_channel_cron_last_sent: new Date().toISOString(),
+        allowed_bots: [],
+      });
+    }
 
-  //     // Check that summary contains the table header
-  //     const summaryCall = (sendSlackMessage as jest.Mock).mock.calls[0][1];
-  //     expect(summaryCall).toContain("| # | Team Name | Ask Channel |");
+    // Set event text
+    mockEvent.text = "team list";
 
-  //     // Check that detail messages were sent - should be 2 chunks of 5 teams
-  //     expect(sendSlackMessage).toHaveBeenCalledTimes(3); // Summary + 2 detail messages
+    // Call performAction
+    await teamAdmin.performAction(mockEvent, mockSlackClient as WebClient);
 
-  //     // Check first detail message
-  //     const firstDetailCall = (sendSlackMessage as jest.Mock).mock.calls[1][1];
-  //     expect(firstDetailCall).toContain("Detailed Team Information (1-5)");
-  //     expect(firstDetailCall).toContain("*Team #1: test-ask-1*");
+    // Check that summary message was sent
+    expect(mockSendSlackMessage).toHaveBeenCalledWith(
+      mockSlackClient,
+      expect.stringContaining("Team Configuration Summary"),
+      mockEvent.channel,
+      mockEvent.thread_ts,
+    );
 
-  //     // Check second detail message
-  //     const secondDetailCall = (sendSlackMessage as jest.Mock).mock.calls[2][1];
-  //     expect(secondDetailCall).toContain("Detailed Team Information (6-6)");
-  //     expect(secondDetailCall).toContain("*Team #6: test-ask-6*");
-  //   });
+    // Check that summary contains the table header
+    const summaryCall = mockSendSlackMessage.mock.calls[0][1];
+    expect(summaryCall).toContain("| # | Team Name | Ask Channel |");
 
-  //   test.skip("no teams to list", async () => {
-  //     // Mock authorization check to succeed
-  //     (adminAuthService.isAuthorized as jest.Mock).mockReturnValue(true);
+    // Check that detail messages were sent - should be 2 chunks of 5 teams
+    expect(mockSendSlackMessage).toHaveBeenCalledTimes(3); // Summary + 2 detail messages
 
-  //     // Set event text
-  //     mockEvent.text = "team list";
+    // Check first detail message
+    const firstDetailCall = mockSendSlackMessage.mock.calls[1][1];
+    expect(firstDetailCall).toContain("Detailed Team Information (1-5)");
+    expect(firstDetailCall).toContain("*Team #1: test-ask-channel-1*");
 
-  //     // Call performAction
-  //     await teamAdmin.performAction(mockEvent, mockSlackClient);
+    // Check second detail message
+    const secondDetailCall = mockSendSlackMessage.mock.calls[2][1];
+    expect(secondDetailCall).toContain("Detailed Team Information (6-6)");
+    expect(secondDetailCall).toContain("*Team #6: test-ask-channel-6*");
+  });
 
-  //     // Check that summary message was sent
-  //     expect(sendSlackMessage).toHaveBeenCalledWith(
-  //       mockSlackClient,
-  //       expect.stringContaining("No teams are currently configured."),
-  //       mockEvent.channel,
-  //       mockEvent.thread_ts,
-  //     );
-  //   });
+  test("no teams to list", async () => {
+    // Mock authorization check to succeed
+    mockAdminAuthService.isAuthorized.mockReturnValue(true);
 
-  //   test("chunkArray should correctly divide teams", () => {
-  //     // Create test data
-  //     const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    // Set event text
+    mockEvent.text = "team list";
 
-  //     // Access private method using type assertion
-  //     const chunkedArray = (teamAdmin as any).chunkArray(testArray, 3);
+    // Call performAction
+    await teamAdmin.performAction(mockEvent, mockSlackClient as WebClient);
 
-  //     // Verify chunking
-  //     expect(chunkedArray).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]);
-  //   });
+    // Check that summary message was sent
+    expect(mockSendSlackMessage).toHaveBeenCalledWith(
+      mockSlackClient,
+      expect.stringContaining("No teams are currently configured."),
+      mockEvent.channel,
+      mockEvent.thread_ts,
+    );
+  });
 
-  //   test("getHelpText returns expected help description", () => {
-  //     const helpText = teamAdmin.getHelpText();
-  //     expect(helpText).toContain("team admin");
-  //     expect(helpText).toContain("Admin commands");
-  //     expect(helpText).toContain("restricted to authorized admins");
-  //   });
+  test("chunkArray should correctly divide teams", () => {
+    // Create test data
+    const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-  //   test.skip("should show help information when 'team help' is used", async () => {
-  //     // Set event text
-  //     mockEvent.text = "team help";
+    // Access private method using type assertion
+    const chunkedArray = (teamAdmin as any).chunkArray(testArray, 3);
 
-  //     // Call performAction
-  //     await teamAdmin.performAction(mockEvent, mockSlackClient);
+    // Verify chunking
+    expect(chunkedArray).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]);
+  });
 
-  //     // Check help message was sent
-  //     expect(sendSlackMessage).toHaveBeenCalledTimes(1);
-  //     expect(sendSlackMessage).toHaveBeenCalledWith(
-  //       mockSlackClient,
-  //       expect.any(String),
-  //       mockEvent.channel,
-  //       mockEvent.thread_ts,
-  //     );
-
-  //     // Get the help message content
-  //     const helpMessage = (sendSlackMessage as jest.Mock).mock.calls[0][1];
-
-  //     // Verify help content includes essential sections
-  //     expect(helpMessage).toContain("Team Administration Commands");
-  //     expect(helpMessage).toContain("team list");
-  //   });
+  test("getHelpText returns expected help description", () => {
+    const helpText = teamAdmin.getHelpText();
+    expect(helpText).toContain("team admin");
+    expect(helpText).toContain("Admin commands");
+    expect(helpText).toContain("restricted to authorized admins");
+  });
 });
