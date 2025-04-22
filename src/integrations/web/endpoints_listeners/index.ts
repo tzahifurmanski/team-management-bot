@@ -1,4 +1,4 @@
-import healthcheck from "./healthcheck.js";
+import { healthcheck } from "./healthcheck.js";
 import { logger } from "../../../settings/server_consts.js";
 
 // Solution based off of: https://github.com/slackapi/bolt-js/issues/212

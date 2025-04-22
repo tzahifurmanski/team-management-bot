@@ -10,6 +10,7 @@ if (process.env.NODE_ENV !== "production") {
     // If there is a custom env file, use it
     console.log("Loading a custom env file...");
     dotenv.config({ path: process.env.ENV_FILE });
+    console.log(`Loaded ${process.env.ENV_FILE} file.`);
   } else {
     console.log("Loading default env file...");
     dotenv.config();
@@ -55,14 +56,21 @@ export const PORT = process.env.PORT || 3000;
 const BOT_PERSONALITY: string = process.env.BOT_PERSONALITY || "generic";
 
 // Load the configuration specific to the selected bot personality
-export const botConfig = (
-  await import(
+let botConfig: any;
+try {
+  const module = await import(
     `../../assets/personalities/${BOT_PERSONALITY}/bot_config.json`,
     {
       with: { type: "json" },
     }
-  )
-).default;
+  );
+  botConfig = module.default;
+} catch (error) {
+  logger.error("Failed to load bot config:", error);
+  botConfig = {}; // Provide a default empty config
+}
+
+export { botConfig };
 
 // If we got a bot name, override the default:
 const BOT_NAME_PLACEHOLDER = "<BOT_NAME>";

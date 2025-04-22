@@ -12,6 +12,18 @@ jest.unstable_mockModule("../../src/integrations/slack/conversations", () => ({
   getConversationId: jest.fn(),
 }));
 
+const mockLoadAllTeams = jest.fn<() => Promise<Map<string, Team>>>();
+const mockCreateTeam = jest.fn<(team: Team) => Promise<boolean>>();
+
+jest.unstable_mockModule("../../src/services/TeamService", () => ({
+  TeamService: {
+    loadAllTeams: mockLoadAllTeams,
+    createTeam: mockCreateTeam,
+  },
+}));
+
+import { Team } from "../../src/settings/team_consts";
+
 jest.unstable_mockModule("../../src/settings/server_consts", () => ({
   setBotSlackId: jest.fn(),
   BOT_SLACK_ID: "",
@@ -32,6 +44,7 @@ let getConversationIdMock: jest.Mock;
 let setBotSlackIdMock: jest.Mock;
 
 describe("loadConfig", () => {
+  console.log(JSON.stringify(process.env));
   let originalEnv: NodeJS.ProcessEnv;
   let slackClient: any;
 
@@ -59,11 +72,21 @@ describe("loadConfig", () => {
     const teamConstsModule = await import("../../src/settings/team_consts");
     loadConfig = teamConstsModule.loadConfig;
     getTeamsList = teamConstsModule.getTeamsList;
+
+    // Clear all mocks
+    mockLoadAllTeams.mockClear();
+    mockCreateTeam.mockClear();
+
+    // Mock the DB calls to do nothing
+    const result = new Map<string, Team>();
+    mockLoadAllTeams.mockResolvedValue(result);
+    mockCreateTeam.mockResolvedValue(true);
   });
 
   afterEach(() => {
     // Restore the original process.env after each test
     process.env = originalEnv;
+    jest.clearAllMocks();
   });
 
   it("should load the Slack config successfully", async () => {
@@ -80,6 +103,7 @@ describe("loadConfig", () => {
     });
 
     // Mock the necessary variables
+    process.env.ENABLE_ENV_TEAMS = "true";
     process.env.TEAM_ASK_CHANNEL_ID = "channelid1,channelid2";
     process.env.TEAM_ASK_CHANNEL_NAME = "channel1,channel2";
     process.env.ASK_CHANNEL_STATS_CRON = "";

@@ -49,7 +49,6 @@ export const sendSlackMessage = async (
     options.thread_ts = threadTS;
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   let result: ChatPostMessageResponse;
 
@@ -73,7 +72,6 @@ export const sendSlackMessage = async (
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return result;
 };

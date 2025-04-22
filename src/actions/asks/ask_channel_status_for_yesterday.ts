@@ -121,12 +121,15 @@ export class AskChannelStatusForYesterday implements BotAction {
       // TODO: Remove this once I figure out the problem that causes cron to fire twice
       if (event.scheduled) {
         const now = new Date();
-        const diff = now.getTime() - team.ask_channel_cron_last_sent.getTime();
-        if (diff < 60 * 1000) {
-          logger.info(
-            `Skipping scheduled ask channel status for yesterday for channel #${team.ask_channel_name} as it was requested less than a minute ago.`,
-          );
-          return;
+        if (team.ask_channel_cron_last_sent) {
+          const diff =
+            now.getTime() - team.ask_channel_cron_last_sent.getTime();
+          if (diff < 60 * 1000) {
+            logger.info(
+              `Skipping scheduled ask channel status for yesterday for channel #${team.ask_channel_name} as it was requested less than a minute ago.`,
+            );
+            return;
+          }
         }
 
         // Set now as the last time this was sent

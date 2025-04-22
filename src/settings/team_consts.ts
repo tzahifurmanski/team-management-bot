@@ -8,6 +8,7 @@ import { BOT_SLACK_ID, logger, setBotSlackId } from "./server_consts.js";
 import { handleListParameter } from "../utils.js";
 import { setSlackWebClient } from "../integrations/consts.js";
 import { isTeam } from "./team_utils.js";
+import { TeamService } from "../services/TeamService.js";
 
 // ====================
 // Teams Configurations
@@ -20,7 +21,7 @@ export interface Team {
   ask_channel_name: string;
   ask_channel_cron: string;
   allowed_bots: string[];
-  ask_channel_cron_last_sent: Date; // Keep track of the last time a scheduled message was sent
+  ask_channel_cron_last_sent: Date | null; // Keep track of the last time a scheduled message was sent
 
   // Zendesk Integration
   zendesk_channel_id: string;
@@ -55,8 +56,9 @@ export const USER_PROFILE_FIELD_ID_DIVISION =
 // Responses
 // ==========
 
-const GROUP_ASK_CHANNELS: string = process.env.GROUP_ASK_CHANNELS || "";
-export let GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
+// TODO: This is broken!, nothing uses the parameter!
+const _GROUP_ASK_CHANNELS: string = process.env.GROUP_ASK_CHANNELS || "";
+export const GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
 
 // TODO: This also doesn't support multi teams
 // Monitored Channel Configurations
@@ -73,20 +75,17 @@ export const MONITORED_CHANNEL_CONDITION_MESSAGE_FAILURE: string =
 export const MONITORED_CHANNEL_TRIGGER: string =
   process.env.MONITORED_CHANNEL_TRIGGER || "";
 
-// This function loads the config from the environment variables.
-// It also:
-// - If the channel ids are not provided, it resolves them from the channel names
-// - It sets the global slack client to use in cron jobs
-// - It initializes the team list
-export const loadConfig = async (slackClient: any) => {
-  logger.info("Starting Slack config load...");
+// Separated legacy environment variable loading function
+export const loadTeamsFromEnv = async (
+  slackClient: any,
+): Promise<Map<string, Team>> => {
+  logger.info("Loading teams from environment variables...");
+  // logger.trace(JSON.stringify(process.env, null, 2));
+
+  const envTeams = new Map<string, Team>();
+
   try {
-    // Load parameters
-    const botSlackID = await getBotId(slackClient);
-    setBotSlackId(botSlackID);
-
-    logger.info(`Loaded bot id ${BOT_SLACK_ID}`);
-
+    // Original environment variable loading logic
     const TEAM_ASK_CHANNEL_ID: string[] = handleListParameter(
       process.env.TEAM_ASK_CHANNEL_ID,
     );
@@ -107,6 +106,7 @@ export const loadConfig = async (slackClient: any) => {
       false,
     );
 
+    logger.debug("Handling ALLOWED_BOTS");
     const ALLOWED_BOTS: string[] = handleListParameter(
       process.env.ALLOWED_BOTS,
       "",
@@ -114,6 +114,7 @@ export const loadConfig = async (slackClient: any) => {
       false,
     );
 
+    logger.debug("DONE Handling ALLOWED_BOTS");
     // Zendesk Tickets Status Configurations
     const ZENDESK_MONITORED_VIEW = handleListParameter(
       process.env.ZENDESK_MONITORED_VIEW,
@@ -166,12 +167,13 @@ export const loadConfig = async (slackClient: any) => {
       logger.error(
         `Error: TEAM_ASK_CHANNEL_ID ${TEAM_ASK_CHANNEL_ID.length} and TEAM_ASK_CHANNEL_NAME ${TEAM_ASK_CHANNEL_NAME.length} have different lengths`,
       );
-      return false;
+      return envTeams;
     } else if (TEAM_ASK_CHANNEL_ID.length != ALLOWED_BOTS.length) {
+      // Each channel (ID) needs to have a bots definition
       logger.error(
         `Error: TEAM_ASK_CHANNEL_ID ${TEAM_ASK_CHANNEL_ID.length} and ALLOWED_BOTS ${ALLOWED_BOTS.length} have different lengths`,
       );
-      return false;
+      return envTeams;
     }
 
     if (ZENDESK_TICKETS_CHANNEL_ID.length === 0) {
@@ -189,7 +191,7 @@ export const loadConfig = async (slackClient: any) => {
       logger.error(
         "Error: TICKETS_CHANNEL_ID and TICKETS_CHANNEL_NAME have different lengths",
       );
-      return false;
+      return envTeams;
     }
 
     if (TEAM_CODE_REVIEW_CHANNEL_ID.length === 0) {
@@ -201,16 +203,15 @@ export const loadConfig = async (slackClient: any) => {
         );
         TEAM_CODE_REVIEW_CHANNEL_ID.push(channelId);
       }
+    } else if (
+      TEAM_CODE_REVIEW_CHANNEL_ID.length !==
+      TEAM_CODE_REVIEW_CHANNEL_NAME.length
+    ) {
+      logger.error(
+        "Error: TEAM_CODE_REVIEW_CHANNEL_ID and TEAM_CODE_REVIEW_CHANNEL_NAME have different lengths",
+      );
+      return envTeams;
     }
-
-    // TODO: By default report on all teams channels
-    GROUP_ASK_CHANNELS_LIST = new Map<string, string>();
-
-    const asksChannels = GROUP_ASK_CHANNELS.split(",");
-    asksChannels.forEach((channelDetails: string) => {
-      const details = channelDetails.split(":");
-      GROUP_ASK_CHANNELS_LIST.set(details[0], details[1]);
-    });
 
     // Load ALLOWED_BOTS per team
     const ALLOWED_BOTS_PER_TEAM = new Map<string, string[]>();
@@ -221,9 +222,7 @@ export const loadConfig = async (slackClient: any) => {
       );
     });
 
-    // Set global slack client to use in cron jobs
-    setSlackWebClient(slackClient);
-
+    // Cron
     const ASK_CHANNEL_STATS_CRON: string[] = handleListParameter(
       process.env.ASK_CHANNEL_STATS_CRON,
       "",
@@ -238,8 +237,6 @@ export const loadConfig = async (slackClient: any) => {
       false,
     );
 
-    // TODO: Temporarily, add the current settings to a team JSON
-    //  Also, this assumes all arrays are the same length, which is incorrect
     TEAM_ASK_CHANNEL_ID.forEach((channelId, index) => {
       const team: Team = {
         ask_channel_id: channelId,
@@ -251,8 +248,8 @@ export const loadConfig = async (slackClient: any) => {
         zendesk_monitored_view_id: ZENDESK_MONITORED_VIEW[index],
         zendesk_aggregated_field_id: ZENDESK_VIEW_AGGREGATED_FIELD_ID[index],
         zendesk_field_id: MONITORED_ZENDESK_FILTER_FIELD_ID[index] || "",
-        zendesk_field_values: (index <
-        MONITORED_ZENDESK_FILTER_FIELD_VALUES.length
+        zendesk_field_values: (MONITORED_ZENDESK_FILTER_FIELD_VALUES.length >
+        index
           ? MONITORED_ZENDESK_FILTER_FIELD_VALUES[index]
           : ""
         ).split(","),
@@ -265,7 +262,7 @@ export const loadConfig = async (slackClient: any) => {
         code_review_channel_name: TEAM_CODE_REVIEW_CHANNEL_NAME[index] || "",
       };
 
-      TEAMS_LIST.set(channelId, team);
+      envTeams.set(channelId, team);
     });
 
     // Load teams JSON list
@@ -281,24 +278,79 @@ export const loadConfig = async (slackClient: any) => {
         const team_object: any = JSON.parse(team_json);
 
         if (isTeam(team_object)) {
-          console.log(`Adding team from JSON list ${team_json}`);
-          TEAMS_LIST.set(team_object.ask_channel_id, team_object);
+          logger.info(`Adding team from JSON list ${team_json}`);
+          envTeams.set(team_object.ask_channel_id, team_object);
         } else {
-          console.log(`Invalid team JSON ${team_json}`);
+          logger.info(`Invalid team JSON ${team_json}`);
         }
       } catch (err) {
-        console.log(`Error while parsing team JSON ${team_json}`, err);
+        logger.error(`Error while parsing team JSON ${team_json}`, err);
       }
     });
 
-    // TODO: Initialize consts from the teams list
-    logger.info(
-      `Loaded ${TEAMS_LIST.size} teams: ${JSON.stringify([...TEAMS_LIST.values()])}`,
-    );
+    logger.info(`Loaded ${envTeams.size} teams from environment variables`);
+  } catch (err) {
+    logger.error("Error while loading teams from environment variables:", err);
+  }
 
+  return envTeams;
+};
+
+// Update loadConfig to use database first, then environment
+export const loadConfig = async (slackClient: any) => {
+  logger.info("Starting Slack config load...");
+  try {
+    // Load bot ID
+    const botSlackID = await getBotId(slackClient);
+    setBotSlackId(botSlackID);
+    logger.info(`Loaded bot id ${BOT_SLACK_ID}`);
+
+    // Set global slack client to use in cron jobs
+    setSlackWebClient(slackClient);
+
+    // Clear the current map
+    TEAMS_LIST.clear();
+
+    // First, try to load teams from database
+    const dbTeams = await TeamService.loadAllTeams();
+    logger.info(`Loaded ${dbTeams.size} teams from database`);
+
+    // Add all DB teams to TEAMS_LIST
+    for (const [channelId, team] of dbTeams.entries()) {
+      TEAMS_LIST.set(channelId, team);
+    }
+
+    // Next, load teams from environment variables (if enabled)
+    if (process.env.ENABLE_ENV_TEAMS === "true") {
+      const envTeams = await loadTeamsFromEnv(slackClient);
+
+      // Merge environment teams with DB teams (environment overrides DB)
+      for (const [channelId, envTeam] of envTeams.entries()) {
+        if (TEAMS_LIST.has(channelId)) {
+          logger.info(
+            `Team for channel ${channelId} exists in DB, overriding with environment config`,
+          );
+        }
+        TEAMS_LIST.set(channelId, envTeam);
+
+        // Also save/update this team in the database
+        if (dbTeams.has(channelId)) {
+          // Update existing team
+          await TeamService.updateTeam(channelId, envTeam);
+        } else {
+          // Create new team
+          await TeamService.createTeam(envTeam);
+        }
+      }
+    }
+
+    logger.info(`Final team count: ${TEAMS_LIST.size} teams`);
     logger.info("Slack config completed successfully.");
   } catch (err) {
-    logger.error("Error while loading Slack Dynamic vars!", err);
+    logger.error(
+      "Error while loading Slack config or connecting to database:",
+      err,
+    );
     return false;
   }
 
