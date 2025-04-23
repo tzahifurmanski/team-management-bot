@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@5.0.2
+  node: circleci/node@7.1.0
   codecov: codecov/codecov@4.0.1
 jobs:
   test:
@@ -10,6 +10,12 @@ jobs:
       tag: "22.14.0"
     steps:
       - checkout
+      - run:
+          name: "Clean Install"
+          command: |
+            rm -rf node_modules
+            rm -f package-lock.json
+            npm install
       - node/install-packages
       - run:
           name: "Run Coverage"
@@ -19,6 +25,8 @@ jobs:
           command: npm run format:check
       - store_artifacts:
           path: coverage
+      - store_artifacts:
+          path: ~/.npm
       - codecov/upload
 workflows:
   test:

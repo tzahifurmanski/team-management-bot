@@ -5,7 +5,7 @@ NODE_ENV=
 PORT=
 LOG_LEVEL= # Log level to be used for the application logging. Default is 'info', option are 'fatal','error:','warn','info','debug','trace'.
 BOLT_LOG_LEVEL= # Log level to be used for Bolt library logging. Default is 'info', option are 'error', 'warn, 'info', 'debug'.
-
+DATABASE_LOGGING= #S Should log the database queries or not
 
 # Bot Configurations
 # ==================
@@ -69,7 +69,7 @@ TEAM_CODE_REVIEW_CHANNEL_NAME=
 # ====================
 
 TEAMS_JSON_LIST= # A comma (',') separated list of JSONs that represent a team. Each JSON contains the following fields:
-
+ENABLE_ENV_TEAMS= # Should we also load team from environment variables, or just from database
 # Features
 
 # Ask Channel Status

@@ -1,6 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const healthcheck = async ({ req, res }: any) => {
+import { Request, Response } from "express";
+
+export const healthcheck = async (_req: Request, res: Response) => {
   res.sendStatus(200);
 };
-
-export default healthcheck;

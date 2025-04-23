@@ -170,7 +170,7 @@ export const getStatsBuckets = async (
     // Put the message in the relevant bucket
     if (buckets.has(bucketKey)) {
       const bucket = buckets.get(bucketKey);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
       // @ts-ignore
       bucket.push(message);
     } else {
@@ -197,7 +197,6 @@ export const getStatsBuckets = async (
 
   // Sort the results by start time
   results.sort(function (a, b) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return new Date(b.startDateInUTC) - new Date(a.startDateInUTC);
   });

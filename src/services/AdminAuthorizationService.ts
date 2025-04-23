@@ -93,6 +93,67 @@ export class AdminAuthorizationService {
   public getAdminUserIds(): string[] {
     return [...this.adminUserIds];
   }
+
+  /**
+   * Request confirmation for an admin action
+   * @param userId The Slack user ID requesting confirmation
+   * @param teamId The Slack team ID
+   * @param action The action being confirmed
+   * @returns A promise that resolves when the confirmation request is processed
+   */
+  public async requestConfirmation(
+    userId: string,
+    teamId: string,
+    action: string,
+  ): Promise<void> {
+    if (this.logActions) {
+      logger.info(
+        `Confirmation requested by user ${userId} for action "${action}" in team ${teamId}`,
+      );
+    }
+
+    // Store the confirmation request with a 5-minute expiration
+    const key = `${userId}:${teamId}:${action}`;
+    this.confirmationRequests.set(key, {
+      userId,
+      action,
+      expires: Date.now() + 5 * 60 * 1000, // 5 minutes
+    });
+  }
+
+  /**
+   * Confirm an admin action
+   * @param userId The Slack user ID confirming the action
+   * @param teamId The Slack team ID
+   * @returns True if the action is confirmed, false otherwise
+   */
+  public async confirmAction(
+    userId: string,
+    teamId: string,
+    action: string,
+  ): Promise<boolean> {
+    if (this.logActions) {
+      logger.info(`Confirmation check for user ${userId} in team ${teamId}`);
+    }
+
+    const key = `${userId}:${teamId}:${action}`;
+
+    const request = this.confirmationRequests.get(key);
+    if (!request) {
+      return false;
+    }
+
+    // Check if the request has expired
+    if (request.expires < Date.now()) {
+      this.confirmationRequests.delete(key);
+      return false;
+    }
+
+    // Clean up the request
+    this.confirmationRequests.delete(key);
+
+    return true;
+  }
 }
 
 // Create and export singleton instance
