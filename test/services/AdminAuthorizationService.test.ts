@@ -38,7 +38,7 @@ describe("AdminAuthorizationService", () => {
 
     test("should handle empty admin user IDs", () => {
       // Set up environment
-      process.env.ADMIN_USER_IDs = "";
+      process.env.ADMIN_USER_IDS = "";
 
       const authService = new AdminAuthorizationService();
 
@@ -65,6 +65,109 @@ describe("AdminAuthorizationService", () => {
       expect(authService.isAuthorized("U12345", "team list")).toBe(true);
       expect(authService.isAuthorized("U99999", "team list")).toBe(false);
       expect(authService.isAuthorized("U99999", "help")).toBe(true);
+    });
+
+    test("should handle empty admin commands", () => {
+      process.env.ADMIN_USER_IDS = "U12345";
+      process.env.ADMIN_COMMANDS = "";
+      process.env.ADMIN_LOG_ACTIONS = "false";
+
+      const authService = new AdminAuthorizationService();
+
+      expect(authService.isAdminCommand("any command")).toBe(false);
+      expect(authService.isAuthorized("U12345", "any command")).toBe(true);
+    });
+
+    test("should handle logging configuration", () => {
+      process.env.ADMIN_USER_IDS = "U12345";
+      process.env.ADMIN_COMMANDS = "team";
+      process.env.ADMIN_LOG_ACTIONS = "true";
+
+      const authService = new AdminAuthorizationService();
+
+      // Logging should be enabled
+      expect(authService.isAuthorized("U12345", "team list")).toBe(true);
+      expect(authService.isAuthorized("U99999", "team list")).toBe(false);
+    });
+  });
+
+  describe("confirmation flow", () => {
+    test("should handle confirmation requests and confirmations", async () => {
+      process.env.ADMIN_USER_IDS = "U12345";
+      process.env.ADMIN_COMMANDS = "team";
+      process.env.ADMIN_REQUIRE_CONFIRMATION = "true";
+      process.env.ADMIN_LOG_ACTIONS = "false";
+
+      const authService = new AdminAuthorizationService();
+      const userId = "U12345";
+      const teamId = "T12345";
+      const action = "delete team";
+
+      // Request confirmation
+      await authService.requestConfirmation(userId, teamId, action);
+
+      // Confirm action immediately
+      expect(authService.confirmAction(userId, teamId, action)).toBe(true);
+
+      // Try to confirm again (should fail as request was consumed)
+      expect(authService.confirmAction(userId, teamId, action)).toBe(false);
+    });
+
+    test("should handle expired confirmation requests", async () => {
+      process.env.ADMIN_USER_IDS = "U12345";
+      process.env.ADMIN_COMMANDS = "team";
+      process.env.ADMIN_REQUIRE_CONFIRMATION = "true";
+      process.env.ADMIN_LOG_ACTIONS = "false";
+
+      const authService = new AdminAuthorizationService();
+      const userId = "U12345";
+      const teamId = "T12345";
+      const action = "delete team";
+
+      // Request confirmation
+      await authService.requestConfirmation(userId, teamId, action);
+
+      // Mock Date.now to simulate expiration
+      const originalNow = Date.now;
+      Date.now = jest.fn(() => originalNow() + 6 * 60 * 1000); // 6 minutes later
+
+      // Try to confirm (should fail as request expired)
+      expect(authService.confirmAction(userId, teamId, action)).toBe(false);
+
+      // Restore Date.now
+      Date.now = originalNow;
+    });
+
+    test("should handle non-existent confirmation requests", () => {
+      process.env.ADMIN_USER_IDS = "U12345";
+      process.env.ADMIN_COMMANDS = "team";
+      process.env.ADMIN_REQUIRE_CONFIRMATION = "true";
+      process.env.ADMIN_LOG_ACTIONS = "false";
+
+      const authService = new AdminAuthorizationService();
+
+      // Try to confirm without requesting
+      expect(authService.confirmAction("U12345", "T12345", "delete team")).toBe(
+        false,
+      );
+    });
+
+    test("should log confirmation actions when logging is enabled", async () => {
+      process.env.ADMIN_USER_IDS = "U12345";
+      process.env.ADMIN_COMMANDS = "team";
+      process.env.ADMIN_REQUIRE_CONFIRMATION = "true";
+      process.env.ADMIN_LOG_ACTIONS = "true";
+
+      const authService = new AdminAuthorizationService();
+      const userId = "U12345";
+      const teamId = "T12345";
+      const action = "delete team";
+
+      // Request confirmation
+      await authService.requestConfirmation(userId, teamId, action);
+
+      // Confirm action with logging enabled
+      expect(authService.confirmAction(userId, teamId, action)).toBe(true);
     });
   });
 });
