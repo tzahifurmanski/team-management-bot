@@ -127,11 +127,11 @@ export class AdminAuthorizationService {
    * @param teamId The Slack team ID
    * @returns True if the action is confirmed, false otherwise
    */
-  public async confirmAction(
+  public confirmAction(
     userId: string,
     teamId: string,
     action: string,
-  ): Promise<boolean> {
+  ): boolean {
     if (this.logActions) {
       logger.info(`Confirmation check for user ${userId} in team ${teamId}`);
     }

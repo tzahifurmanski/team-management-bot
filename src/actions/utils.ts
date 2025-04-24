@@ -140,9 +140,7 @@ export const scheduleCron = (
 ) => {
   if (condition) {
     logger.info(
-      `Setting up a cron to ${description} ${cronstrue.toString(
-        cronExpression,
-      )}.`,
+      `Setting up a cron to ${description} ${cronstrue.toString(cronExpression)}.`,
     );
     cron.schedule(cronExpression, () => {
       functionToSchedule(event, slackClient);

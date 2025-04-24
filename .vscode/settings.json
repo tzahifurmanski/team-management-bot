@@ -1,4 +1,16 @@
 {
   "files.autoSave": "onFocusChange",
-  "files.hotExit": "onExit"
+  "files.hotExit": "onExit",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "prettier.trailingComma": "all"
 }
