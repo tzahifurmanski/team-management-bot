@@ -21,7 +21,7 @@ const mockScheduleAskChannelsCrons =
       channelNameKey: string,
       cronKey: string,
       command: string,
-      callback: Function,
+      callback: (team: Team) => Promise<void> | void,
     ) => void
   >();
 jest.unstable_mockModule("../../../src/actions/utils.js", () => ({

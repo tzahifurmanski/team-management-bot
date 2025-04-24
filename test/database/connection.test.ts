@@ -28,8 +28,13 @@ describe("Database Connection", () => {
       get: jest.fn(() => false),
       configurable: true,
     });
+
     // Set up the initialize spy to resolve by default
     initializeSpy.mockResolvedValue(AppDataSource);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 
   it("should initialize database successfully", async () => {
