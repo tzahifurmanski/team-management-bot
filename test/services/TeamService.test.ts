@@ -40,6 +40,7 @@ describe("TeamService", () => {
     mockTeamRepository = {
       save: jest.fn(),
       remove: jest.fn(),
+      find: jest.fn(),
       metadata: {
         name: "Team",
         target: Team,
@@ -228,6 +229,146 @@ describe("TeamService", () => {
       const updatedTeam = TEAMS_LIST.get("C12345");
       expect(updatedTeam?.ask_channel_cron).toBe("0 9 * * 1-5");
       expect(updatedTeam?.allowed_bots).toEqual(["bot1", "bot2"]);
+    });
+  });
+
+  describe("loadAllTeams", () => {
+    test("should load teams successfully", async () => {
+      // Setup mock data
+      const mockTeams = [
+        {
+          name: "Team 1",
+          askChannel: {
+            channel_id: "C12345",
+            channel_name: "team-1",
+            cron_schedule: "0 9 * * 1-5",
+            cron_last_sent: new Date(),
+            allowed_bots: ["bot1", "bot2"],
+          },
+          zendeskIntegration: {
+            channel_id: "Z12345",
+            channel_name: "zendesk-1",
+            monitored_view_id: "123",
+            aggregated_field_id: "456",
+            field_id: "789",
+            field_values: ["val1", "val2"],
+            cron_schedule: "0 10 * * 1-5",
+          },
+          codeReviewChannel: {
+            channel_id: "CR12345",
+            channel_name: "code-review-1",
+          },
+        },
+      ];
+
+      mockTeamRepository.find.mockResolvedValue(mockTeams);
+
+      const result = await TeamService.loadAllTeams();
+
+      expect(result.size).toBe(1);
+      const team = result.get("C12345");
+      expect(team).toBeDefined();
+      expect(team?.ask_channel_id).toBe("C12345");
+      expect(team?.zendesk_channel_id).toBe("Z12345");
+      expect(team?.code_review_channel_id).toBe("CR12345");
+    });
+
+    test("should handle teams without optional integrations", async () => {
+      const mockTeams = [
+        {
+          name: "Team 1",
+          askChannel: {
+            channel_id: "C12345",
+            channel_name: "team-1",
+            cron_schedule: "",
+            cron_last_sent: null,
+            allowed_bots: [],
+          },
+        },
+      ];
+
+      mockTeamRepository.find.mockResolvedValue(mockTeams);
+
+      const result = await TeamService.loadAllTeams();
+
+      expect(result.size).toBe(1);
+      const team = result.get("C12345");
+      expect(team).toBeDefined();
+      expect(team?.zendesk_channel_id).toBe("");
+      expect(team?.code_review_channel_id).toBe("");
+    });
+
+    test("should handle database error", async () => {
+      mockTeamRepository.find.mockRejectedValue(new Error("Database error"));
+
+      const result = await TeamService.loadAllTeams();
+
+      expect(result.size).toBe(0);
+    });
+
+    test("should handle empty database", async () => {
+      mockTeamRepository.find.mockResolvedValue([]);
+
+      const result = await TeamService.loadAllTeams();
+
+      expect(result.size).toBe(0);
+    });
+  });
+
+  describe("deleteTeam", () => {
+    test("should delete team successfully", async () => {
+      const mockTeam = {
+        id: 1,
+        name: "Team 1",
+      };
+
+      mockAskChannelRepository.findOne.mockResolvedValue({
+        team: mockTeam,
+      });
+
+      mockTeamRepository.remove.mockResolvedValue(true);
+
+      const result = await TeamService.deleteTeam("C12345");
+
+      expect(result).toBe(true);
+      expect(mockTeamRepository.remove).toHaveBeenCalledWith(mockTeam);
+    });
+
+    test("should handle non-existent team", async () => {
+      mockAskChannelRepository.findOne.mockResolvedValue(null);
+
+      const result = await TeamService.deleteTeam("C12345");
+
+      expect(result).toBe(false);
+      expect(mockTeamRepository.remove).not.toHaveBeenCalled();
+    });
+
+    test("should handle database error during team lookup", async () => {
+      mockAskChannelRepository.findOne.mockRejectedValue(
+        new Error("Database error"),
+      );
+
+      const result = await TeamService.deleteTeam("C12345");
+
+      expect(result).toBe(false);
+      expect(mockTeamRepository.remove).not.toHaveBeenCalled();
+    });
+
+    test("should handle database error during team removal", async () => {
+      const mockTeam = {
+        id: 1,
+        name: "Team 1",
+      };
+
+      mockAskChannelRepository.findOne.mockResolvedValue({
+        team: mockTeam,
+      });
+
+      mockTeamRepository.remove.mockRejectedValue(new Error("Database error"));
+
+      const result = await TeamService.deleteTeam("C12345");
+
+      expect(result).toBe(false);
     });
   });
 });
