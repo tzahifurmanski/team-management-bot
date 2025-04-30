@@ -1,6 +1,7 @@
 ---
 description: Ensures explicit acknowledgment of which rules are being followed and which are not relevant
-globs: ["**/*"]
+globs: 
+alwaysApply: false
 ---
 # Rule Acknowledgment and Relevance Tracking
 # Ensures transparency in rule application and relevance

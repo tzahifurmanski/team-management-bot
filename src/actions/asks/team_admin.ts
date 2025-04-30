@@ -12,6 +12,7 @@ import {
 import { TeamService } from "../../services/TeamService.js";
 import { WebClient } from "@slack/web-api";
 import { SlackEventType } from "../../integrations/slack/types.js";
+import { getConversationName } from "../../integrations/slack/conversations.js";
 
 export class TeamAdmin implements BotAction {
   getHelpText(): string {
@@ -261,9 +262,10 @@ export class TeamAdmin implements BotAction {
       // Extract channel information
       const channelRef = args[0];
       const channelId = extractIDFromChannelString(channelRef);
-      const channelName = extractNameFromChannelString(channelRef);
+      let channelName = extractNameFromChannelString(channelRef);
 
-      if (!channelId || !channelName) {
+      if (!channelId) {
+        logger.warn(`Did not find a valid Slack channel in ${channelRef}.`);
         await sendSlackMessage(
           slackClient,
           "Please provide a valid Slack channel: `team add #channel-name`",
@@ -286,6 +288,23 @@ export class TeamAdmin implements BotAction {
 
       // Create new team with basic configuration
       const cronSchedule = args.length > 1 ? args[1] : "";
+
+      if (!channelName) {
+        const retrievedChannelName = await getConversationName(
+          slackClient,
+          channelId,
+        );
+        if (!retrievedChannelName) {
+          await sendSlackMessage(
+            slackClient,
+            "Could not retrieve channel name from Slack API. Please check if the channel exists and the bot has access to it.",
+            event.channel,
+            event.thread_ts,
+          );
+          return;
+        }
+        channelName = retrievedChannelName;
+      }
 
       const newTeam = {
         ask_channel_id: channelId,
@@ -359,6 +378,7 @@ export class TeamAdmin implements BotAction {
       const channelId = extractIDFromChannelString(channelRef);
 
       if (!channelId) {
+        logger.warn(`Did not find a valid Slack channel in ${channelRef}`);
         await sendSlackMessage(
           slackClient,
           "Please provide a valid Slack channel: `team edit #channel-name`",

@@ -10,7 +10,7 @@ alwaysApply: true
 # Testing
 * Project testing is done via Jest
 
-* Project mocking is also done via Jest. Keep in mind that the project modules are in the ES6 standard, so you need to use unstable_mock.
+* Project mocking is also done via Jest. Keep in mind that the project modules are in the ES6 standard, so you need to use unstable_mock and similar functions.
 
 
 

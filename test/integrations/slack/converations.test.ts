@@ -1,7 +1,10 @@
+import { jest } from "@jest/globals";
 import {
   isBotAllowed,
   shouldMessageBeSkipped,
+  getConversationName,
 } from "../../../src/integrations/slack/conversations";
+import { ConversationsInfoResponse, WebClient } from "@slack/web-api";
 import { setBotSlackId } from "../../../src/settings/server_consts";
 
 describe("isBotAllowed", () => {
@@ -98,5 +101,118 @@ describe("shouldMessageBeSkipped", () => {
     };
 
     expect(shouldMessageBeSkipped(message, ALLOWED_BOTS_LIST)).toBeFalsy();
+  });
+});
+
+describe("getConversationName", () => {
+  test("returns empty string for empty channel ID", async () => {
+    const mockSlackClient = {
+      conversations: {
+        info: jest
+          .fn()
+          .mockImplementation(async () => ({}) as ConversationsInfoResponse),
+      },
+    };
+
+    const result = await getConversationName(
+      mockSlackClient as unknown as WebClient,
+      "",
+    );
+    expect(result).toBe("");
+    expect(mockSlackClient.conversations.info).not.toHaveBeenCalled();
+  });
+
+  test("returns channel name for valid channel ID", async () => {
+    const mockSlackClient = {
+      conversations: {
+        info: jest.fn().mockImplementation(
+          async () =>
+            ({
+              ok: true,
+              channel: {
+                id: "C1234567890",
+                name: "test-channel",
+              },
+            }) as ConversationsInfoResponse,
+        ),
+      },
+    };
+
+    const result = await getConversationName(
+      mockSlackClient as unknown as WebClient,
+      "C1234567890",
+    );
+    expect(result).toBe("test-channel");
+    expect(mockSlackClient.conversations.info).toHaveBeenCalledWith({
+      channel: "C1234567890",
+    });
+  });
+
+  test("returns empty string when API call fails", async () => {
+    const mockSlackClient = {
+      conversations: {
+        info: jest.fn().mockImplementation(async () => {
+          throw new Error("API Error");
+        }),
+      },
+    };
+
+    const result = await getConversationName(
+      mockSlackClient as unknown as WebClient,
+      "C1234567890",
+    );
+    expect(result).toBe("");
+    expect(mockSlackClient.conversations.info).toHaveBeenCalledWith({
+      channel: "C1234567890",
+    });
+  });
+
+  test("returns empty string when channel not found", async () => {
+    const mockSlackClient = {
+      conversations: {
+        info: jest.fn().mockImplementation(
+          async () =>
+            ({
+              ok: true,
+              channel: undefined,
+            }) as ConversationsInfoResponse,
+        ),
+      },
+    };
+
+    const result = await getConversationName(
+      mockSlackClient as unknown as WebClient,
+      "C1234567890",
+    );
+    expect(result).toBe("");
+    expect(mockSlackClient.conversations.info).toHaveBeenCalledWith({
+      channel: "C1234567890",
+    });
+  });
+
+  test("returns empty string when channel info response is malformed", async () => {
+    const mockSlackClient = {
+      conversations: {
+        info: jest.fn().mockImplementation(
+          async () =>
+            ({
+              ok: true,
+              channel: {
+                id: "C1234567890",
+                // name is missing
+              },
+            }) as ConversationsInfoResponse,
+        ),
+      },
+    };
+
+    const result = await getConversationName(
+      mockSlackClient as unknown as WebClient,
+      "C1234567890",
+    );
+    expect(result).toBe("");
+    expect(mockSlackClient.conversations.info).toHaveBeenCalledWith({
+      channel: "C1234567890",
+    });
   });
 });

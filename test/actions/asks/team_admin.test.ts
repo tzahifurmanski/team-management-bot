@@ -100,11 +100,12 @@ jest.unstable_mockModule("../../../src/utils.js", () => ({
 
 jest.unstable_mockModule("../../../src/integrations/slack/utils", () => ({
   sanitizeCommandInput: jest.fn((input: string) => input.trim().toLowerCase()),
+  isBotMessage: jest.fn().mockReturnValue(false),
 }));
 
 jest.unstable_mockModule("../../../src/actions/utils", () => ({
   extractIDFromChannelString: jest.fn().mockImplementation((input: any) => {
-    const match = input.match(/<#([A-Z0-9]+)\|.+>/);
+    const match = input.match(/<#([A-Z0-9]+)(?:\|.*)?>/);
     return match ? match[1] : null;
   }),
   extractNameFromChannelString: jest.fn().mockImplementation((input: any) => {
@@ -444,6 +445,49 @@ describe("TeamAdmin", () => {
 
       // Check that TeamService.createTeam was called
       expect(TeamService.createTeam).toHaveBeenCalled();
+
+      // Check success message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Successfully added team"),
+        mockEvent.channel,
+        mockEvent.thread_ts,
+      );
+    });
+
+    test("should add a new team successfully when channel name is not provided in channel string", async () => {
+      adminAuthService.isAuthorized.mockReturnValue(true);
+      TeamService.createTeam.mockResolvedValue(true);
+
+      // Mock the conversations.info response
+      const mockConversationsInfo = jest.fn().mockImplementation(async () => ({
+        ok: true,
+        channel: {
+          id: "C07PNPKGL64",
+          name: "retrieved-channel-name",
+        },
+      })) as jest.MockedFunction<typeof mockSlackClient.conversations.info>;
+
+      mockSlackClient.conversations.info = mockConversationsInfo;
+
+      // Set event text with a channel string that doesn't include a name
+      mockEvent.text = "team add <#C07PNPKGL64|> 0 9 * * 1-5";
+
+      // Call performAction
+      await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+      // Verify conversations.info was called to get the channel name
+      expect(mockConversationsInfo).toHaveBeenCalledWith({
+        channel: "C07PNPKGL64",
+      });
+
+      // Check that TeamService.createTeam was called with the retrieved name
+      expect(TeamService.createTeam).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ask_channel_id: "C07PNPKGL64",
+          ask_channel_name: "retrieved-channel-name",
+        }),
+      );
 
       // Check success message
       expect(sendSlackMessage).toHaveBeenCalledWith(

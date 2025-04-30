@@ -1,5 +1,5 @@
 ---
-description: Rules and standards for Test-Driven Development in NodeJS
+description: Rules and standards for Test-Driven Development (TDD) in NodeJS
 globs: 
 alwaysApply: false
 ---
