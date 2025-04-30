@@ -1,0 +1,322 @@
+---
+description: Rules and standards for Test-Driven Development in NodeJS
+globs: 
+alwaysApply: false
+---
+# Test-Driven Development (TDD) Rule for NodeJS
+
+<rule>
+name: test_driven_development
+description: Rules and standards for Test-Driven Development in NodeJS
+filters:
+  - type: file_extension
+    pattern: "\\.(ts|js|tsx|jsx)$"
+  - type: directory
+    pattern: "(tests?|__tests__|src)"
+  - type: content
+    pattern: "describe\\(|test\\(|it\\("
+actions:
+  - type: suggest
+    message: |
+      Test-Driven Development Rules:
+
+      1. Spec First, Code Second:
+         - ALWAYS check for existing tests
+         - Create tests BEFORE implementation
+         - Use tests as documentation
+
+      2. Implementation Process:
+         a) Review/Create Tests
+         b) Run Tests (should fail)
+         c) Implement Code
+         d) Run Tests (should pass)
+         e) Refactor
+
+      3. Test Structure:
+         ```typescript
+         describe('ServiceName', () => {
+           // Shared test setup
+           beforeEach(() => {
+             // Setup code
+           });
+
+           describe('specific functionality', () => {
+             test('defines expected behavior', () => {
+               // Test implementation
+             });
+
+             test('handles edge cases', () => {
+               // Edge case testing
+             });
+           });
+         });
+         ```
+
+      4. Validation Steps:
+         - Check test location (__tests__ directory)
+         - Review existing tests
+         - Create missing tests
+         - Follow test requirements
+
+      5. Error Prevention:
+         - No implementation without tests
+         - No skipping edge cases
+         - No failing tests
+         - No manual testing only
+         - Proper mock cleanup
+
+examples:
+  - input: |
+      // Bad: Implementation without tests
+      export class MyService {
+        async process() {
+          // Code without tests
+        }
+      }
+
+      // Good: Test first
+      describe('MyService', () => {
+        describe('process', () => {
+          test('performs the expected action', async () => {
+            // Test implementation
+          });
+        });
+      });
+metadata:
+  priority: high
+  version: 1.0.0
+  changelog:
+    - version: 1.0.0
+      changes:
+        - Initial version adapted for NodeJS/Jest
+        - Added core TDD principles
+        - Added Jest-specific test structure
+        - Added validation steps
+
+## Implementation Guide
+
+1. **Finding Existing Tests**
+   ```bash
+   find src/test -name "*.test.ts" | grep $FEATURE_NAME
+   ```
+
+2. **Creating New Tests**
+   ```typescript
+   // src/test/services/MyService.test.ts
+   import { MyService } from '../../services/MyService';
+
+   describe('MyService', () => {
+     let service: MyService;
+
+     beforeEach(() => {
+       service = new MyService();
+     });
+
+     describe('process', () => {
+       test('succeeds with valid input', async () => {
+         const result = await service.process();
+         expect(result).toBeDefined();
+       });
+
+       test('fails gracefully with invalid input', async () => {
+         await expect(service.process(null)).rejects.toThrow();
+       });
+     });
+   });
+   ```
+
+3. **Running Tests**
+   ```bash
+   npm test -- MyService.test.ts
+   npm run coverage -- MyService.test.ts
+   ```
+
+4. **Implementation**
+   ```typescript
+   // src/services/MyService.ts
+   export class MyService {
+     async process() {
+       // Implementation following test requirements
+     }
+   }
+   ```
+
+## Best Practices
+
+1. **Test Organization**
+   - One test file per module/component
+   - Logical grouping with describe blocks
+   - Clear, descriptive test names
+   - Use beforeEach/afterEach for setup/cleanup
+
+2. **Test Coverage**
+   - Happy path scenarios
+   - Edge cases
+   - Error conditions
+   - Boundary values
+   - Async behavior
+   - Mock cleanup
+
+3. **Maintainability**
+   - DRY tests using test helpers
+   - Clear setup using beforeEach
+   - Isolated tests
+   - Meaningful assertions
+   - Proper ES6 mock cleanup
+   - Define mocks before importing tested modules
+   - Use async/await with ES6 module imports
+   - Handle dynamic imports appropriately
+
+4. **Documentation**
+   - Tests serve as documentation
+   - Clear descriptions
+   - Example usage
+   - Edge case documentation
+
+## Mocking Guidelines
+
+1. **ES6 Module Mocks**
+   ```typescript
+   // Mock setup for ES modules
+   import { jest } from '@jest/globals';
+   
+   // Using unstable_mockModule for ES module mocking
+   jest.unstable_mockModule('../path/to/dependency.js', () => ({
+     default: jest.fn(),
+     namedExport: jest.fn(),
+   }));
+
+   // Important: Mock modules must be defined BEFORE importing the modules under test
+   const { default: dependency, namedExport } = await import('../path/to/dependency.js');
+   const { MyService } = await import('./MyService.js');
+   
+   beforeEach(() => {
+     jest.clearAllMocks();
+   });
+
+   afterEach(() => {
+     jest.resetAllMocks();
+   });
+   ```
+
+2. **Mock Validation with ES Modules**
+   ```typescript
+   test('calls dependency correctly', async () => {
+     const mockDependency = await import('../path/to/dependency.js');
+     // Test implementation
+     expect(mockDependency.namedExport).toHaveBeenCalledWith(expectedArgs);
+   });
+   ```
+
+3. **Dynamic Import Mocking**
+   ```typescript
+   test('handles dynamic imports', async () => {
+     // Mock a dynamic import
+     jest.unstable_mockModule('../path/to/dynamic-module.js', () => ({
+       default: jest.fn().mockResolvedValue({ data: 'mocked' })
+     }));
+
+     const result = await service.methodUsingDynamicImport();
+     expect(result).toEqual({ data: 'mocked' });
+   });
+   ```
+
+4. **Common ES6 Mocking Patterns**
+   ```typescript
+   // Mocking class instances
+   jest.unstable_mockModule('../models/User.js', () => ({
+     User: jest.fn().mockImplementation(() => ({
+       save: jest.fn().mockResolvedValue({ id: 1 }),
+       update: jest.fn().mockResolvedValue(true)
+     }))
+   }));
+
+   // Mocking external modules
+   jest.unstable_mockModule('@slack/bolt', () => ({
+     App: jest.fn().mockImplementation(() => ({
+       start: jest.fn().mockResolvedValue(undefined),
+       client: {
+         chat: {
+           postMessage: jest.fn().mockResolvedValue({ ok: true })
+         }
+       }
+     }))
+   }));
+   ```
+
+## Common Patterns
+
+1. **Service Tests**
+   ```typescript
+   describe('ServiceName', () => {
+     describe('methodName', () => {
+       test('performs expected action', async () => {
+         // Test implementation
+       });
+
+       test('handles errors appropriately', async () => {
+         // Error handling test
+       });
+     });
+   });
+   ```
+
+2. **Component Tests**
+   ```typescript
+   describe('ComponentName', () => {
+     describe('when rendering', () => {
+       test('displays expected content', () => {
+         // Test implementation
+       });
+
+       test('handles user interaction', () => {
+         // Interaction test
+       });
+     });
+   });
+   ```
+
+## Error Prevention
+
+1. Never start implementation without tests
+2. Don't modify existing code without reviewing tests
+3. Don't skip writing tests for edge cases
+4. Don't leave failing tests unresolved
+5. Always clean up mocks after tests
+6. Never import modules before setting up their mocks
+7. Always use proper ES6 module mocking patterns
+8. Handle async operations properly with ES6 modules
+
+## Examples
+
+### Good Process
+1. Check for tests
+2. Review existing tests
+3. Write new tests
+4. Implement feature
+5. Refactor
+
+### Bad Process
+1. Start coding immediately
+2. Test manually
+3. Fix bugs as they appear
+4. Write tests later (or never)
+
+## References
+
+- Jest documentation
+- TypeScript documentation
+- Testing best practices
+- Mock documentation
+
+## Enforcement
+
+The AI assistant should:
+
+1. ALWAYS check for existing tests first
+2. Suggest creating tests if none exist
+3. Follow TDD principles
+4. Reference relevant tests in responses
+5. Maintain test coverage
+6. Prevent implementation without tests
+7. Ensure proper mock cleanup 
