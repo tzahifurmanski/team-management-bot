@@ -1718,4 +1718,54 @@ describe("TeamAdmin", () => {
       expect(lastDetailCall).toContain("Detailed Team Information (16-20)");
     });
   });
+
+  test("should list only the specified team when a channel is provided", async () => {
+    adminAuthService.isAuthorized.mockReturnValue(true);
+
+    // Add multiple teams
+    TEAMS_LIST.set("C12345", {
+      ask_channel_id: "C12345",
+      ask_channel_name: "test-channel",
+      ask_channel_cron: "0 9 * * 1-5",
+      ask_channel_cron_last_sent: new Date().toISOString(),
+      allowed_bots: ["bot1"],
+      zendesk_channel_id: "Z12345",
+      zendesk_channel_name: "zendesk-channel",
+      zendesk_monitored_view_id: "123",
+      zendesk_field_id: "456",
+      zendesk_field_values: ["val1", "val2"],
+      zendesk_channel_cron: "0 10 * * 1-5",
+      code_review_channel_id: "CR12345",
+      code_review_channel_name: "code-review",
+    });
+    TEAMS_LIST.set("C67890", {
+      ask_channel_id: "C67890",
+      ask_channel_name: "other-team",
+      ask_channel_cron: "",
+      ask_channel_cron_last_sent: new Date().toISOString(),
+      allowed_bots: [],
+      zendesk_channel_id: "",
+      zendesk_channel_name: "",
+      zendesk_monitored_view_id: "",
+      zendesk_field_id: "",
+      zendesk_field_values: [],
+      zendesk_channel_cron: "",
+      code_review_channel_id: "",
+      code_review_channel_name: "",
+    });
+
+    // Set event text to specify a channel
+    mockEvent.text = "team list <#C12345|test-channel>";
+
+    // Call performAction
+    await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+    // Should only send details for the specified team (no summary, no other teams)
+    expect(sendSlackMessage).toHaveBeenCalledTimes(1);
+    const detailCall = sendSlackMessage.mock.calls[0][1];
+    expect(detailCall).toContain("Detailed Team Information");
+    expect(detailCall).toContain("test-channel");
+    expect(detailCall).not.toContain("other-team");
+    expect(detailCall).not.toContain("Team Configuration Summary");
+  });
 });

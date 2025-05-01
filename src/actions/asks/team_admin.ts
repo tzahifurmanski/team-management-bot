@@ -85,9 +85,12 @@ export class TeamAdmin implements BotAction {
     const subCommand = args[1]?.toLowerCase();
 
     switch (subCommand) {
-      case "list":
-        await this.listTeams(event, client);
+      case "list": {
+        // Support: team list <#channel>
+        const channelArg = args[2];
+        await this.listTeams(event, client, channelArg);
         break;
+      }
       case "add":
         await this.addTeam(args.slice(2), event, client);
         break;
@@ -105,8 +108,13 @@ export class TeamAdmin implements BotAction {
 
   /**
    * Optimized team listing method for handling large numbers of teams reliably
+   * If channelArg is provided, only list that team.
    */
-  private async listTeams(event: any, slackClient: any): Promise<void> {
+  private async listTeams(
+    event: any,
+    slackClient: any,
+    channelArg?: string,
+  ): Promise<void> {
     try {
       if (TEAMS_LIST.size === 0) {
         await sendSlackMessage(
@@ -118,10 +126,33 @@ export class TeamAdmin implements BotAction {
         return;
       }
 
-      // Convert teams to array for processing
-      const teamsArray = Array.from(TEAMS_LIST.entries()).map(
-        ([, team]) => team,
-      );
+      let teamsArray = Array.from(TEAMS_LIST.entries()).map(([, team]) => team);
+      if (channelArg) {
+        // Try to extract channel ID from the argument
+        const channelId = extractIDFromChannelString(channelArg);
+        if (channelId && TEAMS_LIST.has(channelId)) {
+          const team = TEAMS_LIST.get(channelId);
+          // Only send details for this team
+          const detailMessage = this.createDetailedTeamMessage([team], 0);
+          await sendSlackMessage(
+            slackClient,
+            detailMessage,
+            event.channel,
+            event.thread_ts,
+          );
+          return;
+        } else {
+          await sendSlackMessage(
+            slackClient,
+            `No team found for channel ${channelArg}.`,
+            event.channel,
+            event.thread_ts,
+          );
+          return;
+        }
+      }
+
+      // Default: all teams
       // Create summary message
       const summaryMessage = this.createSummaryMessage(teamsArray);
       await sendSlackMessage(
