@@ -2,6 +2,7 @@ import {
   ConversationsHistoryArguments,
   ConversationsHistoryResponse,
   ConversationsListArguments,
+  ConversationsInfoResponse,
 } from "@slack/web-api";
 import { isBotMessage } from "./utils.js";
 import { logger, BOT_SLACK_ID } from "../../settings/server_consts.js";
@@ -50,7 +51,7 @@ export const getConversationId = async (
     //  If possible, get the next cursor and look again
     if (!channelsList.response_metadata.next_cursor) {
       // No more data, we didn't find return empty
-      logger.warning(
+      logger.warn(
         "Could not resolve conversation id for channel '" + name + "'",
       );
       return "";
@@ -153,4 +154,43 @@ export const isBotAllowed = (
     (message.username && allowedBotsList.includes(message.username)) ||
     (message.bot_profile && allowedBotsList.includes(message.bot_profile.name))
   );
+};
+
+// Gets a channel name by its ID using conversations.info API
+export const getConversationName = async (
+  slackClient: any,
+  channelId: string,
+): Promise<string> => {
+  if (!channelId) {
+    logger.warn("No channel ID provided to getConversationName");
+    return "";
+  }
+
+  try {
+    logger.info("Resolving channel name for ID", channelId);
+    const response: ConversationsInfoResponse =
+      await slackClient.conversations.info({
+        channel: channelId,
+      });
+
+    if (response.channel?.name) {
+      logger.info(
+        "Resolved channel name '" +
+          response.channel.name +
+          "' for ID '" +
+          channelId +
+          "'",
+      );
+      return response.channel.name;
+    }
+
+    logger.warn("Could not resolve channel name for ID '" + channelId + "'");
+    return "";
+  } catch (error) {
+    logger.error(
+      "Error getting channel name for ID '" + channelId + "':",
+      error,
+    );
+    return "";
+  }
 };

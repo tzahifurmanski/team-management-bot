@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Guidlines
+* Whenever asked to make a change, make the change and then run the project's tests. If there are any errors, go back and fix the issues. Repeat until all tests are passing, and there are no linting errors.
+
+# Testing
+* Project testing is done via Jest
+
+* Project mocking is also done via Jest. Keep in mind that the project modules are in the ES6 standard, so you need to use unstable_mock and similar functions.
+
+
+
