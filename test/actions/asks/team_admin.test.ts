@@ -628,6 +628,13 @@ describe("TeamAdmin", () => {
         code_review_channel_id: "",
         code_review_channel_name: "",
       });
+
+      // Reset mocks
+      jest.clearAllMocks();
+      adminAuthService.isAuthorized.mockReturnValue(true);
+      adminAuthService.requestConfirmation.mockResolvedValue(undefined);
+      adminAuthService.confirmAction.mockResolvedValue(true);
+      TeamService.updateTeam.mockResolvedValue(true);
     });
 
     test("should edit a team successfully", async () => {
@@ -1074,6 +1081,147 @@ describe("TeamAdmin", () => {
       expect(TEAMS_LIST.has("C12345")).toBe(true);
       const team = TEAMS_LIST.get("C12345");
       expect(team?.ask_channel_id).toBe("C12345");
+    });
+
+    test("should validate valid cron schedule for ask_channel_cron", async () => {
+      // Set event text with valid cron
+      const event = {
+        text: "team edit <#C12345|test-channel> ask_channel_cron 0 9 * * 1-5",
+        user: "U12345",
+        team: "T12345",
+        channel: "C67890",
+        thread_ts: "1234567890.123456",
+      };
+
+      // Call performAction
+      await teamAdmin.performAction(event, mockSlackClient);
+
+      // Check that TeamService.updateTeam was called with the valid cron
+      expect(TeamService.updateTeam).toHaveBeenCalledWith("C12345", {
+        ask_channel_cron: "0 9 * * 1-5",
+      });
+
+      // Check success message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Successfully updated team"),
+        event.channel,
+        event.thread_ts,
+      );
+    });
+
+    test("should reject invalid cron schedule for ask_channel_cron", async () => {
+      // Set event text with invalid cron
+      const event = {
+        text: "team edit <#C12345|test-channel> ask_channel_cron invalid-cron",
+        user: "U12345",
+        team: "T12345",
+        channel: "C67890",
+        thread_ts: "1234567890.123456",
+      };
+
+      // Call performAction
+      await teamAdmin.performAction(event, mockSlackClient);
+
+      // Check that TeamService.updateTeam was not called
+      expect(TeamService.updateTeam).not.toHaveBeenCalled();
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Invalid cron schedule format"),
+        event.channel,
+        event.thread_ts,
+      );
+    });
+
+    test("should validate valid cron schedule for zendesk_channel_cron", async () => {
+      // Set event text with valid cron
+      const event = {
+        text: "team edit <#C12345|test-channel> zendesk_channel_cron 0 9 * * 1-5",
+        user: "U12345",
+        team: "T12345",
+        channel: "C67890",
+        thread_ts: "1234567890.123456",
+      };
+
+      // Call performAction
+      await teamAdmin.performAction(event, mockSlackClient);
+
+      // Check that TeamService.updateTeam was called with the valid cron
+      expect(TeamService.updateTeam).toHaveBeenCalledWith("C12345", {
+        zendesk_channel_cron: "0 9 * * 1-5",
+      });
+
+      // Check success message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Successfully updated team"),
+        event.channel,
+        event.thread_ts,
+      );
+    });
+
+    test("should reject invalid cron schedule for zendesk_channel_cron", async () => {
+      // Set event text with invalid cron
+      const event = {
+        text: "team edit <#C12345|test-channel> zendesk_channel_cron invalid-cron",
+        user: "U12345",
+        team: "T12345",
+        channel: "C67890",
+        thread_ts: "1234567890.123456",
+      };
+
+      // Call performAction
+      await teamAdmin.performAction(event, mockSlackClient);
+
+      // Check that TeamService.updateTeam was not called
+      expect(TeamService.updateTeam).not.toHaveBeenCalled();
+
+      // Check error message
+      expect(sendSlackMessage).toHaveBeenCalledWith(
+        mockSlackClient,
+        expect.stringContaining("Invalid cron schedule format"),
+        event.channel,
+        event.thread_ts,
+      );
+    });
+
+    test("should allow empty value for cron schedules", async () => {
+      // Test ask_channel_cron
+      const event1 = {
+        text: "team edit <#C12345|test-channel> ask_channel_cron EMPTY",
+        user: "U12345",
+        team: "T12345",
+        channel: "C67890",
+        thread_ts: "1234567890.123456",
+      };
+
+      await teamAdmin.performAction(event1, mockSlackClient);
+      expect(TeamService.updateTeam).toHaveBeenCalledWith("C12345", {
+        ask_channel_cron: "",
+      });
+
+      // Reset mocks
+      jest.clearAllMocks();
+      adminAuthService.isAuthorized.mockReturnValue(true);
+      adminAuthService.requestConfirmation.mockResolvedValue(undefined);
+      adminAuthService.confirmAction.mockResolvedValue(true);
+      TeamService.updateTeam.mockResolvedValue(true);
+
+      // Test zendesk_channel_cron
+      const event2 = {
+        text: "team edit <#C12345|test-channel> zendesk_channel_cron EMPTY",
+        user: "U12345",
+        team: "T12345",
+        channel: "C67890",
+        thread_ts: "1234567890.123456",
+      };
+
+      await teamAdmin.performAction(event2, mockSlackClient);
+      expect(TeamService.updateTeam).toHaveBeenCalledWith("C12345", {
+        zendesk_channel_cron: "",
+      });
     });
   });
 

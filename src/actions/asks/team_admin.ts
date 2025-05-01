@@ -13,6 +13,7 @@ import { TeamService } from "../../services/TeamService.js";
 import { WebClient } from "@slack/web-api";
 import { SlackEventType } from "../../integrations/slack/types.js";
 import { getConversationName } from "../../integrations/slack/conversations.js";
+import { isValidCronExpression } from "../../utils/cron.js";
 
 export class TeamAdmin implements BotAction {
   getHelpText(): string {
@@ -409,6 +410,22 @@ export class TeamAdmin implements BotAction {
         await sendSlackMessage(
           slackClient,
           `Invalid property "${property}". Valid properties are: ${Object.keys(team).join(", ")}`,
+          event.channel,
+          event.thread_ts,
+        );
+        return;
+      }
+
+      // Validate cron expressions if applicable
+      if (
+        (property === "ask_channel_cron" ||
+          property === "zendesk_channel_cron") &&
+        value.toUpperCase() !== "EMPTY" &&
+        !isValidCronExpression(value)
+      ) {
+        await sendSlackMessage(
+          slackClient,
+          `Invalid cron schedule format for ${property}. Please use a valid cron expression (e.g., "0 9 * * 1-5" for weekdays at 9 AM).`,
           event.channel,
           event.thread_ts,
         );

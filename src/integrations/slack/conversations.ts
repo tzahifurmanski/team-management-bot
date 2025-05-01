@@ -51,7 +51,7 @@ export const getConversationId = async (
     //  If possible, get the next cursor and look again
     if (!channelsList.response_metadata.next_cursor) {
       // No more data, we didn't find return empty
-      logger.warning(
+      logger.warn(
         "Could not resolve conversation id for channel '" + name + "'",
       );
       return "";
@@ -173,7 +173,7 @@ export const getConversationName = async (
         channel: channelId,
       });
 
-    if (response.channel && response.channel.name) {
+    if (response.channel?.name) {
       logger.info(
         "Resolved channel name '" +
           response.channel.name +
