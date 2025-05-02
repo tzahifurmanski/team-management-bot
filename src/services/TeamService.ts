@@ -156,6 +156,10 @@ export class TeamService {
         return false;
       }
 
+      logger.info(
+        `Updating team with ask_channel_id ${channelId} and updates: ${JSON.stringify(updates)}`,
+      );
+
       const team = askChannel.team;
 
       // Get previous team details
@@ -167,35 +171,33 @@ export class TeamService {
         return false;
       }
 
-      // Update ask channel properties
+      // Update ask channel properties via team.askChannel
       if (updates.ask_channel_id !== undefined) {
-        // Update the ask channel properties
-        askChannel.channel_id = updates.ask_channel_id;
+        team.askChannel.channel_id = updates.ask_channel_id;
       }
 
       if (updates.ask_channel_name) {
-        askChannel.channel_name = updates.ask_channel_name;
+        team.askChannel.channel_name = updates.ask_channel_name;
         team.name = updates.ask_channel_name;
       }
 
-      if (updates.ask_channel_cron !== undefined)
-        askChannel.cron_schedule = updates.ask_channel_cron;
-      if (updates.ask_channel_cron_last_sent)
-        askChannel.cron_last_sent = updates.ask_channel_cron_last_sent;
-      if (updates.allowed_bots) askChannel.allowed_bots = updates.allowed_bots;
+      if (updates.ask_channel_cron !== undefined) {
+        team.askChannel.cron_schedule = updates.ask_channel_cron;
+      }
+      if (updates.ask_channel_cron_last_sent !== undefined)
+        team.askChannel.cron_last_sent = updates.ask_channel_cron_last_sent;
+      if (updates.allowed_bots !== undefined)
+        team.askChannel.allowed_bots = updates.allowed_bots;
 
-      // Save askChannel after mutation
-      await askChannelRepository.save(askChannel);
-
-      // Update zendesk integration
+      // Update zendesk integration via team.zendeskIntegration
       if (
-        updates.zendesk_channel_id ||
-        updates.zendesk_channel_name ||
-        updates.zendesk_monitored_view_id ||
-        updates.zendesk_aggregated_field_id ||
-        updates.zendesk_field_id ||
-        updates.zendesk_field_values ||
-        updates.zendesk_channel_cron
+        updates.zendesk_channel_id !== undefined ||
+        updates.zendesk_channel_name !== undefined ||
+        updates.zendesk_monitored_view_id !== undefined ||
+        updates.zendesk_aggregated_field_id !== undefined ||
+        updates.zendesk_field_id !== undefined ||
+        updates.zendesk_field_values !== undefined ||
+        updates.zendesk_channel_cron !== undefined
       ) {
         let zendeskIntegration = team.zendeskIntegration;
 
@@ -223,14 +225,9 @@ export class TeamService {
           zendeskIntegration.field_values = updates.zendesk_field_values;
         if (updates.zendesk_channel_cron !== undefined)
           zendeskIntegration.cron_schedule = updates.zendesk_channel_cron;
-
-        // Save zendeskIntegration after mutation
-        const zendeskIntegrationRepository =
-          AppDataSource.getRepository(ZendeskIntegration);
-        await zendeskIntegrationRepository.save(zendeskIntegration);
       }
 
-      // Update code review channel
+      // Update code review channel via team.codeReviewChannel
       if (
         updates.code_review_channel_id !== undefined ||
         updates.code_review_channel_name !== undefined
@@ -243,9 +240,6 @@ export class TeamService {
         ) {
           // If both ID and name are empty/undefined, remove the code review channel
           if (codeReviewChannel) {
-            const codeReviewRepository =
-              AppDataSource.getRepository(CodeReviewChannel);
-            await codeReviewRepository.remove(codeReviewChannel);
             team.codeReviewChannel = null;
           }
         } else {
@@ -265,16 +259,11 @@ export class TeamService {
               codeReviewChannel.channel_id = updates.code_review_channel_id;
             if (updates.code_review_channel_name !== undefined)
               codeReviewChannel.channel_name = updates.code_review_channel_name;
-
-            // Save codeReviewChannel after mutation
-            const codeReviewRepository =
-              AppDataSource.getRepository(CodeReviewChannel);
-            await codeReviewRepository.save(codeReviewChannel);
           }
         }
       }
 
-      // Save all changes to database first
+      // Save all changes to database first (only save team)
       const teamRepository = AppDataSource.getRepository(Team);
       await teamRepository.save(team);
 
