@@ -1908,4 +1908,58 @@ describe("TeamAdmin", () => {
     expect(detailCall).not.toContain("other-team");
     expect(detailCall).not.toContain("Team Configuration Summary");
   });
+
+  test("should handle non-existent team gracefully", async () => {
+    // Mock authorization check to succeed
+    adminAuthService.isAuthorized.mockReturnValue(true);
+
+    // Clear any existing teams
+    TEAMS_LIST.clear();
+
+    // Add a different team to ensure TEAMS_LIST is not empty
+    TEAMS_LIST.set("C1", {
+      ask_channel_id: "C1",
+      ask_channel_name: "existing-team",
+      ask_channel_cron_last_sent: new Date().toISOString(),
+    });
+
+    // Try to list a non-existent team
+    const channelRef = "<#C999|non-existent-team>";
+    mockEvent.text = `team list ${channelRef}`;
+    await teamAdmin.performAction(mockEvent, mockSlackClient as WebClient);
+
+    // Check that error message was sent
+    expect(sendSlackMessage).toHaveBeenCalledWith(
+      mockSlackClient,
+      `No team found for channel ${channelRef}.`,
+      mockEvent.channel,
+      mockEvent.thread_ts,
+    );
+  });
+
+  test("should handle invalid channel format gracefully", async () => {
+    // Mock authorization check to succeed
+    adminAuthService.isAuthorized.mockReturnValue(true);
+
+    // Clear any existing teams
+    TEAMS_LIST.clear();
+
+    // Mock extractIDFromChannelString to return null for invalid format
+    const { extractIDFromChannelString } = await import(
+      "../../../src/actions/utils"
+    );
+    (extractIDFromChannelString as jest.Mock).mockReturnValueOnce(null);
+
+    // Try to list with invalid channel format
+    mockEvent.text = "team list invalid-channel-format";
+    await teamAdmin.performAction(mockEvent, mockSlackClient as WebClient);
+
+    // Check that error message was sent
+    expect(sendSlackMessage).toHaveBeenCalledWith(
+      mockSlackClient,
+      "No teams are currently configured.",
+      mockEvent.channel,
+      mockEvent.thread_ts,
+    );
+  });
 });
