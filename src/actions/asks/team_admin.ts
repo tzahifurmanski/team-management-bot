@@ -14,10 +14,39 @@ import { WebClient } from "@slack/web-api";
 import { SlackEventType } from "../../integrations/slack/types.js";
 import { getConversationName } from "../../integrations/slack/conversations.js";
 import { isValidCronExpression } from "../../utils/cron.js";
+import * as cronstrue from "cronstrue";
 
 export class TeamAdmin implements BotAction {
   getHelpText(): string {
-    return "`team admin` - Admin commands for managing teams (restricted to authorized admins)";
+    // TODO: Only show this if the user is an admin (adminAuthService.isUserAdmin - Requires changing the function signature in all actions)
+    return `\`team admin\` - Admin commands for managing teams (restricted to authorized admins)
+
+*Available Commands:*
+
+• \`team list\` - List all configured teams
+• \`team list #channel-name\` - Show detailed information for a specific team
+
+• \`team add #channel-name [cron schedule]\` - Add a new team
+  - Required: #channel-name - The Slack channel for the team
+  - Optional: cron schedule - When to run scheduled asks (e.g. "0 9 * * 1-5" for weekdays at 9 AM GMT)
+
+• \`team edit #channel-name property value\` - Edit team properties
+  Properties:
+  - \`ask_channel_id\` - Update team's ask channel
+  - \`ask_channel_name\` - Update channel name
+  - \`ask_channel_cron\` - Update ask schedule (cron format)
+  - \`allowed_bots\` - Comma-separated list of allowed bots
+  - \`zendesk_channel_id\` - Zendesk notifications channel
+  - \`zendesk_monitored_view_id\` - Zendesk view ID to monitor
+  - \`zendesk_field_id\` - Zendesk field ID
+  - \`zendesk_field_values\` - Comma-separated list of field values
+  - \`zendesk_channel_cron\` - Zendesk check schedule (cron format)
+  - \`code_review_channel_id\` - Code review notifications channel
+  Use "EMPTY" as value to clear a field
+
+• \`team delete #channel-name\` - Delete a team configuration
+
+• \`team help\` - Show this help message`;
   }
 
   isEnabled(): boolean {
@@ -85,9 +114,12 @@ export class TeamAdmin implements BotAction {
     const subCommand = args[1]?.toLowerCase();
 
     switch (subCommand) {
-      case "list":
-        await this.listTeams(event, client);
+      case "list": {
+        // Support: team list <#channel>
+        const channelArg = args[2];
+        await this.listTeams(event, client, channelArg);
         break;
+      }
       case "add":
         await this.addTeam(args.slice(2), event, client);
         break;
@@ -105,8 +137,13 @@ export class TeamAdmin implements BotAction {
 
   /**
    * Optimized team listing method for handling large numbers of teams reliably
+   * If channelArg is provided, only list that team.
    */
-  private async listTeams(event: any, slackClient: any): Promise<void> {
+  private async listTeams(
+    event: any,
+    slackClient: any,
+    channelArg?: string,
+  ): Promise<void> {
     try {
       if (TEAMS_LIST.size === 0) {
         await sendSlackMessage(
@@ -118,10 +155,33 @@ export class TeamAdmin implements BotAction {
         return;
       }
 
-      // Convert teams to array for processing
-      const teamsArray = Array.from(TEAMS_LIST.entries()).map(
-        ([, team]) => team,
-      );
+      let teamsArray = Array.from(TEAMS_LIST.entries()).map(([, team]) => team);
+      if (channelArg) {
+        // Try to extract channel ID from the argument
+        const channelId = extractIDFromChannelString(channelArg);
+        if (channelId && TEAMS_LIST.has(channelId)) {
+          const team = TEAMS_LIST.get(channelId);
+          // Only send details for this team
+          const detailMessage = this.createDetailedTeamMessage([team], 0);
+          await sendSlackMessage(
+            slackClient,
+            detailMessage,
+            event.channel,
+            event.thread_ts,
+          );
+          return;
+        } else {
+          await sendSlackMessage(
+            slackClient,
+            `No team found for channel ${channelArg}.`,
+            event.channel,
+            event.thread_ts,
+          );
+          return;
+        }
+      }
+
+      // Default: all teams
       // Create summary message
       const summaryMessage = this.createSummaryMessage(teamsArray);
       await sendSlackMessage(
@@ -185,6 +245,43 @@ export class TeamAdmin implements BotAction {
   }
 
   /**
+   * Format cron schedule with human-readable times in different timezones
+   */
+  private formatCronSchedule(
+    cronExpression: string | null | undefined,
+    scheduleType: string,
+  ): string {
+    if (!cronExpression) {
+      return "";
+    }
+
+    try {
+      const gmtCron = cronstrue.toString(cronExpression);
+
+      // If the cron expression is invalid, only show the raw expression
+      if (gmtCron === "Invalid cron expression") {
+        return `• ${scheduleType} Schedule: \`${cronExpression}\`\n`;
+      }
+
+      const gmtHour = parseInt(gmtCron.match(/(\d+):00/)?.[1] || "0");
+
+      // Calculate IDT time (GMT+3)
+      const idtHour = (gmtHour + 3) % 24;
+      const nextDay = gmtHour + 3 >= 24;
+      const restOfCronText = gmtCron.split(",")[1] || "";
+
+      return (
+        `• ${scheduleType} Schedule: \`${cronExpression}\`\n` +
+        `• ${scheduleType} Schedule (GMT): ${gmtCron}\n` +
+        `• ${scheduleType} Schedule (IDT): At ${idtHour.toString().padStart(2, "0")}:00${nextDay ? " (next day)" : ""}${restOfCronText ? "," + restOfCronText : ""}\n`
+      );
+    } catch (error) {
+      logger.error(`Error formatting cron expression: ${error}`);
+      return `• ${scheduleType} Schedule: \`${cronExpression}\`\n`;
+    }
+  }
+
+  /**
    * Create a detailed message for a chunk of teams
    */
   private createDetailedTeamMessage(
@@ -214,13 +311,16 @@ export class TeamAdmin implements BotAction {
         message += `• Zendesk View ID: ${team.zendesk_monitored_view_id}\n`;
       }
 
-      // Schedules
+      // Add schedules with human-readable format
       if (team.ask_channel_cron) {
-        message += `• Ask Schedule: \`${team.ask_channel_cron}\`\n`;
+        message += this.formatCronSchedule(team.ask_channel_cron, "Ask");
       }
 
       if (team.zendesk_channel_cron) {
-        message += `• Zendesk Schedule: \`${team.zendesk_channel_cron}\`\n`;
+        message += this.formatCronSchedule(
+          team.zendesk_channel_cron,
+          "Zendesk",
+        );
       }
 
       // Add a separator between teams (except after the last one)
@@ -616,7 +716,8 @@ export class TeamAdmin implements BotAction {
 *Team Administration Commands*
 
 - \`team list\` - List all configured teams
-- \`team add #channel-name [cron schedule]\` - Add a new team for a channel
+- \`team list #channel-name\` - Show detailed information for a specific team
+- \`team add #channel-name [cron schedule]\` - Add a new team
 - \`team edit #channel-name property value\` - Edit a team property
 - \`team delete #channel-name\` - Delete a team
 - \`team help\` - Show this help message

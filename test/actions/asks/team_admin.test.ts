@@ -128,6 +128,29 @@ jest.unstable_mockModule("../../../src/services/TeamService", () => ({
   },
 }));
 
+jest.unstable_mockModule("cronstrue", () => ({
+  toString: jest.fn().mockImplementation((cronExpression) => {
+    switch (cronExpression) {
+      case "0 9 * * 1-5":
+        return "At 09:00, Monday through Friday";
+      case "0 10 * * 1-5":
+        return "At 10:00, Monday through Friday";
+      case "0 14 * * 1-5":
+        return "At 14:00, Monday through Friday";
+      case "0 22 * * 1-5":
+        return "At 22:00, Monday through Friday";
+      case "0 23 * * 1-5":
+        return "At 23:00, Monday through Friday";
+      case "0 0 * * 1-5":
+        return "At 00:00, Monday through Friday";
+      case "0 12 * * 1-5":
+        return "At 12:00, Monday through Friday";
+      default:
+        return "Invalid cron expression";
+    }
+  }),
+}));
+
 describe("TeamAdmin", () => {
   let teamAdmin: TeamAdmin;
   let mockSlackClient: WebClient;
@@ -176,44 +199,42 @@ describe("TeamAdmin", () => {
         postMessage: jest.fn().mockImplementation(async () => ({
           ok: true,
           ts: "1234567890.123456",
-        })) as jest.MockedFunction<() => Promise<ChatPostMessageResponse>>,
+        })),
         delete: jest.fn().mockImplementation(async () => ({
           ok: true,
-        })) as jest.MockedFunction<() => Promise<ChatDeleteResponse>>,
+        })),
         deleteScheduledMessage: jest.fn().mockImplementation(async () => ({
           ok: true,
-        })) as jest.MockedFunction<
-          () => Promise<ChatDeleteScheduledMessageResponse>
-        >,
+        })),
         getPermalink: jest.fn().mockImplementation(async () => ({
           ok: true,
           permalink: "https://example.com",
-        })) as jest.MockedFunction<() => Promise<ChatGetPermalinkResponse>>,
+        })),
         meMessage: jest.fn().mockImplementation(async () => ({
           ok: true,
           channel: "C12345",
-        })) as jest.MockedFunction<() => Promise<ChatMeMessageResponse>>,
+        })),
         postEphemeral: jest.fn().mockImplementation(async () => ({
           ok: true,
           message_ts: "1234567890.123456",
-        })) as jest.MockedFunction<() => Promise<ChatPostEphemeralResponse>>,
+        })),
         scheduleMessage: jest.fn().mockImplementation(async () => ({
           ok: true,
           scheduled_message_id: "Q1234",
-        })) as jest.MockedFunction<() => Promise<ChatScheduleMessageResponse>>,
+        })),
         unfurl: jest.fn().mockImplementation(async () => ({
           ok: true,
-        })) as jest.MockedFunction<() => Promise<ChatUnfurlResponse>>,
+        })),
         update: jest.fn().mockImplementation(async () => ({
           ok: true,
           ts: "1234567890.123456",
-        })) as jest.MockedFunction<() => Promise<ChatUpdateResponse>>,
+        })),
       },
       conversations: {
         info: jest.fn().mockImplementation(async () => ({
           ok: true,
           channel: { name: "test-channel" },
-        })) as jest.MockedFunction<() => Promise<ConversationsInfoResponse>>,
+        })),
         acceptSharedInvite: jest.fn(),
         approveSharedInvite: jest.fn(),
         archive: jest.fn(),
@@ -366,6 +387,125 @@ describe("TeamAdmin", () => {
     const secondDetailCall = sendSlackMessage.mock.calls[2][1];
     expect(secondDetailCall).toContain("Detailed Team Information (6-6)");
     expect(secondDetailCall).toContain("*Team #6: test-ask-channel-6*");
+  });
+
+  test("should list teams with human-readable cron expressions for various times", async () => {
+    // Mock authorization check to succeed
+    adminAuthService.isAuthorized.mockReturnValue(true);
+
+    // Add test teams with different cron expressions
+    const testTeams = [
+      {
+        ask_channel_id: "C1",
+        ask_channel_name: "morning-team",
+        ask_channel_cron: "0 9 * * 1-5", // 9 AM GMT -> 12 PM IDT
+        ask_channel_cron_last_sent: new Date().toISOString(),
+      },
+      {
+        ask_channel_id: "C2",
+        ask_channel_name: "afternoon-team",
+        ask_channel_cron: "0 14 * * 1-5", // 2 PM GMT -> 5 PM IDT
+        ask_channel_cron_last_sent: new Date().toISOString(),
+      },
+      {
+        ask_channel_id: "C3",
+        ask_channel_name: "night-team",
+        ask_channel_cron: "0 22 * * 1-5", // 10 PM GMT -> 1 AM IDT (next day)
+        ask_channel_cron_last_sent: new Date().toISOString(),
+      },
+      {
+        ask_channel_id: "C4",
+        ask_channel_name: "late-night-team",
+        ask_channel_cron: "0 23 * * 1-5", // 11 PM GMT -> 2 AM IDT (next day)
+        ask_channel_cron_last_sent: new Date().toISOString(),
+      },
+      {
+        ask_channel_id: "C5",
+        ask_channel_name: "midnight-team",
+        ask_channel_cron: "0 0 * * 1-5", // 12 AM GMT -> 3 AM IDT
+        ask_channel_cron_last_sent: new Date().toISOString(),
+      },
+      {
+        ask_channel_id: "C6",
+        ask_channel_name: "noon-team",
+        ask_channel_cron: "0 12 * * 1-5", // 12 PM GMT -> 3 PM IDT
+        ask_channel_cron_last_sent: new Date().toISOString(),
+      },
+    ];
+
+    testTeams.forEach((team) => TEAMS_LIST.set(team.ask_channel_id, team));
+
+    // Test each team individually
+    for (const team of testTeams) {
+      mockEvent.text = `team list <#${team.ask_channel_id}|${team.ask_channel_name}>`;
+      await teamAdmin.performAction(mockEvent, mockSlackClient as WebClient);
+
+      const message =
+        sendSlackMessage.mock.calls[sendSlackMessage.mock.calls.length - 1][1];
+
+      // Verify basic formatting
+      expect(message).toContain(`*Team #1: ${team.ask_channel_name}*`);
+      expect(message).toContain(`• Ask Schedule: \`${team.ask_channel_cron}\``);
+
+      // Verify specific time conversions
+      switch (team.ask_channel_id) {
+        case "C1": // 9 AM GMT
+          expect(message).toContain("Schedule (IDT): At 12:00");
+          expect(message).not.toContain("(next day)");
+          break;
+        case "C2": // 2 PM GMT
+          expect(message).toContain("Schedule (IDT): At 17:00");
+          expect(message).not.toContain("(next day)");
+          break;
+        case "C3": // 10 PM GMT
+          expect(message).toContain("Schedule (IDT): At 01:00 (next day)");
+          break;
+        case "C4": // 11 PM GMT
+          expect(message).toContain("Schedule (IDT): At 02:00 (next day)");
+          break;
+        case "C5": // 12 AM GMT
+          expect(message).toContain("Schedule (IDT): At 03:00");
+          expect(message).not.toContain("(next day)");
+          break;
+        case "C6": // 12 PM GMT
+          expect(message).toContain("Schedule (IDT): At 15:00");
+          expect(message).not.toContain("(next day)");
+          break;
+      }
+    }
+
+    // Clean up
+    testTeams.forEach((team) => TEAMS_LIST.delete(team.ask_channel_id));
+  });
+
+  test("should handle invalid cron expressions gracefully", async () => {
+    adminAuthService.isAuthorized.mockReturnValue(true);
+
+    // Add a test team with an invalid cron expression
+    const invalidTeam = {
+      ask_channel_id: "C999",
+      ask_channel_name: "invalid-team",
+      ask_channel_cron: "invalid-cron",
+      ask_channel_cron_last_sent: new Date().toISOString(),
+    };
+
+    TEAMS_LIST.set(invalidTeam.ask_channel_id, invalidTeam);
+
+    mockEvent.text = `team list <#${invalidTeam.ask_channel_id}|${invalidTeam.ask_channel_name}>`;
+    await teamAdmin.performAction(mockEvent, mockSlackClient as WebClient);
+
+    const message =
+      sendSlackMessage.mock.calls[sendSlackMessage.mock.calls.length - 1][1];
+
+    // Should still show the cron expression but without the parsed times
+    expect(message).toContain(
+      `• Ask Schedule: \`${invalidTeam.ask_channel_cron}\``,
+    );
+    expect(message).not.toContain("Schedule (GMT):");
+    expect(message).not.toContain("Schedule (IDT):");
+
+    // Clean up
+    TEAMS_LIST.delete(invalidTeam.ask_channel_id);
   });
 
   test("no teams to list", async () => {
@@ -1717,5 +1857,109 @@ describe("TeamAdmin", () => {
       const lastDetailCall = sendSlackMessage.mock.calls[4][1];
       expect(lastDetailCall).toContain("Detailed Team Information (16-20)");
     });
+  });
+
+  test("should list only the specified team when a channel is provided", async () => {
+    adminAuthService.isAuthorized.mockReturnValue(true);
+
+    // Add multiple teams
+    TEAMS_LIST.set("C12345", {
+      ask_channel_id: "C12345",
+      ask_channel_name: "test-channel",
+      ask_channel_cron: "0 9 * * 1-5",
+      ask_channel_cron_last_sent: new Date().toISOString(),
+      allowed_bots: ["bot1"],
+      zendesk_channel_id: "Z12345",
+      zendesk_channel_name: "zendesk-channel",
+      zendesk_monitored_view_id: "123",
+      zendesk_field_id: "456",
+      zendesk_field_values: ["val1", "val2"],
+      zendesk_channel_cron: "0 10 * * 1-5",
+      code_review_channel_id: "CR12345",
+      code_review_channel_name: "code-review",
+    });
+    TEAMS_LIST.set("C67890", {
+      ask_channel_id: "C67890",
+      ask_channel_name: "other-team",
+      ask_channel_cron: "",
+      ask_channel_cron_last_sent: new Date().toISOString(),
+      allowed_bots: [],
+      zendesk_channel_id: "",
+      zendesk_channel_name: "",
+      zendesk_monitored_view_id: "",
+      zendesk_field_id: "",
+      zendesk_field_values: [],
+      zendesk_channel_cron: "",
+      code_review_channel_id: "",
+      code_review_channel_name: "",
+    });
+
+    // Set event text to specify a channel
+    mockEvent.text = "team list <#C12345|test-channel>";
+
+    // Call performAction
+    await teamAdmin.performAction(mockEvent, mockSlackClient);
+
+    // Should only send details for the specified team (no summary, no other teams)
+    expect(sendSlackMessage).toHaveBeenCalledTimes(1);
+    const detailCall = sendSlackMessage.mock.calls[0][1];
+    expect(detailCall).toContain("Detailed Team Information");
+    expect(detailCall).toContain("test-channel");
+    expect(detailCall).not.toContain("other-team");
+    expect(detailCall).not.toContain("Team Configuration Summary");
+  });
+
+  test("should handle non-existent team gracefully", async () => {
+    // Mock authorization check to succeed
+    adminAuthService.isAuthorized.mockReturnValue(true);
+
+    // Clear any existing teams
+    TEAMS_LIST.clear();
+
+    // Add a different team to ensure TEAMS_LIST is not empty
+    TEAMS_LIST.set("C1", {
+      ask_channel_id: "C1",
+      ask_channel_name: "existing-team",
+      ask_channel_cron_last_sent: new Date().toISOString(),
+    });
+
+    // Try to list a non-existent team
+    const channelRef = "<#C999|non-existent-team>";
+    mockEvent.text = `team list ${channelRef}`;
+    await teamAdmin.performAction(mockEvent, mockSlackClient as WebClient);
+
+    // Check that error message was sent
+    expect(sendSlackMessage).toHaveBeenCalledWith(
+      mockSlackClient,
+      `No team found for channel ${channelRef}.`,
+      mockEvent.channel,
+      mockEvent.thread_ts,
+    );
+  });
+
+  test("should handle invalid channel format gracefully", async () => {
+    // Mock authorization check to succeed
+    adminAuthService.isAuthorized.mockReturnValue(true);
+
+    // Clear any existing teams
+    TEAMS_LIST.clear();
+
+    // Mock extractIDFromChannelString to return null for invalid format
+    const { extractIDFromChannelString } = await import(
+      "../../../src/actions/utils"
+    );
+    (extractIDFromChannelString as jest.Mock).mockReturnValueOnce(null);
+
+    // Try to list with invalid channel format
+    mockEvent.text = "team list invalid-channel-format";
+    await teamAdmin.performAction(mockEvent, mockSlackClient as WebClient);
+
+    // Check that error message was sent
+    expect(sendSlackMessage).toHaveBeenCalledWith(
+      mockSlackClient,
+      "No teams are currently configured.",
+      mockEvent.channel,
+      mockEvent.thread_ts,
+    );
   });
 });

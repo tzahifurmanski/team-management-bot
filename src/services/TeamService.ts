@@ -171,9 +171,6 @@ export class TeamService {
       if (updates.ask_channel_id !== undefined) {
         // Update the ask channel properties
         askChannel.channel_id = updates.ask_channel_id;
-
-        // Remove old entry from TEAMS_LIST
-        TEAMS_LIST.delete(channelId);
       }
 
       if (updates.ask_channel_name) {
@@ -264,38 +261,28 @@ export class TeamService {
         }
       }
 
-      // Save all changes
+      // Save all changes to database first
       const teamRepository = AppDataSource.getRepository(Team);
-      try {
-        await teamRepository.save(team);
+      await teamRepository.save(team);
 
-        // Update TEAMS_LIST with all changes
-        const updatedTeam = { ...previousTeam, ...updates };
-        TEAMS_LIST.set(
-          updates.ask_channel_id !== undefined
-            ? updates.ask_channel_id
-            : channelId,
-          updatedTeam,
-        );
+      // Only after successful database save, update TEAMS_LIST
+      const updatedTeam = { ...previousTeam, ...updates };
 
-        TEAMS_LIST.set(
-          updates.ask_channel_id !== undefined &&
-            updates.ask_channel_id !== null &&
-            updates.ask_channel_id !== ""
-            ? updates.ask_channel_id
-            : channelId,
-          updatedTeam,
-        );
-
-        logger.info(`Updated team with ask_channel_id ${channelId}`);
-        return true;
-      } catch (error) {
-        // If save fails, restore the old entry in TEAMS_LIST
-        if (updates.ask_channel_id !== undefined) {
-          TEAMS_LIST.set(channelId, previousTeam);
-        }
-        throw error;
+      // If ask_channel_id was updated, we need to remove the old entry
+      if (updates.ask_channel_id !== undefined) {
+        TEAMS_LIST.delete(channelId);
       }
+
+      // Set the new entry with the correct channel ID
+      TEAMS_LIST.set(
+        updates.ask_channel_id !== undefined
+          ? updates.ask_channel_id
+          : channelId,
+        updatedTeam,
+      );
+
+      logger.info(`Updated team with ask_channel_id ${channelId}`);
+      return true;
     } catch (error) {
       logger.error(
         `Failed to update team with ask_channel_id ${channelId}:`,
