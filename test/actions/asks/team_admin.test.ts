@@ -411,10 +411,10 @@ describe("TeamAdmin", () => {
           "• Zendesk Channel: <#Z12345|zendesk-channel>\n" +
           "• Ask Schedule: `0 9 * * 1-5`\n" +
           "• Ask Schedule (GMT): At 09:00 AM, Monday through Friday\n" +
-          "• Ask Schedule (IDT): At 12:00 PM, Monday through Friday\n" +
+          "• Ask Schedule (IDT): At 12:00, Monday through Friday\n" +
           "• Zendesk Schedule: `0 10 * * 1-5`\n" +
           "• Zendesk Schedule (GMT): At 10:00 AM, Monday through Friday\n" +
-          "• Zendesk Schedule (IDT): At 13:00 PM, Monday through Friday",
+          "• Zendesk Schedule (IDT): At 13:00, Monday through Friday",
       ),
       mockEvent.channel,
       mockEvent.thread_ts,

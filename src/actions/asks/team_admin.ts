@@ -217,6 +217,36 @@ export class TeamAdmin implements BotAction {
   }
 
   /**
+   * Format cron schedule with human-readable times in different timezones
+   */
+  private formatCronSchedule(
+    cronExpression: string | null | undefined,
+    scheduleType: string,
+  ): string {
+    if (!cronExpression) {
+      return "";
+    }
+
+    try {
+      const gmtCron = cronstrue.toString(cronExpression);
+      const gmtHour = parseInt(gmtCron.match(/(\d+):00/)?.[1] || "0");
+
+      // Calculate IDT time (GMT+3)
+      const idtHour = (gmtHour + 3) % 24;
+      const restOfCronText = gmtCron.split(",")[1] || "";
+
+      return (
+        `• ${scheduleType} Schedule: \`${cronExpression}\`\n` +
+        `• ${scheduleType} Schedule (GMT): ${gmtCron}\n` +
+        `• ${scheduleType} Schedule (IDT): At ${idtHour.toString().padStart(2, "0")}:00${restOfCronText ? "," + restOfCronText : ""}\n`
+      );
+    } catch (error) {
+      logger.error(`Error formatting cron expression: ${error}`);
+      return `• ${scheduleType} Schedule: \`${cronExpression}\`\n`;
+    }
+  }
+
+  /**
    * Create a detailed message for a chunk of teams
    */
   private createDetailedTeamMessage(
@@ -246,29 +276,16 @@ export class TeamAdmin implements BotAction {
         message += `• Zendesk View ID: ${team.zendesk_monitored_view_id}\n`;
       }
 
-      // Schedules with human-readable format
+      // Add schedules with human-readable format
       if (team.ask_channel_cron) {
-        const gmtCron = cronstrue.toString(team.ask_channel_cron);
-        message += `• Ask Schedule: \`${team.ask_channel_cron}\`\n`;
-        message += `• Ask Schedule (GMT): ${gmtCron}\n`;
-        message += `• Ask Schedule (IDT): ${gmtCron
-          .replace("AM", "PM")
-          .replace(/(\d+):00/, (match) => {
-            const hour = parseInt(match) + 3;
-            return `${hour}:00`;
-          })}\n`;
+        message += this.formatCronSchedule(team.ask_channel_cron, "Ask");
       }
 
       if (team.zendesk_channel_cron) {
-        const gmtCron = cronstrue.toString(team.zendesk_channel_cron);
-        message += `• Zendesk Schedule: \`${team.zendesk_channel_cron}\`\n`;
-        message += `• Zendesk Schedule (GMT): ${gmtCron}\n`;
-        message += `• Zendesk Schedule (IDT): ${gmtCron
-          .replace("AM", "PM")
-          .replace(/(\d+):00/, (match) => {
-            const hour = parseInt(match) + 3;
-            return `${hour}:00`;
-          })}\n`;
+        message += this.formatCronSchedule(
+          team.zendesk_channel_cron,
+          "Zendesk",
+        );
       }
 
       // Add a separator between teams (except after the last one)
@@ -664,6 +681,7 @@ export class TeamAdmin implements BotAction {
 *Team Administration Commands*
 
 - \`team list\` - List all configured teams
+- \`team list #channel-name\` - Show detailed information for a specific team
 - \`team add #channel-name [cron schedule]\` - Add a new team for a channel
 - \`team edit #channel-name property value\` - Edit a team property
 - \`team delete #channel-name\` - Delete a team
