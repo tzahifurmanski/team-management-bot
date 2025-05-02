@@ -229,16 +229,23 @@ export class TeamAdmin implements BotAction {
 
     try {
       const gmtCron = cronstrue.toString(cronExpression);
+
+      // If the cron expression is invalid, only show the raw expression
+      if (gmtCron === "Invalid cron expression") {
+        return `• ${scheduleType} Schedule: \`${cronExpression}\`\n`;
+      }
+
       const gmtHour = parseInt(gmtCron.match(/(\d+):00/)?.[1] || "0");
 
       // Calculate IDT time (GMT+3)
       const idtHour = (gmtHour + 3) % 24;
+      const nextDay = gmtHour + 3 >= 24;
       const restOfCronText = gmtCron.split(",")[1] || "";
 
       return (
         `• ${scheduleType} Schedule: \`${cronExpression}\`\n` +
         `• ${scheduleType} Schedule (GMT): ${gmtCron}\n` +
-        `• ${scheduleType} Schedule (IDT): At ${idtHour.toString().padStart(2, "0")}:00${restOfCronText ? "," + restOfCronText : ""}\n`
+        `• ${scheduleType} Schedule (IDT): At ${idtHour.toString().padStart(2, "0")}:00${nextDay ? " (next day)" : ""}${restOfCronText ? "," + restOfCronText : ""}\n`
       );
     } catch (error) {
       logger.error(`Error formatting cron expression: ${error}`);
