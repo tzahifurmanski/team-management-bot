@@ -13,4 +13,8 @@ alwaysApply: true
 * Project mocking is also done via Jest. Keep in mind that the project modules are in the ES6 standard, so you need to use unstable_mock and similar functions.
 
 
+# Development style 
+Develop it using TDD style (use the corresponding cursor rule), and keep going until the tests pass successfully without errors.
+Keep in mind that the project is using ES6 standard, so standard mocking won't work (and you should use things like unstable_mock).
+
 

@@ -1,6 +1,7 @@
 ---
 description: Rules and standards for Test-Driven Development (TDD) in NodeJS
 globs: 
+  - "**/*.{ts,js,tsx,jsx}"
 alwaysApply: false
 ---
 # Test-Driven Development (TDD) Rule for NodeJS
@@ -8,7 +9,7 @@ alwaysApply: false
 <rule>
 name: test_driven_development
 description: Rules and standards for Test-Driven Development in NodeJS
-filters:
+filters: 
   - type: file_extension
     pattern: "\\.(ts|js|tsx|jsx)$"
   - type: directory

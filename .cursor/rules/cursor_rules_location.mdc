@@ -1,6 +1,7 @@
 ---
 description: Enforces the location and naming conventions for all other .cursorrules files.  This is the MOST IMPORTANT rule.
-globs: 
+globs:
+  - ".cursor/rules/**/*.mdc"
 ---
 # Cursor Rules Location
 # Enforces the location and naming conventions for all other .cursorrules files.  This is the MOST IMPORTANT rule.
