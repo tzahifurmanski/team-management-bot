@@ -18,7 +18,35 @@ import * as cronstrue from "cronstrue";
 
 export class TeamAdmin implements BotAction {
   getHelpText(): string {
-    return "`team admin` - Admin commands for managing teams (restricted to authorized admins)";
+    // TODO: Only show this if the user is an admin (adminAuthService.isUserAdmin - Requires changing the function signature in all actions)
+    return `\`team admin\` - Admin commands for managing teams (restricted to authorized admins)
+
+*Available Commands:*
+
+• \`team list\` - List all configured teams
+• \`team list #channel-name\` - Show detailed information for a specific team
+
+• \`team add #channel-name [cron schedule]\` - Add a new team
+  - Required: #channel-name - The Slack channel for the team
+  - Optional: cron schedule - When to run scheduled asks (e.g. "0 9 * * 1-5" for weekdays at 9 AM GMT)
+
+• \`team edit #channel-name property value\` - Edit team properties
+  Properties:
+  - \`ask_channel_id\` - Update team's ask channel
+  - \`ask_channel_name\` - Update channel name
+  - \`ask_channel_cron\` - Update ask schedule (cron format)
+  - \`allowed_bots\` - Comma-separated list of allowed bots
+  - \`zendesk_channel_id\` - Zendesk notifications channel
+  - \`zendesk_monitored_view_id\` - Zendesk view ID to monitor
+  - \`zendesk_field_id\` - Zendesk field ID
+  - \`zendesk_field_values\` - Comma-separated list of field values
+  - \`zendesk_channel_cron\` - Zendesk check schedule (cron format)
+  - \`code_review_channel_id\` - Code review notifications channel
+  Use "EMPTY" as value to clear a field
+
+• \`team delete #channel-name\` - Delete a team configuration
+
+• \`team help\` - Show this help message`;
   }
 
   isEnabled(): boolean {
@@ -689,7 +717,7 @@ export class TeamAdmin implements BotAction {
 
 - \`team list\` - List all configured teams
 - \`team list #channel-name\` - Show detailed information for a specific team
-- \`team add #channel-name [cron schedule]\` - Add a new team for a channel
+- \`team add #channel-name [cron schedule]\` - Add a new team
 - \`team edit #channel-name property value\` - Edit a team property
 - \`team delete #channel-name\` - Delete a team
 - \`team help\` - Show this help message
