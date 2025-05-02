@@ -171,12 +171,6 @@ export class TeamService {
         return false;
       }
 
-      // UNSET TEAM
-      // askChannel.team = null;
-      logger.info(
-        `ASK CHANNEL id=${askChannel.channel_id}, name=${askChannel.channel_name}`,
-      );
-
       // Update ask channel properties via team.askChannel
       if (updates.ask_channel_id !== undefined) {
         team.askChannel.channel_id = updates.ask_channel_id;
@@ -190,20 +184,20 @@ export class TeamService {
       if (updates.ask_channel_cron !== undefined) {
         team.askChannel.cron_schedule = updates.ask_channel_cron;
       }
-      if (updates.ask_channel_cron_last_sent)
+      if (updates.ask_channel_cron_last_sent !== undefined)
         team.askChannel.cron_last_sent = updates.ask_channel_cron_last_sent;
-      if (updates.allowed_bots)
+      if (updates.allowed_bots !== undefined)
         team.askChannel.allowed_bots = updates.allowed_bots;
 
       // Update zendesk integration via team.zendeskIntegration
       if (
-        updates.zendesk_channel_id ||
-        updates.zendesk_channel_name ||
-        updates.zendesk_monitored_view_id ||
-        updates.zendesk_aggregated_field_id ||
-        updates.zendesk_field_id ||
-        updates.zendesk_field_values ||
-        updates.zendesk_channel_cron
+        updates.zendesk_channel_id !== undefined ||
+        updates.zendesk_channel_name !== undefined ||
+        updates.zendesk_monitored_view_id !== undefined ||
+        updates.zendesk_aggregated_field_id !== undefined ||
+        updates.zendesk_field_id !== undefined ||
+        updates.zendesk_field_values !== undefined ||
+        updates.zendesk_channel_cron !== undefined
       ) {
         let zendeskIntegration = team.zendeskIntegration;
 

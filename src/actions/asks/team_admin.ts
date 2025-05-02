@@ -263,17 +263,31 @@ export class TeamAdmin implements BotAction {
         return `• ${scheduleType} Schedule: \`${cronExpression}\`\n`;
       }
 
-      const gmtHour = parseInt(gmtCron.match(/(\d+):00/)?.[1] || "0");
+      // Extract hour and minute from the cronstrue output (e.g., 'At 08:30, Monday through Friday')
+      const timeMatch = gmtCron.match(/At (\d{2}):(\d{2})/);
+      let gmtHour = 0;
+      let gmtMinute = 0;
+      if (timeMatch) {
+        gmtHour = parseInt(timeMatch[1], 10);
+        gmtMinute = parseInt(timeMatch[2], 10);
+      }
 
       // Calculate IDT time (GMT+3)
-      const idtHour = (gmtHour + 3) % 24;
-      const nextDay = gmtHour + 3 >= 24;
+      let idtHour = gmtHour + 3;
+      let idtMinute = gmtMinute;
+      let nextDay = false;
+      if (idtHour >= 24) {
+        idtHour = idtHour % 24;
+        nextDay = true;
+      }
+      // Format IDT time as HH:MM
+      const idtTime = `${idtHour.toString().padStart(2, "0")}:${idtMinute.toString().padStart(2, "0")}`;
       const restOfCronText = gmtCron.split(",")[1] || "";
 
       return (
         `• ${scheduleType} Schedule: \`${cronExpression}\`\n` +
         `• ${scheduleType} Schedule (GMT): ${gmtCron}\n` +
-        `• ${scheduleType} Schedule (IDT): At ${idtHour.toString().padStart(2, "0")}:00${nextDay ? " (next day)" : ""}${restOfCronText ? "," + restOfCronText : ""}\n`
+        `• ${scheduleType} Schedule (IDT): At ${idtTime}${nextDay ? " (next day)" : ""}${restOfCronText ? "," + restOfCronText : ""}\n`
       );
     } catch (error) {
       logger.error(`Error formatting cron expression: ${error}`);

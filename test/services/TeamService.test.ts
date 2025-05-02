@@ -268,7 +268,7 @@ describe("TeamService", () => {
       const result = await TeamService.updateTeam("C12345", updates);
 
       expect(result).toBe(true);
-      expect(mockTeamRepository.save).toHaveBeenCalled();
+      expect(mockTeamRepository.save).toHaveBeenCalledWith(existingTeam);
       // Verify TEAMS_LIST updates
       const updatedTeam = TEAMS_LIST.get("C12345");
       expect(updatedTeam?.code_review_channel_id).toBe("CR67890");
@@ -319,7 +319,8 @@ describe("TeamService", () => {
       const result = await TeamService.updateTeam("C12345", updates);
 
       expect(result).toBe(true);
-      expect(mockTeamRepository.save).toHaveBeenCalled();
+      expect(mockTeamRepository.save).toHaveBeenCalledWith(existingTeam);
+
       // Verify TEAMS_LIST updates
       const updatedTeam = TEAMS_LIST.get("C12345");
       expect(updatedTeam?.zendesk_channel_id).toBe("Z67890");

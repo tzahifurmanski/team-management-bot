@@ -145,6 +145,8 @@ jest.unstable_mockModule("cronstrue", () => ({
         return "At 00:00, Monday through Friday";
       case "0 12 * * 1-5":
         return "At 12:00, Monday through Friday";
+      case "30 8 * * 1-5":
+        return "At 08:30, Monday through Friday";
       default:
         return "Invalid cron expression";
     }
@@ -431,6 +433,12 @@ describe("TeamAdmin", () => {
         ask_channel_cron: "0 12 * * 1-5", // 12 PM GMT -> 3 PM IDT
         ask_channel_cron_last_sent: new Date().toISOString(),
       },
+      {
+        ask_channel_id: "C7",
+        ask_channel_name: "morning-team2",
+        ask_channel_cron: "30 8 * * 1-5", // 8:30 AM GMT -> 11:30 AM IDT
+        ask_channel_cron_last_sent: new Date().toISOString(),
+      },
     ];
 
     testTeams.forEach((team) => TEAMS_LIST.set(team.ask_channel_id, team));
@@ -469,6 +477,10 @@ describe("TeamAdmin", () => {
           break;
         case "C6": // 12 PM GMT
           expect(message).toContain("Schedule (IDT): At 15:00");
+          expect(message).not.toContain("(next day)");
+          break;
+        case "C7": // 8:30 AM GMT
+          expect(message).toContain("Schedule (IDT): At 11:30");
           expect(message).not.toContain("(next day)");
           break;
       }
