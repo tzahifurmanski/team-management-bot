@@ -184,6 +184,9 @@ export class TeamService {
         askChannel.cron_last_sent = updates.ask_channel_cron_last_sent;
       if (updates.allowed_bots) askChannel.allowed_bots = updates.allowed_bots;
 
+      // Save askChannel after mutation
+      await askChannelRepository.save(askChannel);
+
       // Update zendesk integration
       if (
         updates.zendesk_channel_id ||
@@ -220,6 +223,11 @@ export class TeamService {
           zendeskIntegration.field_values = updates.zendesk_field_values;
         if (updates.zendesk_channel_cron !== undefined)
           zendeskIntegration.cron_schedule = updates.zendesk_channel_cron;
+
+        // Save zendeskIntegration after mutation
+        const zendeskIntegrationRepository =
+          AppDataSource.getRepository(ZendeskIntegration);
+        await zendeskIntegrationRepository.save(zendeskIntegration);
       }
 
       // Update code review channel
@@ -257,6 +265,11 @@ export class TeamService {
               codeReviewChannel.channel_id = updates.code_review_channel_id;
             if (updates.code_review_channel_name !== undefined)
               codeReviewChannel.channel_name = updates.code_review_channel_name;
+
+            // Save codeReviewChannel after mutation
+            const codeReviewRepository =
+              AppDataSource.getRepository(CodeReviewChannel);
+            await codeReviewRepository.save(codeReviewChannel);
           }
         }
       }

@@ -601,9 +601,13 @@ export class TeamAdmin implements BotAction {
           TEAMS_LIST.delete(channelId);
           teamAny.ask_channel_id = updateData.ask_channel_id;
           teamAny.ask_channel_name = updateData.ask_channel_name;
-          TEAMS_LIST.set(updateData.ask_channel_id, team);
+          TEAMS_LIST.set(updateData.ask_channel_id, {
+            ...teamAny,
+            ...updateData,
+          });
         } else {
-          teamAny[property] = updateData[property];
+          // Always update the in-memory object with the latest data
+          Object.assign(teamAny, updateData);
         }
 
         await sendSlackMessage(

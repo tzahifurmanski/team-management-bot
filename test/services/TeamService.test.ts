@@ -49,6 +49,7 @@ describe("TeamService", () => {
 
     mockAskChannelRepository = {
       findOne: jest.fn(),
+      save: jest.fn(),
       metadata: {
         name: "AskChannel",
         target: AskChannel,
@@ -57,6 +58,7 @@ describe("TeamService", () => {
 
     mockZendeskIntegrationRepository = {
       remove: jest.fn(),
+      save: jest.fn(),
       metadata: {
         name: "ZendeskIntegration",
         target: ZendeskIntegration,
@@ -65,6 +67,7 @@ describe("TeamService", () => {
 
     mockCodeReviewChannelRepository = {
       remove: jest.fn(),
+      save: jest.fn(),
       metadata: {
         name: "CodeReviewChannel",
         target: CodeReviewChannel,
@@ -229,6 +232,107 @@ describe("TeamService", () => {
       const updatedTeam = TEAMS_LIST.get("C12345");
       expect(updatedTeam?.ask_channel_cron).toBe("0 9 * * 1-5");
       expect(updatedTeam?.allowed_bots).toEqual(["bot1", "bot2"]);
+    });
+
+    test("should update code review channel properties and save to DB", async () => {
+      // Setup initial state
+      TEAMS_LIST.set("C12345", {
+        ask_channel_id: "C12345",
+        ask_channel_name: "test-channel",
+        ask_channel_cron: "",
+        ask_channel_cron_last_sent: null,
+        allowed_bots: [],
+        zendesk_channel_id: "",
+        zendesk_channel_name: "",
+        zendesk_monitored_view_id: "",
+        zendesk_aggregated_field_id: "",
+        zendesk_field_id: "",
+        zendesk_field_values: [],
+        zendesk_channel_cron: "",
+        code_review_channel_id: "CR12345",
+        code_review_channel_name: "old-review-channel",
+      });
+
+      // Attach a codeReviewChannel to the team
+      const codeReviewChannel = new CodeReviewChannel();
+      codeReviewChannel.channel_id = "CR12345";
+      codeReviewChannel.channel_name = "old-review-channel";
+      codeReviewChannel.team = existingTeam;
+      existingTeam.codeReviewChannel = codeReviewChannel;
+
+      const updates = {
+        code_review_channel_id: "CR67890",
+        code_review_channel_name: "new-review-channel",
+      };
+
+      const result = await TeamService.updateTeam("C12345", updates);
+
+      expect(result).toBe(true);
+      expect(mockCodeReviewChannelRepository.save).toHaveBeenCalledWith(
+        codeReviewChannel,
+      );
+      // Verify TEAMS_LIST updates
+      const updatedTeam = TEAMS_LIST.get("C12345");
+      expect(updatedTeam?.code_review_channel_id).toBe("CR67890");
+      expect(updatedTeam?.code_review_channel_name).toBe("new-review-channel");
+    });
+
+    test("should update zendesk integration properties and save to DB", async () => {
+      // Setup initial state
+      TEAMS_LIST.set("C12345", {
+        ask_channel_id: "C12345",
+        ask_channel_name: "test-channel",
+        ask_channel_cron: "",
+        ask_channel_cron_last_sent: null,
+        allowed_bots: [],
+        zendesk_channel_id: "Z12345",
+        zendesk_channel_name: "old-zendesk-channel",
+        zendesk_monitored_view_id: "old-view-id",
+        zendesk_aggregated_field_id: "old-agg-id",
+        zendesk_field_id: "old-field-id",
+        zendesk_field_values: ["old1"],
+        zendesk_channel_cron: "",
+        code_review_channel_id: "",
+        code_review_channel_name: "",
+      });
+
+      // Attach a zendeskIntegration to the team
+      const zendeskIntegration = new ZendeskIntegration();
+      zendeskIntegration.channel_id = "Z12345";
+      zendeskIntegration.channel_name = "old-zendesk-channel";
+      zendeskIntegration.monitored_view_id = "old-view-id";
+      zendeskIntegration.aggregated_field_id = "old-agg-id";
+      zendeskIntegration.field_id = "old-field-id";
+      zendeskIntegration.field_values = ["old1"];
+      zendeskIntegration.cron_schedule = "";
+      zendeskIntegration.team = existingTeam;
+      existingTeam.zendeskIntegration = zendeskIntegration;
+
+      const updates = {
+        zendesk_channel_id: "Z67890",
+        zendesk_channel_name: "new-zendesk-channel",
+        zendesk_monitored_view_id: "new-view-id",
+        zendesk_aggregated_field_id: "new-agg-id",
+        zendesk_field_id: "new-field-id",
+        zendesk_field_values: ["new1", "new2"],
+        zendesk_channel_cron: "0 10 * * 1-5",
+      };
+
+      const result = await TeamService.updateTeam("C12345", updates);
+
+      expect(result).toBe(true);
+      expect(mockZendeskIntegrationRepository.save).toHaveBeenCalledWith(
+        zendeskIntegration,
+      );
+      // Verify TEAMS_LIST updates
+      const updatedTeam = TEAMS_LIST.get("C12345");
+      expect(updatedTeam?.zendesk_channel_id).toBe("Z67890");
+      expect(updatedTeam?.zendesk_channel_name).toBe("new-zendesk-channel");
+      expect(updatedTeam?.zendesk_monitored_view_id).toBe("new-view-id");
+      expect(updatedTeam?.zendesk_aggregated_field_id).toBe("new-agg-id");
+      expect(updatedTeam?.zendesk_field_id).toBe("new-field-id");
+      expect(updatedTeam?.zendesk_field_values).toEqual(["new1", "new2"]);
+      expect(updatedTeam?.zendesk_channel_cron).toBe("0 10 * * 1-5");
     });
   });
 
