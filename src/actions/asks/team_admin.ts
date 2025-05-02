@@ -14,6 +14,7 @@ import { WebClient } from "@slack/web-api";
 import { SlackEventType } from "../../integrations/slack/types.js";
 import { getConversationName } from "../../integrations/slack/conversations.js";
 import { isValidCronExpression } from "../../utils/cron.js";
+import * as cronstrue from "cronstrue";
 
 export class TeamAdmin implements BotAction {
   getHelpText(): string {
@@ -245,13 +246,29 @@ export class TeamAdmin implements BotAction {
         message += `• Zendesk View ID: ${team.zendesk_monitored_view_id}\n`;
       }
 
-      // Schedules
+      // Schedules with human-readable format
       if (team.ask_channel_cron) {
+        const gmtCron = cronstrue.toString(team.ask_channel_cron);
         message += `• Ask Schedule: \`${team.ask_channel_cron}\`\n`;
+        message += `• Ask Schedule (GMT): ${gmtCron}\n`;
+        message += `• Ask Schedule (IDT): ${gmtCron
+          .replace("AM", "PM")
+          .replace(/(\d+):00/, (match) => {
+            const hour = parseInt(match) + 3;
+            return `${hour}:00`;
+          })}\n`;
       }
 
       if (team.zendesk_channel_cron) {
+        const gmtCron = cronstrue.toString(team.zendesk_channel_cron);
         message += `• Zendesk Schedule: \`${team.zendesk_channel_cron}\`\n`;
+        message += `• Zendesk Schedule (GMT): ${gmtCron}\n`;
+        message += `• Zendesk Schedule (IDT): ${gmtCron
+          .replace("AM", "PM")
+          .replace(/(\d+):00/, (match) => {
+            const hour = parseInt(match) + 3;
+            return `${hour}:00`;
+          })}\n`;
       }
 
       // Add a separator between teams (except after the last one)

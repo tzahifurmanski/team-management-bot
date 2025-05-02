@@ -128,6 +128,17 @@ jest.unstable_mockModule("../../../src/services/TeamService", () => ({
   },
 }));
 
+jest.unstable_mockModule("cronstrue", () => ({
+  toString: jest.fn().mockImplementation((cronExpression) => {
+    if (cronExpression === "0 9 * * 1-5") {
+      return "At 09:00 AM, Monday through Friday";
+    } else if (cronExpression === "0 10 * * 1-5") {
+      return "At 10:00 AM, Monday through Friday";
+    }
+    return "Invalid cron expression";
+  }),
+}));
+
 describe("TeamAdmin", () => {
   let teamAdmin: TeamAdmin;
   let mockSlackClient: WebClient;
@@ -176,44 +187,42 @@ describe("TeamAdmin", () => {
         postMessage: jest.fn().mockImplementation(async () => ({
           ok: true,
           ts: "1234567890.123456",
-        })) as jest.MockedFunction<() => Promise<ChatPostMessageResponse>>,
+        })),
         delete: jest.fn().mockImplementation(async () => ({
           ok: true,
-        })) as jest.MockedFunction<() => Promise<ChatDeleteResponse>>,
+        })),
         deleteScheduledMessage: jest.fn().mockImplementation(async () => ({
           ok: true,
-        })) as jest.MockedFunction<
-          () => Promise<ChatDeleteScheduledMessageResponse>
-        >,
+        })),
         getPermalink: jest.fn().mockImplementation(async () => ({
           ok: true,
           permalink: "https://example.com",
-        })) as jest.MockedFunction<() => Promise<ChatGetPermalinkResponse>>,
+        })),
         meMessage: jest.fn().mockImplementation(async () => ({
           ok: true,
           channel: "C12345",
-        })) as jest.MockedFunction<() => Promise<ChatMeMessageResponse>>,
+        })),
         postEphemeral: jest.fn().mockImplementation(async () => ({
           ok: true,
           message_ts: "1234567890.123456",
-        })) as jest.MockedFunction<() => Promise<ChatPostEphemeralResponse>>,
+        })),
         scheduleMessage: jest.fn().mockImplementation(async () => ({
           ok: true,
           scheduled_message_id: "Q1234",
-        })) as jest.MockedFunction<() => Promise<ChatScheduleMessageResponse>>,
+        })),
         unfurl: jest.fn().mockImplementation(async () => ({
           ok: true,
-        })) as jest.MockedFunction<() => Promise<ChatUnfurlResponse>>,
+        })),
         update: jest.fn().mockImplementation(async () => ({
           ok: true,
           ts: "1234567890.123456",
-        })) as jest.MockedFunction<() => Promise<ChatUpdateResponse>>,
+        })),
       },
       conversations: {
         info: jest.fn().mockImplementation(async () => ({
           ok: true,
           channel: { name: "test-channel" },
-        })) as jest.MockedFunction<() => Promise<ConversationsInfoResponse>>,
+        })),
         acceptSharedInvite: jest.fn(),
         approveSharedInvite: jest.fn(),
         archive: jest.fn(),
@@ -366,6 +375,50 @@ describe("TeamAdmin", () => {
     const secondDetailCall = sendSlackMessage.mock.calls[2][1];
     expect(secondDetailCall).toContain("Detailed Team Information (6-6)");
     expect(secondDetailCall).toContain("*Team #6: test-ask-channel-6*");
+  });
+
+  test("should list teams with human-readable cron expressions", async () => {
+    // Mock authorization check to succeed
+    adminAuthService.isAuthorized.mockReturnValue(true);
+
+    // Add a test team with cron expressions
+    TEAMS_LIST.set("C12345", {
+      ask_channel_id: "C12345",
+      ask_channel_name: "test-channel",
+      ask_channel_cron: "0 9 * * 1-5",
+      ask_channel_cron_last_sent: new Date().toISOString(),
+      zendesk_channel_id: "Z12345",
+      zendesk_channel_name: "zendesk-channel",
+      zendesk_channel_cron: "0 10 * * 1-5",
+      allowed_bots: [],
+    });
+
+    // Set event text to list specific team
+    mockEvent.text = "team list <#C12345|test-channel>";
+
+    // Call performAction
+    await teamAdmin.performAction(mockEvent, mockSlackClient as WebClient);
+
+    // Check that the message includes human-readable cron expressions
+    expect(sendSlackMessage).toHaveBeenCalledWith(
+      mockSlackClient,
+      expect.stringContaining(
+        "*Detailed Team Information (1-1)*\n\n" +
+          "*Team #1: test-channel*\n" +
+          "• Ask Channel: <#C12345|test-channel>\n" +
+          "• Allowed Bots: None\n" +
+          "• Last Status: 2025-05-02\n" +
+          "• Zendesk Channel: <#Z12345|zendesk-channel>\n" +
+          "• Ask Schedule: `0 9 * * 1-5`\n" +
+          "• Ask Schedule (GMT): At 09:00 AM, Monday through Friday\n" +
+          "• Ask Schedule (IDT): At 12:00 PM, Monday through Friday\n" +
+          "• Zendesk Schedule: `0 10 * * 1-5`\n" +
+          "• Zendesk Schedule (GMT): At 10:00 AM, Monday through Friday\n" +
+          "• Zendesk Schedule (IDT): At 13:00 PM, Monday through Friday",
+      ),
+      mockEvent.channel,
+      mockEvent.thread_ts,
+    );
   });
 
   test("no teams to list", async () => {
