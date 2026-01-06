@@ -10,9 +10,12 @@ const mockLogger = {
   error: jest.fn(),
 };
 
-jest.unstable_mockModule("../../../../src/integrations/slack/events.js", () => ({
-  handleDirectEvent: mockHandleDirectEvent,
-}));
+jest.unstable_mockModule(
+  "../../../../src/integrations/slack/events.js",
+  () => ({
+    handleDirectEvent: mockHandleDirectEvent,
+  }),
+);
 
 jest.unstable_mockModule("../../../../src/integrations/slack/utils.js", () => ({
   isBotMessage: mockIsBotMessage,

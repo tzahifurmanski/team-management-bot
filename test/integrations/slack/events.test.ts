@@ -159,7 +159,10 @@ describe("handleChannelEvent", () => {
 
     await handleChannelEvent(event, mockClient);
 
-    expect(mockLogger.debug).toHaveBeenCalledWith("Got new channel event", event);
+    expect(mockLogger.debug).toHaveBeenCalledWith(
+      "Got new channel event",
+      event,
+    );
     expect(mockRunActions).toHaveBeenCalled();
   });
 });

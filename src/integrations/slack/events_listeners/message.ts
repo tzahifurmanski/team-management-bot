@@ -32,7 +32,10 @@ export const messageCallback = async ({
       await handleChannelEvent(event, client);
     } else if (event.channel_type === "im") {
       // After filtering special subtypes, we can safely treat this as a GenericMessageEvent
-      await handleDirectEvent(event as GenericMessageEvent as DirectEvent, client);
+      await handleDirectEvent(
+        event as GenericMessageEvent as DirectEvent,
+        client,
+      );
     }
   } catch (error) {
     logger.error(error);

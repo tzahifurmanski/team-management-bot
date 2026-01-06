@@ -23,9 +23,7 @@ export const reactionAddedCallback = async ({
 
     const team = findTeamByValue(event.item.channel, "ask_channel_id");
     if (!team) {
-      logger.error(
-        `Unable to find team for channel ID ${event.item.channel}`,
-      );
+      logger.error(`Unable to find team for channel ID ${event.item.channel}`);
 
       return;
     }
