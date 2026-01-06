@@ -1,3 +1,4 @@
+import { SlackEventMiddlewareArgs, AllMiddlewareArgs } from "@slack/bolt";
 import {
   convertSecondsToTimeString,
   countReactions,
@@ -8,7 +9,10 @@ import { getConversationHistory } from "../conversations.js";
 import { logger, REACTIONS_HANDLED } from "../../../settings/server_consts.js";
 import { findTeamByValue } from "../../../settings/team_utils.js";
 
-export const reactionAddedCallback = async ({ event, client }: any) => {
+export const reactionAddedCallback = async ({
+  event,
+  client,
+}: SlackEventMiddlewareArgs<"reaction_added"> & AllMiddlewareArgs) => {
   logger.debug("Got a reaction added callback...", JSON.stringify(event));
 
   try {
@@ -19,9 +23,7 @@ export const reactionAddedCallback = async ({ event, client }: any) => {
 
     const team = findTeamByValue(event.item.channel, "ask_channel_id");
     if (!team) {
-      logger.error(
-        `Unable to find team for channel ID ${event.item.channel}. Ask: ${event.text}`,
-      );
+      logger.error(`Unable to find team for channel ID ${event.item.channel}`);
 
       return;
     }
@@ -58,13 +60,15 @@ export const reactionAddedCallback = async ({ event, client }: any) => {
     }
 
     // Calculate the time from start to resolution
-    const duration = convertSecondsToTimeString(event.event_ts - event.item.ts);
+    const duration = convertSecondsToTimeString(
+      parseFloat(event.event_ts) - parseFloat(event.item.ts),
+    );
 
     const userProfile = (await getUserProfile(client, event.user)) || {};
 
     // TODO: Instead, should I tag the closing user?
     const promptText = `${
-      event.user ? userProfile?.display_name : event.username
+      userProfile?.display_name || event.user
     } has resolved this ask after ${duration}.`;
 
     await client.chat.postMessage({

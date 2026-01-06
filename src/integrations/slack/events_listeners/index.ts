@@ -1,9 +1,10 @@
+import { App } from "@slack/bolt";
 import { ENABLE_ASK_SUMMARY, logger } from "../../../settings/server_consts.js";
 import { messageCallback } from "./message.js";
 import { appMentionCallback } from "./app_mention.js";
 import { reactionAddedCallback } from "./reaction_added.js";
 
-export const register = (app: any) => {
+export const register = (app: App) => {
   logger.info("Setting up events...");
 
   app.event("message", messageCallback);
@@ -16,7 +17,7 @@ export const register = (app: any) => {
   }
 
   // All errors in listeners are caught here. If this weren't caught, the program would terminate.
-  app.error((error: any) => {
+  app.error(async (error: Error) => {
     // TODO: Add better error handling
     logger.error(error);
   });

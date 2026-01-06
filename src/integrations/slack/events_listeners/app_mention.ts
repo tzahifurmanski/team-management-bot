@@ -1,16 +1,20 @@
+import { SlackEventMiddlewareArgs, AllMiddlewareArgs } from "@slack/bolt";
 import { handleDirectEvent } from "../events.js";
 import { isBotMessage } from "../utils.js";
 import { logger } from "../../../settings/server_consts.js";
 
-export const appMentionCallback = async ({ event, client }: any) => {
+export const appMentionCallback = async ({
+  event,
+  client,
+}: SlackEventMiddlewareArgs<"app_mention"> & AllMiddlewareArgs) => {
   if (isBotMessage(event)) {
     logger.info("Got a message from bot, ignoring...");
     return;
   }
 
   try {
-    // If this is an edit to an existing mention, don't reply anything
-    if (event.reply_count) {
+    // If this is a thread reply (has thread_ts different from ts), don't reply
+    if (event.thread_ts && event.thread_ts !== event.ts) {
       return;
     }
     await handleDirectEvent(event, client);
